@@ -1,13 +1,13 @@
 <template>
-  <div class="not-found-container">
+  <div class="home-container">
     <div class="controls">
       <LocaleToggle />
       <ThemeToggle />
     </div>
 
     <div class="content">
-      <h1>404</h1>
-      <p>{{ $t('notFound.message') }}</p>
+      <h1>{{ $t('home.title') }}</h1>
+      <p>{{ $t('home.subtitle') }}</p>
     </div>
   </div>
 </template>
@@ -17,4 +17,4 @@ import ThemeToggle from '@/components/common/ThemeToggle/ThemeToggle.vue';
 import LocaleToggle from '@/components/common/LocaleToggle/LocaleToggle.vue';
 </script>
 
-<style scoped src="./NotFoundView.css"></style>
+<style scoped src="./HomeView.css"></style>

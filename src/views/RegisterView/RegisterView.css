@@ -1,0 +1,23 @@
+.register-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    height: 100vh;
+    background-color: var(--bg-primary);
+    padding: 2rem;
+    transition: background-color 0.3s ease;
+    overflow: hidden;
+}
+
+@media (max-width: 768px) {
+    .register-container {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .register-container {
+        padding: 1rem;
+    }
+}

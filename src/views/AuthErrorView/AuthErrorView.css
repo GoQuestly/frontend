@@ -1,4 +1,4 @@
-.not-found-container {
+.auth-error-container {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -19,7 +19,7 @@
 }
 
 h1 {
-    font-size: 6rem;
+    font-size: 3rem;
     margin: 0;
     color: var(--text-primary);
     transition: color 0.3s ease;
@@ -37,7 +37,7 @@ p {
 
 @media (max-width: 768px) {
     h1 {
-        font-size: 4.5rem;
+        font-size: 2.5rem;
     }
 
     p {
@@ -47,7 +47,7 @@ p {
 
 @media (max-width: 480px) {
     h1 {
-        font-size: 3.5rem;
+        font-size: 2rem;
     }
 
     p {
