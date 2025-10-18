@@ -1,0 +1,90 @@
+<template>
+  <div class="login-form-wrapper">
+    <div class="login-form-content">
+      <h2>{{ $t('auth.login.title') }} <br><span class="brand">{{ $t('auth.login.brand') }}</span></h2>
+
+      <ErrorBox :message="translatedErrorMessage" />
+
+      <form @submit.prevent="handleLogin">
+        <label>{{ $t('common.email') }}</label>
+        <BaseInput
+            v-model="state.email"
+            type="email"
+            :placeholder="$t('auth.login.emailPlaceholder')"
+            :maxlength="100"
+            required
+            :disabled="state.isLoading"
+        />
+
+        <label>{{ $t('common.password') }}</label>
+        <BaseInput
+            v-model="state.password"
+            type="password"
+            :placeholder="$t('auth.login.passwordPlaceholder')"
+            :maxlength="255"
+            required
+            :disabled="state.isLoading"
+        />
+
+        <div class="forgot">
+          <router-link to="/forgot-password">{{ $t('auth.login.forgotPassword') }}</router-link>
+        </div>
+
+        <BaseButton type="submit" variant="primary" :disabled="state.isLoading">
+          {{ state.isLoading ? $t('auth.login.loggingIn') : $t('auth.login.loginButton') }}
+        </BaseButton>
+
+        <BaseButton type="button" variant="secondary" @click="goToRegister">
+          {{ $t('auth.login.registerButton') }}
+        </BaseButton>
+      </form>
+
+      <GoogleIcon @click="handleGoogleLogin" />
+    </div>
+
+    <footer>{{ $t('footer.copyright') }}</footer>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { reactive, computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
+import BaseInput from '@/components/base/BaseInput/BaseInput.vue';
+import BaseButton from '@/components/base/BaseButton/BaseButton.vue';
+import ErrorBox from '@/components/common/ErrorBox/ErrorBox.vue';
+import GoogleIcon from '@/components/common/GoogleIcon/GoogleIcon.vue';
+import {
+  createInitialState,
+  getTranslatedErrorMessage,
+  handleLoginLogic,
+  handleGoogleLoginLogic,
+  goToRegisterLogic
+} from './LoginForm';
+import './LoginForm.css';
+
+const router = useRouter();
+const { t } = useI18n();
+
+const state = reactive(createInitialState());
+
+const translatedErrorMessage = computed(() =>
+    getTranslatedErrorMessage(state.errorKey, t)
+);
+
+const handleLogin = async (): Promise<void> => {
+  await handleLoginLogic(state, router);
+};
+
+const handleGoogleLogin = async (): Promise<void> => {
+  await handleGoogleLoginLogic((key: string) => {
+    state.errorKey = key;
+  });
+};
+
+const goToRegister = (): void => {
+  goToRegisterLogic(router);
+};
+</script>
+
+<style scoped src="./LoginForm.css"></style>

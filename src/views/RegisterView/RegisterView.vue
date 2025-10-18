@@ -1,20 +1,16 @@
 <template>
-  <div class="not-found-container">
+  <div class="register-container">
     <div class="controls">
       <LocaleToggle />
       <ThemeToggle />
     </div>
-
-    <div class="content">
-      <h1>404</h1>
-      <p>{{ $t('notFound.message') }}</p>
-    </div>
+    <RegisterForm />
   </div>
 </template>
 
 <script setup lang="ts">
+import RegisterForm from '@/components/features/auth/RegisterForm/RegisterForm.vue';
 import ThemeToggle from '@/components/common/ThemeToggle/ThemeToggle.vue';
 import LocaleToggle from '@/components/common/LocaleToggle/LocaleToggle.vue';
+import './RegisterView.css';
 </script>
-
-<style scoped src="./NotFoundView.css"></style>

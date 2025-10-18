@@ -1,0 +1,43 @@
+.locale-toggle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1px solid var(--input-border);
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.locale-toggle:hover {
+    background-color: var(--brand-color);
+    color: var(--bg-primary);
+    transform: scale(1.1);
+}
+
+.locale-toggle:active {
+    transform: scale(0.95);
+}
+
+@media (max-width: 900px) {
+    .locale-toggle {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+@media (max-width: 480px) {
+    .locale-toggle {
+        width: 36px;
+        height: 36px;
+    }
+
+    .locale-toggle svg {
+        width: 18px;
+        height: 18px;
+    }
+}
