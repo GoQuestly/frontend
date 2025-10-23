@@ -1,0 +1,99 @@
+.welcome-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: url('@/assets/images/welcome-bg.png') no-repeat center center fixed;
+    background-size: cover;
+    color: white;
+    padding: clamp(0.5rem, 2vh, 1rem);
+    position: relative;
+}
+
+.welcome-container::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(180deg,
+    rgba(0,0,0,0.2) 0%,
+    rgba(0,48,36,0.6) 50%,
+    rgba(0,48,36,0.99) 100%);
+    z-index: 1;
+}
+
+.welcome-container > * {
+    position: relative;
+    z-index: 2;
+}
+
+.controls {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: clamp(0.5rem, 2vh, 1rem);
+}
+
+.hero-section {
+    text-align: center;
+    margin-bottom: clamp(1rem, 4vh, 2rem);
+}
+
+.logo img {
+    width: clamp(60px, 8vh, 80px);
+    margin-bottom: clamp(0.5rem, 2vh, 1rem);
+}
+
+h1 {
+    font-size: clamp(2rem, 6vh, 3.5rem);
+    margin-bottom: clamp(0.5rem, 2vh, 1rem);
+    font-weight: bold;
+}
+
+.subtitle, .description {
+    font-size: clamp(1rem, 2.5vh, 1.2rem);
+    margin-bottom: clamp(0.3rem, 1vh, 0.5rem);
+}
+
+.features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(0.8rem, 2vh, 1.5rem);
+    margin: 0 auto;
+    width: min(100%, 1200px);
+    padding: 0 clamp(0.5rem, 2vw, 1rem);
+}
+
+.cta-section {
+    margin: clamp(1rem, 3vh, 2rem) auto;
+    width: min(100%, 1200px);
+    padding: 0 clamp(0.5rem, 2vw, 1rem);
+    margin-bottom: auto;
+}
+
+.cta-section :deep(.base-btn) {
+    max-width: none;
+    color: white;
+    font-weight: 700;
+    text-transform: capitalize;
+    border-radius: 20px;
+    background-color: #00c4a1;
+}
+
+@media (max-width: 900px) {
+    .features {
+        grid-template-columns: 1fr;
+        max-width: 600px;
+        gap: 0.6rem;
+    }
+
+    .cta-section {
+        max-width: 600px;
+    }
+}
+
+@media (min-width: 601px) and (max-width: 1100px) {
+    .features {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}

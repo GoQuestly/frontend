@@ -1,4 +1,5 @@
 import { ref, watch, onMounted } from 'vue';
+import {getTheme, setTheme} from "@/utils/storage.ts";
 
 type Theme = 'light' | 'dark';
 
@@ -6,7 +7,7 @@ export function useTheme() {
     const isDark = ref<boolean>(false);
 
     onMounted(() => {
-        const savedTheme = localStorage.getItem('theme') as Theme | null;
+        const savedTheme = getTheme();
         isDark.value = savedTheme === 'dark';
         applyTheme();
     });
@@ -22,7 +23,7 @@ export function useTheme() {
     const toggleTheme = (): void => {
         isDark.value = !isDark.value;
         const theme: Theme = isDark.value ? 'dark' : 'light';
-        localStorage.setItem('theme', theme);
+        setTheme(theme);
         applyTheme();
     };
 

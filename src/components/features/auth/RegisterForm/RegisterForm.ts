@@ -2,6 +2,9 @@ import type { Router } from 'vue-router';
 import { authApi } from '@/api/authApi';
 import { setAccessToken, setUser } from '@/utils/storage';
 import { nextTick } from 'vue';
+import { isValidEmail, validatePasswordFields } from '@/utils/validation';
+import { getTranslatedErrorMessage, createErrorKey } from '@/utils/errors';
+import { handleGoogleAuthLogic } from '@/utils/auth';
 
 export interface RegisterFormState {
     name: string;
@@ -12,9 +15,9 @@ export interface RegisterFormState {
     isLoading: boolean;
 }
 
-export const MIN_PASSWORD_LENGTH = 4;
+const ERROR_PREFIX = 'auth.register';
 
-export const createInitialState = (): RegisterFormState => ({
+export const createInitialRegisterState = (): RegisterFormState => ({
     name: '',
     email: '',
     password: '',
@@ -23,14 +26,7 @@ export const createInitialState = (): RegisterFormState => ({
     isLoading: false
 });
 
-export const getTranslatedErrorMessage = (
-    errorKey: string,
-    t: (key: string) => string
-): string => {
-    if (!errorKey) return '';
-    const [mainKey, detailKey] = errorKey.split('|');
-    return `${t(mainKey)}\n${t(detailKey)}`;
-};
+export { getTranslatedErrorMessage };
 
 export const handleRegisterLogic = async (
     state: RegisterFormState,
@@ -38,13 +34,14 @@ export const handleRegisterLogic = async (
 ): Promise<void> => {
     state.errorKey = '';
 
-    if (state.password.length < MIN_PASSWORD_LENGTH) {
-        state.errorKey = 'auth.register.errors.failed|auth.register.errors.passwordTooShort';
+    if (!isValidEmail(state.email)) {
+        state.errorKey = createErrorKey(ERROR_PREFIX, 'invalidEmail');
         return;
     }
 
-    if (state.password !== state.confirmPassword) {
-        state.errorKey = 'auth.register.errors.failed|auth.register.errors.passwordMismatch';
+    const passwordError = validatePasswordFields(state.password, state.confirmPassword);
+    if (passwordError) {
+        state.errorKey = createErrorKey(ERROR_PREFIX, passwordError);
         return;
     }
 
@@ -66,31 +63,16 @@ export const handleRegisterLogic = async (
         const status = error.response?.status;
         const message = error.response?.data?.message;
 
-        if (status === 400 || status === 409) {
-            if (message && message.toLowerCase().includes('email already registered')) {
-                state.errorKey = 'auth.register.errors.failed|auth.register.errors.emailExists';
-            } else {
-                state.errorKey = 'auth.register.errors.failed|auth.register.errors.general';
-            }
+        if ((status === 400 || status === 409) && message?.toLowerCase().includes('email already registered')) {
+            state.errorKey = createErrorKey(ERROR_PREFIX, 'emailExists');
         } else {
-            state.errorKey = 'auth.register.errors.failed|auth.register.errors.general';
+            state.errorKey = createErrorKey(ERROR_PREFIX, 'general');
         }
     } finally {
         state.isLoading = false;
     }
 };
 
-export const handleGoogleRegisterLogic = async (
-    setErrorKey: (key: string) => void
-): Promise<void> => {
-    try {
-        const { url } = await authApi.getGoogleAuthUrl();
-        window.location.href = url;
-    } catch (error) {
-        setErrorKey('auth.register.errors.failed|auth.register.errors.general');
-    }
-};
-
-export const goToLoginLogic = (router: Router): void => {
-    router.replace('/login');
+export const handleGoogleRegisterLogic = async (setErrorKey: (key: string) => void): Promise<void> => {
+    await handleGoogleAuthLogic(setErrorKey, ERROR_PREFIX);
 };

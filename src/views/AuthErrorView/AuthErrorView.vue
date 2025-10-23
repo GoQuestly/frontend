@@ -35,6 +35,7 @@ const displayErrorMessage = computed(() =>
 onMounted(() => {
   errorMessage.value = extractErrorMessageFromRoute(route);
 });
+
 </script>
 
 <style scoped src="./AuthErrorView.css"></style>

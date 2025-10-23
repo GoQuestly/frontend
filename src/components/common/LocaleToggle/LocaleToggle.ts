@@ -1,8 +1,10 @@
+import { setLocale } from '@/utils/storage';
+
 export type Locale = 'en' | 'uk';
 
 export const toggleLocaleLogic = (currentLocale: string): Locale => {
     const newLocale: Locale = currentLocale === 'en' ? 'uk' : 'en';
-    localStorage.setItem('locale', newLocale);
+    setLocale(newLocale);
     return newLocale;
 };
 
