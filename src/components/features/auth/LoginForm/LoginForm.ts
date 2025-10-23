@@ -1,6 +1,9 @@
 import type { Router } from 'vue-router';
 import { authApi } from '@/api/authApi';
 import { setAccessToken, setUser } from '@/utils/storage';
+import { isValidEmail, validatePasswordLength } from '@/utils/validation';
+import { getTranslatedErrorMessage, createErrorKey } from '@/utils/errors';
+import { handleGoogleAuthLogic } from '@/utils/auth';
 
 export interface LoginFormState {
     email: string;
@@ -9,24 +12,16 @@ export interface LoginFormState {
     isLoading: boolean;
 }
 
-export const MIN_PASSWORD_LENGTH = 4;
+const ERROR_PREFIX = 'auth.login';
 
-export const createInitialState = (): LoginFormState => ({
+export const createInitialLoginState = (): LoginFormState => ({
     email: '',
     password: '',
     errorKey: '',
     isLoading: false
 });
 
-export const getTranslatedErrorMessage = (
-    errorKey: string,
-    t: (key: string) => string
-): string => {
-    if (!errorKey) return '';
-
-    const [mainKey, detailKey] = errorKey.split('|');
-    return `${t(mainKey)}\n${t(detailKey)}`;
-};
+export { getTranslatedErrorMessage };
 
 export const handleLoginLogic = async (
     state: LoginFormState,
@@ -34,8 +29,14 @@ export const handleLoginLogic = async (
 ): Promise<void> => {
     state.errorKey = '';
 
-    if (state.password.length < MIN_PASSWORD_LENGTH) {
-        state.errorKey = 'auth.login.errors.failed|auth.login.errors.passwordTooShort';
+    if (!isValidEmail(state.email)) {
+        state.errorKey = createErrorKey(ERROR_PREFIX, 'invalidEmail');
+        return;
+    }
+
+    const passwordError = validatePasswordLength(state.password);
+    if (passwordError) {
+        state.errorKey = createErrorKey(ERROR_PREFIX, passwordError);
         return;
     }
 
@@ -53,26 +54,15 @@ export const handleLoginLogic = async (
         await router.replace('/verify-email');
     } catch (error: any) {
         if (error.response?.status === 401) {
-            state.errorKey = 'auth.login.errors.failed|auth.login.errors.invalidCredentials';
+            state.errorKey = createErrorKey(ERROR_PREFIX, 'invalidCredentials');
         } else {
-            state.errorKey = 'auth.login.errors.failed|auth.login.errors.general';
+            state.errorKey = createErrorKey(ERROR_PREFIX, 'general');
         }
     } finally {
         state.isLoading = false;
     }
 };
 
-export const handleGoogleLoginLogic = async (
-    setErrorKey: (key: string) => void
-): Promise<void> => {
-    try {
-        const { url } = await authApi.getGoogleAuthUrl();
-        window.location.href = url;
-    } catch (error) {
-        setErrorKey('auth.login.errors.failed|auth.login.errors.general');
-    }
-};
-
-export const goToRegisterLogic = (router: Router): void => {
-    router.replace('/register');
+export const handleGoogleLoginLogic = async (setErrorKey: (key: string) => void): Promise<void> => {
+    await handleGoogleAuthLogic(setErrorKey, ERROR_PREFIX);
 };

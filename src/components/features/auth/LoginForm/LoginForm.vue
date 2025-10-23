@@ -9,7 +9,6 @@
         <label>{{ $t('common.email') }}</label>
         <BaseInput
             v-model="state.email"
-            type="email"
             :placeholder="$t('auth.login.emailPlaceholder')"
             :maxlength="100"
             required
@@ -27,14 +26,14 @@
         />
 
         <div class="forgot">
-          <router-link to="/forgot-password">{{ $t('auth.login.forgotPassword') }}</router-link>
+          <a href="#" @click.prevent="router.replace('/reset-password')">{{ $t('auth.login.forgotPassword') }}</a>
         </div>
 
         <BaseButton type="submit" variant="primary" :disabled="state.isLoading">
           {{ state.isLoading ? $t('auth.login.loggingIn') : $t('auth.login.loginButton') }}
         </BaseButton>
 
-        <BaseButton type="button" variant="secondary" @click="goToRegister">
+        <BaseButton type="button" variant="secondary" @click="router.replace('/register')">
           {{ $t('auth.login.registerButton') }}
         </BaseButton>
       </form>
@@ -42,7 +41,7 @@
       <GoogleIcon @click="handleGoogleLogin" />
     </div>
 
-    <footer>{{ $t('footer.copyright') }}</footer>
+    <Footer />
   </div>
 </template>
 
@@ -54,19 +53,19 @@ import BaseInput from '@/components/base/BaseInput/BaseInput.vue';
 import BaseButton from '@/components/base/BaseButton/BaseButton.vue';
 import ErrorBox from '@/components/common/ErrorBox/ErrorBox.vue';
 import GoogleIcon from '@/components/common/GoogleIcon/GoogleIcon.vue';
+import Footer from '@/components/common/Footer/Footer.vue';
 import {
-  createInitialState,
+  createInitialLoginState,
   getTranslatedErrorMessage,
   handleLoginLogic,
-  handleGoogleLoginLogic,
-  goToRegisterLogic
+  handleGoogleLoginLogic
 } from './LoginForm';
 import './LoginForm.css';
 
 const router = useRouter();
 const { t } = useI18n();
 
-const state = reactive(createInitialState());
+const state = reactive(createInitialLoginState());
 
 const translatedErrorMessage = computed(() =>
     getTranslatedErrorMessage(state.errorKey, t)
@@ -80,10 +79,6 @@ const handleGoogleLogin = async (): Promise<void> => {
   await handleGoogleLoginLogic((key: string) => {
     state.errorKey = key;
   });
-};
-
-const goToRegister = (): void => {
-  goToRegisterLogic(router);
 };
 </script>
 

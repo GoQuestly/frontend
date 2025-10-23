@@ -40,3 +40,16 @@ export interface ResendVerificationResponse {
     can_resend_at: string;
     server_time: string;
 }
+
+export interface RequestPasswordResetResponse {
+    success: boolean;
+    message: string;
+}
+export interface VerifyResetTokenResponse {
+    valid: boolean;
+}
+
+export interface ResetPasswordResponse {
+    success: boolean;
+    message: string;
+}

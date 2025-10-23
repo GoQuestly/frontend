@@ -12,7 +12,6 @@
     <form @submit.prevent="handleRegister">
       <BaseInput
           v-model="state.name"
-          type="text"
           :placeholder="$t('auth.register.namePlaceholder')"
           :maxlength="100"
           required
@@ -21,7 +20,6 @@
 
       <BaseInput
           v-model="state.email"
-          type="email"
           :placeholder="$t('auth.register.emailPlaceholder')"
           :maxlength="100"
           required
@@ -30,7 +28,6 @@
 
       <BaseInput
           v-model="state.password"
-          type="password"
           :placeholder="$t('auth.register.passwordPlaceholder')"
           :maxlength="255"
           required
@@ -39,7 +36,6 @@
 
       <BaseInput
           v-model="state.confirmPassword"
-          type="password"
           :placeholder="$t('auth.register.confirmPasswordPlaceholder')"
           :maxlength="255"
           required
@@ -55,7 +51,7 @@
 
     <p class="login-link">
       {{ $t('auth.register.alreadyHaveAccount') }}
-      <a href="#" @click.prevent="goToLogin" class="link">{{ $t('common.login') }}</a>
+      <a href="#" @click.prevent="router.replace('/login')" class="link">{{ $t('common.login') }}</a>
     </p>
   </div>
 </template>
@@ -69,18 +65,17 @@ import BaseButton from '@/components/base/BaseButton/BaseButton.vue';
 import ErrorBox from '@/components/common/ErrorBox/ErrorBox.vue';
 import GoogleIcon from '@/components/common/GoogleIcon/GoogleIcon.vue';
 import {
-  createInitialState,
+  createInitialRegisterState,
   getTranslatedErrorMessage,
   handleRegisterLogic,
-  handleGoogleRegisterLogic,
-  goToLoginLogic
+  handleGoogleRegisterLogic
 } from './RegisterForm';
 import './RegisterForm.css';
 
 const router = useRouter();
 const { t } = useI18n();
 
-const state = reactive(createInitialState());
+const state = reactive(createInitialRegisterState());
 
 const translatedErrorMessage = computed(() =>
     getTranslatedErrorMessage(state.errorKey, t)
@@ -94,10 +89,6 @@ const handleGoogleRegister = async (): Promise<void> => {
   await handleGoogleRegisterLogic((key: string) => {
     state.errorKey = key;
   });
-};
-
-const goToLogin = (): void => {
-  goToLoginLogic(router);
 };
 </script>
 

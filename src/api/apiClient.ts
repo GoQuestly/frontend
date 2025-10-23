@@ -1,12 +1,7 @@
 import axios from 'axios';
+import { getAccessToken, clearAuth } from '@/utils/storage';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-
-const clearAuthData = (): void => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('user');
-    localStorage.removeItem('pendingUserId');
-};
+const API_URL = import.meta.env.VITE_API_URL;
 
 export const apiClient = axios.create({
     baseURL: API_URL,
@@ -17,15 +12,13 @@ export const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
     (config) => {
-        const accessToken = localStorage.getItem('accessToken');
+        const accessToken = getAccessToken();
         if (accessToken) {
             config.headers.Authorization = `Bearer ${accessToken}`;
         }
         return config;
     },
-    (error) => {
-        return Promise.reject(error);
-    }
+    (error) => Promise.reject(error)
 );
 
 apiClient.interceptors.response.use(
@@ -38,7 +31,7 @@ apiClient.interceptors.response.use(
             error.config?.url?.includes('/auth/verify-email');
 
         if (error.response?.status === 401 && !isAuthEndpoint) {
-            clearAuthData();
+            clearAuth();
             window.location.href = '/login';
         }
 

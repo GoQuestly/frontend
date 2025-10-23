@@ -1,5 +1,5 @@
 <template>
-  <div class="timer-badge">
+  <div v-if="timeLeft > 0" class="timer-badge">
     {{ formattedTime }}
   </div>
 </template>
@@ -28,5 +28,3 @@ defineExpose({
   timeLeft,
 });
 </script>
-
-<style scoped src="./TimerBadge.css"></style>

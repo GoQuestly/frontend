@@ -1,6 +1,7 @@
 <template>
   <div class="verify-email-form">
     <TimerBadge
+        v-if="state.timerDuration > 0"
         ref="timerRef"
         :duration="state.timerDuration"
         @complete="onTimerComplete"
@@ -46,7 +47,7 @@ import BaseButton from '@/components/base/BaseButton/BaseButton.vue';
 import ErrorBox from '@/components/common/ErrorBox/ErrorBox.vue';
 import TimerBadge from '@/components/common/TimerBadge/TimerBadge.vue';
 import {
-  createInitialState,
+  createInitialVerifyState,
   getTranslatedErrorMessage,
   fetchVerificationStatusLogic,
   handleResendCodeLogic,
@@ -57,7 +58,7 @@ import './VerifyEmailForm.css';
 const router = useRouter();
 const { t } = useI18n();
 
-const state = reactive(createInitialState());
+const state = reactive(createInitialVerifyState());
 const timerRef = ref<InstanceType<typeof TimerBadge> | null>(null);
 
 const translatedErrorMessage = computed(() =>
@@ -66,6 +67,7 @@ const translatedErrorMessage = computed(() =>
 
 const onTimerComplete = (): void => {
   state.canResend = true;
+  state.timerDuration = 0;
 };
 
 const handleResendCode = async (): Promise<void> => {

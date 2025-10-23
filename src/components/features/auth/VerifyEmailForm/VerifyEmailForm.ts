@@ -1,6 +1,9 @@
-import type {Router} from 'vue-router';
-import {clearAuth, getUser, setUser} from '@/utils/storage';
-import {authApi} from '@/api/authApi';
+import type { Router } from 'vue-router';
+import { authApi } from '@/api/authApi';
+import { getTranslatedErrorMessage, createErrorKey, handleUnauthorizedError } from '@/utils/errors';
+import { validateCode } from '@/utils/validation';
+import { calculateSecondsUntil } from '@/utils/auth';
+import { getUser, setUser } from '@/utils/storage';
 
 export interface VerifyEmailFormState {
     code: string;
@@ -11,9 +14,18 @@ export interface VerifyEmailFormState {
     timerDuration: number;
 }
 
-export const CODE_LENGTH = 6;
+const ERROR_PREFIX = 'auth.verifyEmail';
+const CODE_LENGTH = 6;
 
-export const createInitialState = (): VerifyEmailFormState => ({
+const updateUserVerificationStatus = (isVerified: boolean): void => {
+    const user = getUser();
+    if (user) {
+        user.is_verified = isVerified;
+        setUser(user);
+    }
+};
+
+export const createInitialVerifyState = (): VerifyEmailFormState => ({
     code: '',
     errorKey: '',
     canResend: false,
@@ -22,21 +34,7 @@ export const createInitialState = (): VerifyEmailFormState => ({
     timerDuration: 0
 });
 
-export const getTranslatedErrorMessage = (
-    errorKey: string,
-    t: (key: string) => string
-): string => {
-    if (!errorKey) return '';
-    const [mainKey, detailKey] = errorKey.split('|');
-    return `${t(mainKey)}\n${t(detailKey)}`;
-};
-
-export const calculateSecondsUntil = (targetTime: string, serverTime: string): number => {
-    const target = new Date(targetTime).getTime();
-    const server = new Date(serverTime).getTime();
-    const difference = Math.floor((target - server) / 1000);
-    return Math.max(0, difference);
-};
+export { getTranslatedErrorMessage };
 
 export const fetchVerificationStatusLogic = async (
     state: VerifyEmailFormState,
@@ -47,12 +45,8 @@ export const fetchVerificationStatusLogic = async (
         const status = await authApi.getVerificationStatus();
 
         if (status.is_verified) {
-            const user = getUser();
-            if (user) {
-                user.is_verified = true;
-                setUser(user);
-            }
-            await router.replace('/');
+            updateUserVerificationStatus(true);
+            await router.replace('/home');
             return;
         }
 
@@ -66,23 +60,11 @@ export const fetchVerificationStatusLogic = async (
                 status.can_resend_at,
                 status.server_time
             );
-            state.timerDuration = secondsUntilResend;
-            state.canResend = secondsUntilResend === 0;
-            setTimeout(() => {
-                if (timerRef) timerRef.reset();
-            }, 50);
+            state.timerDuration = Math.max(0, secondsUntilResend);
+            state.canResend = secondsUntilResend <= 0;
         }
     } catch (error: any) {
-        if (error.response?.status === 401) {
-            clearAuth();
-            await router.replace({
-                name: 'auth-error',
-                query: {
-                    error: 'unauthorized',
-                    message: 'Your session has expired. Please log in again.'
-                }
-            });
-        }
+        await handleUnauthorizedError(error, router);
     }
 };
 
@@ -93,6 +75,7 @@ export const handleResendCodeLogic = async (
 ): Promise<void> => {
     state.errorKey = '';
     state.isResending = true;
+
     try {
         const response = await authApi.resendVerification();
         state.timerDuration = calculateSecondsUntil(
@@ -100,21 +83,14 @@ export const handleResendCodeLogic = async (
             response.server_time
         );
         state.canResend = false;
-        setTimeout(() => {
-            if (timerRef) timerRef.reset();
-        }, 50);
+
+        if (timerRef) {
+            setTimeout(() => timerRef.reset(), 50);
+        }
     } catch (error: any) {
-        if (error.response?.status === 401) {
-            clearAuth();
-            await router.replace({
-                name: 'auth-error',
-                query: {
-                    error: 'unauthorized',
-                    message: 'Your session has expired. Please log in again.'
-                }
-            });
-        } else {
-            state.errorKey = 'auth.verifyEmail.errors.failed|auth.verifyEmail.errors.general';
+        const isHandled = await handleUnauthorizedError(error, router);
+        if (!isHandled) {
+            state.errorKey = createErrorKey(ERROR_PREFIX, 'couldNotResend');
         }
     } finally {
         state.isResending = false;
@@ -126,33 +102,29 @@ export const handleVerifyLogic = async (
     router: Router
 ): Promise<void> => {
     state.errorKey = '';
-    if (state.code.length < CODE_LENGTH) {
-        state.errorKey = 'auth.verifyEmail.errors.failed|auth.verifyEmail.errors.invalidCode';
+
+    const codeError = validateCode(state.code, CODE_LENGTH);
+    if (codeError) {
+        state.errorKey = createErrorKey(ERROR_PREFIX, codeError);
         return;
     }
+
     state.isLoading = true;
+
     try {
         await authApi.verifyEmail(state.code);
-        const user = getUser();
-        if (user) {
-            user.is_verified = true;
-            setUser(user);
-        }
-        await router.replace('/');
+        updateUserVerificationStatus(true);
+        await router.replace('/home');
     } catch (error: any) {
-        if (error.response?.status === 401) {
-            clearAuth();
-            await router.replace({
-                name: 'auth-error',
-                query: {
-                    error: 'unauthorized',
-                    message: 'Your session has expired. Please log in again.'
-                }
-            });
-        } else if (error.response?.status === 409) {
-            state.errorKey = 'auth.verifyEmail.errors.failed|auth.verifyEmail.errors.codeExpired';
-        } else {
-            state.errorKey = 'auth.verifyEmail.errors.failed|auth.verifyEmail.errors.codeInvalid';
+        const isHandled = await handleUnauthorizedError(error, router);
+        if (!isHandled) {
+            const errorMessage = error.response?.data?.message;
+            if (errorMessage?.toLowerCase().includes('expired')) {
+                state.errorKey = createErrorKey(ERROR_PREFIX, 'codeExpired');
+                state.canResend = true;
+            } else {
+                state.errorKey = createErrorKey(ERROR_PREFIX, 'codeInvalid');
+            }
         }
     } finally {
         state.isLoading = false;

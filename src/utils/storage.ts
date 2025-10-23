@@ -1,19 +1,15 @@
 import type { User } from '@/types/user.ts';
 
-export const getAccessToken = (): string | null => {
-    return localStorage.getItem('accessToken');
-};
+const getItem = (key: string): string | null => localStorage.getItem(key);
+const setItem = (key: string, value: string): void => localStorage.setItem(key, value);
+const removeItem = (key: string): void => localStorage.removeItem(key);
 
-export const setAccessToken = (token: string): void => {
-    localStorage.setItem('accessToken', token);
-};
-
-export const removeAccessToken = (): void => {
-    localStorage.removeItem('accessToken');
-};
+export const getAccessToken = (): string | null => getItem('accessToken');
+export const setAccessToken = (token: string): void => setItem('accessToken', token);
+export const removeAccessToken = (): void => removeItem('accessToken');
 
 export const getUser = (): User | null => {
-    const userString = localStorage.getItem('user');
+    const userString = getItem('user');
     if (!userString) return null;
     try {
         return JSON.parse(userString);
@@ -22,19 +18,19 @@ export const getUser = (): User | null => {
     }
 };
 
-export const setUser = (user: User): void => {
-    localStorage.setItem('user', JSON.stringify(user));
-};
+export const setUser = (user: User): void => setItem('user', JSON.stringify(user));
+export const removeUser = (): void => removeItem('user');
 
-export const removeUser = (): void => {
-    localStorage.removeItem('user');
-};
+export const getLocale = (): string => getItem('locale') || 'en';
+export const setLocale = (locale: string): void => setItem('locale', locale);
+
+export const getTheme = (): string | null => getItem('theme');
+export const setTheme = (theme: 'light' | 'dark'): void => setItem('theme', theme);
+
+export const removePendingUserId = (): void => removeItem('pendingUserId');
 
 export const clearAuth = (): void => {
     removeAccessToken();
     removeUser();
-};
-
-export const isValidToken = (token: string | null): boolean => {
-    return !!token && token !== 'null' && token !== 'undefined' && token.trim() !== '';
+    removePendingUserId();
 };

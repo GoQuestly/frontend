@@ -7,6 +7,9 @@ import {
     VerifyEmailResponse,
     VerificationStatusResponse,
     ResendVerificationResponse,
+    RequestPasswordResetResponse,
+    ResetPasswordResponse,
+    VerifyResetTokenResponse,
     User
 } from '@/types/index.ts';
 
@@ -52,6 +55,24 @@ export const authApi = {
 
     resendVerification: async (): Promise<ResendVerificationResponse> => {
         const response = await apiClient.post('/auth/send-verification-code');
+        return response.data;
+    },
+
+    requestPasswordReset: async (email: string): Promise<RequestPasswordResetResponse> => {
+        const response = await apiClient.post('/auth/request-password-reset', { email });
+        return response.data;
+    },
+
+    verifyResetToken: async (token: string): Promise<VerifyResetTokenResponse> => {
+        const response = await apiClient.post('/auth/verify-reset-token', { token });
+        return response.data;
+    },
+
+    resetPassword: async (token: string, password: string): Promise<ResetPasswordResponse> => {
+        const response = await apiClient.post('/auth/reset-password', {
+            token,
+            password
+        });
         return response.data;
     },
 };

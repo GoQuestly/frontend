@@ -1,69 +1,68 @@
-import { ref, computed, watch, onUnmounted } from 'vue';
+import { ref, computed, watch, onUnmounted, readonly } from 'vue';
 
-export interface TimerBadgeOptions {
-    duration: number;
-    emit: {
-        (event: 'complete'): void;
-        (event: 'tick', timeLeft: number): void;
-    };
-}
+type EmitFunction = {
+    (event: 'complete'): void;
+    (event: 'tick', timeLeft: number): void;
+};
 
-export function useTimerBadge(props: { duration: number }, emit: TimerBadgeOptions['emit']) {
+export function useTimerBadge(
+    props: { duration: number },
+    emit: EmitFunction
+) {
     const timeLeft = ref<number>(props.duration);
-    let timerInterval: number | null = null;
+    let timerInterval: ReturnType<typeof setInterval> | null = null;
 
     const formattedTime = computed(() => {
         const minutes = Math.floor(timeLeft.value / 60);
         const seconds = timeLeft.value % 60;
-        return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
     });
 
-    const startTimer = (): void => {
+    const stopTimer = (): void => {
         if (timerInterval) {
             clearInterval(timerInterval);
             timerInterval = null;
         }
+    };
 
-        if (timeLeft.value === 0) {
+    const startTimer = (): void => {
+        stopTimer();
+
+        if (timeLeft.value <= 0) {
             emit('complete');
             return;
         }
 
         timerInterval = setInterval(() => {
-            if (timeLeft.value > 0) {
-                timeLeft.value--;
-                emit('tick', timeLeft.value);
+            timeLeft.value--;
+            emit('tick', timeLeft.value);
 
-                if (timeLeft.value === 0) {
-                    if (timerInterval) {
-                        clearInterval(timerInterval);
-                        timerInterval = null;
-                    }
-                    emit('complete');
-                }
+            if (timeLeft.value <= 0) {
+                stopTimer();
+                emit('complete');
             }
         }, 1000);
     };
 
     const reset = (): void => {
-        timeLeft.value = props.duration;
+        timeLeft.value = Math.max(0, props.duration);
         startTimer();
     };
 
-    watch(() => props.duration, (newDuration) => {
-        timeLeft.value = newDuration;
-        startTimer();
-    }, { immediate: true });
+    watch(
+        () => props.duration,
+        (newDuration) => {
+            timeLeft.value = Math.max(0, newDuration);
+            startTimer();
+        },
+        { immediate: true }
+    );
 
-    onUnmounted(() => {
-        if (timerInterval) {
-            clearInterval(timerInterval);
-        }
-    });
+    onUnmounted(stopTimer);
 
     return {
         reset,
-        timeLeft: computed(() => timeLeft.value),
+        timeLeft: readonly(timeLeft),
         formattedTime,
     };
 }

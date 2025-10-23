@@ -1,6 +1,7 @@
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { getAccessToken, getUser, clearAuth, isValidToken } from '@/utils/storage';
+import { getAccessToken, getUser, clearAuth } from '@/utils/storage';
+import {isValidToken} from "@/utils/validation.ts";
 
 export const useAuth = () => {
     const router = useRouter();
