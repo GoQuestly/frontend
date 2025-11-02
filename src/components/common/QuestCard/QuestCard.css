@@ -1,0 +1,306 @@
+.quest-card {
+    background-color: var(--bg-secondary);
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.quest-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+:global(.dark-theme) .quest-card {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+:global(.dark-theme) .quest-card:hover {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+}
+
+.quest-header {
+    position: relative;
+    height: 180px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.quest-image,
+.quest-placeholder {
+    width: 100%;
+    height: 100%;
+}
+
+.quest-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.quest-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #d5d5d5 0%, #b8b8b8 100%);
+}
+
+:global(.dark-theme) .quest-placeholder {
+    background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+}
+
+.placeholder-content {
+    text-align: center;
+}
+
+.camera-icon {
+    width: 48px;
+    height: 58px;
+    opacity: 0.5;
+}
+
+.quest-header-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1.5rem 1rem 1rem;
+    background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.7) 100%);
+    display: flex;
+    align-items: flex-end;
+}
+
+.quest-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.3;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.quest-description {
+    padding: 1rem 1.15rem;
+    min-height: 60px;
+}
+
+.quest-description p {
+    margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: var(--text-primary);
+    transition: color 0.3s ease;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.no-description {
+    font-style: italic;
+    color: var(--text-tertiary) !important;
+}
+
+.quest-info {
+    display: flex;
+    gap: 1.5rem;
+    padding: 0 1.15rem 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+    transition: border-color 0.3s ease;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    transition: color 0.3s ease;
+}
+
+.info-icon {
+    width: 18px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.quest-dates {
+    padding: 1rem 1.15rem;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+}
+
+.date-item {
+    display: flex;
+    gap: 0.35rem;
+}
+
+.date-item.empty-date {
+    flex: 1;
+}
+
+.date-label {
+    color: var(--text-secondary);
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.date-value {
+    color: var(--text-primary);
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.no-session {
+    color: var(--text-tertiary);
+    font-style: italic;
+    transition: color 0.3s ease;
+}
+
+@media (max-width: 1024px) {
+    .quest-header {
+        height: 160px;
+    }
+
+    .quest-title {
+        font-size: 1.15rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .quest-card {
+        border-radius: 10px;
+    }
+
+    .quest-header {
+        height: 130px;
+    }
+
+    .quest-header-overlay {
+        padding: 1.25rem 0.85rem 0.85rem;
+    }
+
+    .quest-title {
+        font-size: 1.05rem;
+    }
+
+    .camera-icon {
+        width: 48px;
+        height: 58px;
+    }
+
+    .quest-description {
+        padding: 0.8rem 0.9rem;
+        min-height: 50px;
+    }
+
+    .quest-description p {
+        font-size: 0.8rem;
+        line-height: 1.35;
+        -webkit-line-clamp: 2;
+    }
+
+    .quest-info {
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0 0.9rem 0.65rem;
+    }
+
+    .info-item {
+        font-size: 0.8rem;
+    }
+
+    .info-icon {
+        width: 18px;
+        height: 18px;
+    }
+
+    .quest-dates {
+        flex-direction: column;
+        gap: 0.4rem;
+        padding: 0.65rem 0.9rem;
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .quest-header {
+        height: 120px;
+    }
+
+    .quest-header-overlay {
+        padding: 1rem 0.75rem 0.75rem;
+    }
+
+    .quest-title {
+        font-size: 0.95rem;
+    }
+
+    .camera-icon {
+        width: 36px;
+        height: 36px;
+    }
+
+    .quest-description {
+        padding: 0.7rem 0.85rem;
+        min-height: 46px;
+    }
+
+    .quest-description p {
+        font-size: 0.78rem;
+    }
+
+    .quest-info {
+        padding: 0 0.85rem 0.6rem;
+        gap: 0.45rem;
+    }
+
+    .info-item {
+        font-size: 0.78rem;
+        gap: 0.3rem;
+    }
+
+    .info-icon {
+        width: 16px;
+        height: 16px;
+    }
+
+    .quest-dates {
+        padding: 0.6rem 0.85rem;
+        gap: 0.35rem;
+        font-size: 0.72rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .quest-header {
+        height: 110px;
+    }
+
+    .quest-header-overlay {
+        padding: 0.85rem 0.65rem 0.65rem;
+    }
+
+    .quest-title {
+        font-size: 0.9rem;
+    }
+
+    .camera-icon {
+        width: 32px;
+        height: 32px;
+    }
+
+    .quest-description {
+        padding: 0.65rem 0.8rem;
+        min-height: 42px;
+    }
+
+    .quest-description p {
+        font-size: 0.75rem;
+    }
+}

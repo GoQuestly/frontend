@@ -1,0 +1,38 @@
+.header-nav-button {
+    padding: 0.5rem 1rem;
+    border-radius: 0;
+    border: none;
+    background-color: transparent;
+    color: #716c6c;
+    font-size: 0.95rem;
+    font-weight: 400;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    margin-top: 6px;
+}
+
+.header-nav-button:hover {
+    color: var(--text-primary);
+}
+
+.header-nav-button.active {
+    color: var(--text-primary);
+    font-weight: 400;
+}
+
+@media (max-width: 768px) {
+    .header-nav-button {
+        font-size: 0.9rem;
+        padding: 0.45rem 0.85rem;
+        margin-top: 1px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-nav-button {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.7rem;
+        margin-top: 1px;
+    }
+}

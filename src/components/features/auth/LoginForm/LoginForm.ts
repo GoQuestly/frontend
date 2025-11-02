@@ -56,7 +56,7 @@ export const handleLoginLogic = async (
         if (error.response?.status === 401) {
             state.errorKey = createErrorKey(ERROR_PREFIX, 'invalidCredentials');
         } else {
-            state.errorKey = createErrorKey(ERROR_PREFIX, 'general');
+            state.errorKey = 'errors.generalFailed|errors.general';
         }
     } finally {
         state.isLoading = false;

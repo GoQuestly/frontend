@@ -46,7 +46,7 @@ export const fetchVerificationStatusLogic = async (
 
         if (status.is_verified) {
             updateUserVerificationStatus(true);
-            await router.replace('/home');
+            await router.replace('/my-quests');
             return;
         }
 
@@ -122,8 +122,10 @@ export const handleVerifyLogic = async (
             if (errorMessage?.toLowerCase().includes('expired')) {
                 state.errorKey = createErrorKey(ERROR_PREFIX, 'codeExpired');
                 state.canResend = true;
-            } else {
+            } else if (errorMessage?.toLowerCase().includes('invalid')) {
                 state.errorKey = createErrorKey(ERROR_PREFIX, 'codeInvalid');
+            } else {
+                state.errorKey = createErrorKey(ERROR_PREFIX, 'failed');
             }
         }
     } finally {
