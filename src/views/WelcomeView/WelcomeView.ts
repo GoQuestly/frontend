@@ -18,6 +18,6 @@ export const handleWelcomeStartClick = (router: Router): void => {
     }
 
     if (tokenValid && user?.is_verified) {
-        router.replace('/home');
+        router.replace('/my-quests');
     }
 };

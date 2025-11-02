@@ -39,6 +39,10 @@
     --verify-input-bg: #fafafa;
 
     --header-border: rgba(0, 0, 0, 0.08);
+    --border-color: #e0e0e0;
+    --bg-hover: rgba(32, 178, 170, 0.08);
+    --bg-active: rgba(32, 178, 170, 0.12);
+    --bg-tertiary: #e9ecef;
 }
 
 :root.dark {
@@ -82,4 +86,8 @@
     --verify-input-bg: #4B5563;
 
     --header-border: rgba(255, 255, 255, 0.1);
+    --border-color: #404040;
+    --bg-hover: rgba(32, 178, 170, 0.12);
+    --bg-active: rgba(32, 178, 170, 0.18);
+    --bg-tertiary: #2a3a3a;
 }

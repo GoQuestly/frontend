@@ -12,9 +12,9 @@ const router = createRouter({
             component: () => import('../views/WelcomeView/WelcomeView.vue'),
         },
         {
-            path: '/home',
-            name: 'home',
-            component: () => import('../views/HomeView/HomeView.vue'),
+            path: '/my-quests',
+            name: 'my-quests',
+            component: () => import('../views/MyQuestsView/MyQuestsView.vue'),
             meta: { requiresAuth: true, requiresVerification: true },
         },
         {
@@ -36,7 +36,7 @@ const router = createRouter({
         {
             path: '/auth/callback',
             name: 'auth-callback',
-            component: () => import('../views/HomeView/HomeView.vue'),
+            component: () => import('../views/MyQuestsView/MyQuestsView.vue'),
             meta: { isAuthCallback: true },
         },
         {
@@ -90,7 +90,7 @@ router.beforeEach((to, _from, next) => {
         if (callbackToken) {
             setAccessToken(callbackToken);
             removePendingUserId();
-            return next({ path: '/home', replace: true });
+            return next({ path: '/my-quests', replace: true });
         }
         return next({
             name: 'auth-error',
@@ -100,7 +100,7 @@ router.beforeEach((to, _from, next) => {
     }
 
     if ((to.name === 'login' || to.name === 'register') && tokenValid) {
-        const destination = user && !user.is_verified ? 'verify-email' : 'home';
+        const destination = user && !user.is_verified ? 'verify-email' : 'my-quests';
         return next({ name: destination, replace: true });
     }
 

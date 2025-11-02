@@ -66,7 +66,7 @@ export const handleRegisterLogic = async (
         if ((status === 400 || status === 409) && message?.toLowerCase().includes('email already registered')) {
             state.errorKey = createErrorKey(ERROR_PREFIX, 'emailExists');
         } else {
-            state.errorKey = createErrorKey(ERROR_PREFIX, 'general');
+            state.errorKey = 'errors.generalFailed|errors.general';
         }
     } finally {
         state.isLoading = false;

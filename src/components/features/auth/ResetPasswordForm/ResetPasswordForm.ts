@@ -40,16 +40,18 @@ export const handleResetPasswordLogic = async (
             state.isSuccess = true;
             state.email = '';
         } else {
-            state.errorKey = createErrorKey(ERROR_PREFIX, 'general');
+            state.errorKey = 'errors.generalFailed|errors.general';
         }
     } catch (error: any) {
         const status = error.response?.status;
-        let errorType = 'general';
 
-        if (status === 404) errorType = 'emailNotFound';
-        else if (status === 429) errorType = 'tooManyAttempts';
-
-        state.errorKey = createErrorKey(ERROR_PREFIX, errorType);
+        if (status === 404) {
+            state.errorKey = createErrorKey(ERROR_PREFIX, 'emailNotFound');
+        } else if (status === 429) {
+            state.errorKey = createErrorKey(ERROR_PREFIX, 'tooManyAttempts');
+        } else {
+            state.errorKey = 'errors.generalFailed|errors.general';
+        }
     } finally {
         state.isLoading = false;
     }

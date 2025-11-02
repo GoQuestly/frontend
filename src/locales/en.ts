@@ -1,16 +1,9 @@
 export default {
     common: {
         login: 'Login',
-        register: 'Register',
-        logout: 'Logout',
         email: 'Email',
+        logout: 'Logout',
         password: 'Password',
-        name: 'Name',
-        submit: 'Submit',
-        cancel: 'Cancel',
-        loading: 'Loading...',
-        error: 'Error',
-        success: 'Success',
     },
     auth: {
         welcome: {
@@ -32,7 +25,6 @@ export default {
                 }
             },
             startButton: 'Start',
-            copyright: '© 2025 GoQuestly. All Rights Reserved.',
         },
         login: {
             title: 'Welcome to',
@@ -49,7 +41,6 @@ export default {
                 invalidCredentials: 'Invalid email or password.',
                 passwordTooShort: 'Password must be at least 4 characters long.',
                 invalidEmail: 'Please enter a valid email address.',
-                general: 'An error occurred. Please try again.',
             },
         },
         register: {
@@ -69,7 +60,6 @@ export default {
                 passwordMismatch: 'Passwords do not match.',
                 passwordTooShort: 'Password must be at least 4 characters long.',
                 emailExists: 'Email already registered.',
-                general: 'An error occurred. Please try again.',
             },
         },
         verifyEmail: {
@@ -82,11 +72,9 @@ export default {
             errors: {
                 failed: 'Verification Failed',
                 invalidCode: 'Please enter a valid 6-digit code.',
-                noUserId: 'User ID not found. Please register again.',
                 couldNotResend: 'Could not resend code. Please try again.',
                 codeExpired: 'Verification code expired.',
                 codeInvalid: 'Invalid verification code.',
-                general: 'An error occurred. Please try again.',
             },
         },
         resetPassword: {
@@ -100,8 +88,6 @@ export default {
                 failed: 'Request Failed',
                 emailNotFound: 'Email not found',
                 invalidEmail: 'Please enter a valid email address',
-                tooManyAttempts: 'Too many attempts. Please try again later',
-                general: 'An error occurred. Please try again.',
             },
         },
         changePassword: {
@@ -116,9 +102,9 @@ export default {
                 failed: 'Change Failed',
                 passwordTooShort: 'Password must be at least 4 characters long',
                 passwordMismatch: 'Passwords do not match',
+                samePassword: 'New password must be different from the current password',
                 invalidToken: 'Invalid or expired reset link',
                 invalidPassword: 'Invalid password format',
-                general: 'An error occurred. Please try again.',
             },
         },
         error: {
@@ -127,9 +113,28 @@ export default {
             authRequired: 'Authentication required. Please log in to access this page.',
         },
     },
-    home: {
-        title: 'Welcome to GoQuestly!',
-        subtitle: 'Create exciting quests and share them with the world',
+    myQuests: {
+        title: 'My Quests',
+        newQuest: 'New Quest',
+        searchPlaceholder: 'Search quests...',
+        loading: 'Loading quests...',
+        emptyState: {
+            title: 'No Quests Here Yet',
+            subtitle: "It looks like you haven't created any quests. Let's change that!"
+        },
+        noDescription: 'No description yet. Add one to entice your players!',
+        checkpoints: 'Checkpoints',
+        duration: {
+            min: 'min',
+            hr: 'hr'
+        },
+        last: 'Last',
+        next: 'Next',
+        noSessionData: 'No session data available yet.',
+    },
+    navigation: {
+        myquests: 'My Quests',
+        profile: 'Profile'
     },
     notFound: {
         message: 'Sorry, the page you are looking for could not be found.',
@@ -138,6 +143,8 @@ export default {
         copyright: 'GoQuestly ©2025',
     },
     errors: {
-        sessionExpired: 'Your session has expired. Please log in again.'
+        sessionExpired: 'Your session has expired. Please log in again.',
+        generalFailed: 'Request Failed',
+        general: 'An error occurred. Please try again.',
     }
 };

@@ -1,16 +1,9 @@
 export default {
     common: {
         login: 'Вхід',
-        register: 'Реєстрація',
-        logout: 'Вийти',
         email: 'Електронна пошта',
+        logout: 'Вийти',
         password: 'Пароль',
-        name: "Ім'я",
-        submit: 'Надіслати',
-        cancel: 'Скасувати',
-        loading: 'Завантаження...',
-        error: 'Помилка',
-        success: 'Успішно',
     },
     auth: {
         welcome: {
@@ -32,7 +25,6 @@ export default {
                 }
             },
             startButton: 'Почати',
-            copyright: '© 2025 GoQuestly. Всі права захищені.',
         },
         login: {
             title: 'Ласкаво просимо до',
@@ -49,7 +41,6 @@ export default {
                 invalidCredentials: 'Невірна електронна пошта або пароль.',
                 passwordTooShort: 'Пароль повинен містити щонайменше 4 символи.',
                 invalidEmail: 'Будь ласка, введіть коректну електронну пошту.',
-                general: 'Сталася помилка. Спробуйте ще раз.',
             },
         },
         register: {
@@ -69,7 +60,6 @@ export default {
                 passwordMismatch: 'Паролі не співпадають.',
                 passwordTooShort: 'Пароль повинен містити щонайменше 4 символи.',
                 emailExists: 'Електронна пошта вже зареєстрована.',
-                general: 'Сталася помилка. Спробуйте ще раз.',
             },
         },
         verifyEmail: {
@@ -82,11 +72,9 @@ export default {
             errors: {
                 failed: 'Помилка верифікації',
                 invalidCode: 'Будь ласка, введіть дійсний 6-значний код.',
-                noUserId: 'ID користувача не знайдено. Зареєструйтеся знову.',
                 couldNotResend: 'Не вдалося надіслати код повторно. Спробуйте ще раз.',
                 codeExpired: 'Код верифікації закінчився.',
                 codeInvalid: 'Невірний код верифікації.',
-                general: 'Сталася помилка. Спробуйте ще раз.',
             },
         },
         resetPassword: {
@@ -101,7 +89,6 @@ export default {
                 emailNotFound: 'Електронну пошту не знайдено',
                 invalidEmail: 'Будь ласка, введіть коректну електронну пошту',
                 tooManyAttempts: 'Забагато спроб. Спробуйте пізніше',
-                general: 'Виникла помилка. Спробуйте ще раз.',
             },
         },
         changePassword: {
@@ -116,9 +103,9 @@ export default {
                 failed: 'Помилка зміни',
                 passwordTooShort: 'Пароль має містити щонайменше 4 символа',
                 passwordMismatch: 'Паролі не співпадають',
+                samePassword: 'Новий пароль має відрізнятися від поточного пароля',
                 invalidToken: 'Недійсне або застаріле посилання для скидання',
                 invalidPassword: 'Невірний формат пароля',
-                general: 'Виникла помилка. Спробуйте ще раз.',
             },
         },
         error: {
@@ -127,9 +114,28 @@ export default {
             authRequired: 'Необхідна автентифікація. Будь ласка, увійдіть, щоб отримати доступ до цієї сторінки.',
         },
     },
-    home: {
-        title: 'Ласкаво просимо до GoQuestly!',
-        subtitle: 'Створюйте захопливі квести та діліться ними зі світом',
+    myQuests: {
+        title: 'Мої Квести',
+        newQuest: 'Новий Квест',
+        searchPlaceholder: 'Пошук квестів...',
+        loading: 'Завантаження квестів...',
+        emptyState: {
+            title: 'Тут Ще Немає Квестів',
+            subtitle: 'Схоже, ви ще не створили жодного квесту. Давайте це виправимо!'
+        },
+        noDescription: 'Опису ще немає. Додайте його, щоб зацікавити гравців!',
+        checkpoints: 'Контрольні точки',
+        duration: {
+            min: 'хв',
+            hr: 'год'
+        },
+        last: 'Ост',
+        next: 'Наст',
+        noSessionData: 'Дані про сесії ще недоступні.',
+    },
+    navigation: {
+        myquests: 'Мої Квести',
+        profile: 'Профіль'
     },
     notFound: {
         message: 'На жаль, сторінку, яку ви шукаєте, не знайдено.',
@@ -138,6 +144,8 @@ export default {
         copyright: 'GoQuestly ©2025',
     },
     errors: {
-        sessionExpired: 'Ваша сесія закінчилася. Будь ласка, увійдіть знову.'
+        sessionExpired: 'Ваша сесія закінчилася. Будь ласка, увійдіть знову.',
+        generalFailed: 'Помилка запиту',
+        general: 'Виникла помилка. Спробуйте ще раз.',
     }
 };
