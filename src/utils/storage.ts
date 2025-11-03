@@ -1,4 +1,4 @@
-import type { User } from '@/types/user.ts';
+import type { User } from '@/types/user';
 
 const getItem = (key: string): string | null => localStorage.getItem(key);
 const setItem = (key: string, value: string): void => localStorage.setItem(key, value);

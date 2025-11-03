@@ -9,7 +9,8 @@ export const HEADER_CONFIG = {
     logoAlt: 'GoQuestly',
     logoText: 'GoQuestly',
     homeRoute: '/',
-    myQuestsRoute: '/my-quests'
+    myQuestsRoute: '/my-quests',
+    profileEditRoute: '/profile/edit'
 } as const;
 
 export interface NavigationItem {
@@ -72,14 +73,14 @@ export const checkIsActiveRoute = (
     return route.path === routePath;
 };
 
-export const handleProfileNavigation = (): void => {
-    // TODO: Navigate to profile page when it's ready
+export const handleProfileNavigation = (router: Router): void => {
+    router.replace({ name: 'profile-edit' });
 };
 
 export const handleLogoNavigation = (router: Router): void => {
-    router.replace('/');
+    router.replace({ name: 'welcome' });
 };
 
 export const handleMyQuestsNavigation = (router: Router): void => {
-    router.replace('/my-quests');
+    router.replace({ name: 'my-quests' });
 };

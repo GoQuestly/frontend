@@ -27,7 +27,7 @@ export const handleResetPasswordLogic = async (
     state.isSuccess = false;
 
     if (!isValidEmail(state.email)) {
-        state.errorKey = createErrorKey(ERROR_PREFIX, 'invalidEmail');
+        state.errorKey = 'errors.invalidEmail';
         return;
     }
 

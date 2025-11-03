@@ -9,7 +9,7 @@
         <label>{{ $t('common.email') }}</label>
         <BaseInput
             v-model="state.email"
-            :placeholder="$t('auth.login.emailPlaceholder')"
+            :placeholder="$t('common.emailPlaceholder')"
             :maxlength="100"
             required
             :disabled="state.isLoading"
@@ -19,7 +19,7 @@
         <BaseInput
             v-model="state.password"
             type="password"
-            :placeholder="$t('auth.login.passwordPlaceholder')"
+            :placeholder="$t('common.passwordPlaceholder')"
             :maxlength="255"
             required
             :disabled="state.isLoading"
@@ -34,7 +34,7 @@
         </BaseButton>
 
         <BaseButton type="button" variant="secondary" @click="router.replace('/register')">
-          {{ $t('auth.login.registerButton') }}
+          {{ $t('common.register') }}
         </BaseButton>
       </form>
 

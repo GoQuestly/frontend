@@ -65,7 +65,6 @@ export const fetchQuestsLogic = async (
         state.currentPage = response.pageNumber;
         state.totalPages = Math.ceil(response.total / response.pageSize);
     } catch (error) {
-        console.error('Failed to fetch quests:', error);
         state.error = 'Failed to load quests';
         state.quests = [];
         state.totalPages = 1;
@@ -92,10 +91,4 @@ export const handlePageChangeLogic = async (
 
 export { formatDuration };
 
-export const handleNewQuestNavigation = (): void => {
-    console.log('Navigate to create quest');
-};
 
-export const handleQuestClickNavigation = (questId: string): void => {
-    console.log('Navigate to quest:', questId);
-};
