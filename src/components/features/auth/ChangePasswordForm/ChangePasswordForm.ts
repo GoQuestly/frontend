@@ -45,7 +45,7 @@ export const handleChangePasswordLogic = async (
     const passwordError = validatePasswordFields(state.password, state.confirmPassword);
     if (passwordError)
     {
-        state.errorKey = createErrorKey(ERROR_PREFIX, passwordError);
+        state.errorKey = `errors.${passwordError}`;
         return;
     }
 

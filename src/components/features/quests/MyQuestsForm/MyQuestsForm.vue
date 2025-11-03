@@ -4,7 +4,6 @@
       <h1>{{ $t('myQuests.title') }}</h1>
       <BaseButton
           variant="primary"
-          @click="handleNewQuest"
           class="new-quest-button"
       >
         <span class="plus-icon">+</span>
@@ -38,7 +37,6 @@
           v-for="quest in state.quests"
           :key="quest.id"
           :quest="quest"
-          @click="handleQuestClick"
       />
     </div>
 
@@ -67,8 +65,6 @@ import {
   fetchQuestsLogic,
   handleSearchLogic,
   handlePageChangeLogic,
-  handleNewQuestNavigation,
-  handleQuestClickNavigation,
 } from './MyQuestsForm.ts';
 import './MyQuestsForm.css';
 
@@ -134,13 +130,5 @@ const handleSearchDebounced = async (value: string): Promise<void> => {
 const handlePageChange = async (page: number): Promise<void> => {
   updateUrl(page, state.searchQuery);
   await handlePageChangeLogic(state, page);
-};
-
-const handleNewQuest = (): void => {
-  handleNewQuestNavigation();
-};
-
-const handleQuestClick = (questId: string): void => {
-  handleQuestClickNavigation(questId);
 };
 </script>

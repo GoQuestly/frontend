@@ -9,7 +9,7 @@
       <form @submit.prevent="handleReset">
         <BaseInput
             v-model="state.email"
-            :placeholder="$t('auth.resetPassword.emailPlaceholder')"
+            :placeholder="$t('common.emailPlaceholder')"
             :maxlength="100"
             required
             :disabled="state.isLoading"

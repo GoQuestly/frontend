@@ -23,8 +23,9 @@
         <LocaleToggle />
         <ProfileButton
             v-if="isAuthenticated"
-            :title="$t('navigation.profile') || 'Profile'"
+            :title="$t('navigation.profile') || 'profile'"
             :user-name="userName"
+            :photo-url="userPhotoUrl"
             @click="handleProfileClick"
         />
         <LogoutButton v-if="isLoggedIn" />
@@ -59,8 +60,9 @@ const { isAuthenticated, isLoggedIn, user } = getUserData();
 const visibleNavItems = computed(() => getVisibleNavItems(isAuthenticated.value));
 const isActiveRoute = (routePath: string) => checkIsActiveRoute(route, routePath);
 const userName = computed(() => user.value?.name || '');
+const userPhotoUrl = computed(() => user.value?.photo_url);
 
-const handleProfileClick = () => handleProfileNavigation();
+const handleProfileClick = () => handleProfileNavigation(router);
 const handleLogoClick = () => handleLogoNavigation(router);
 const handleNavClick = (routePath: string) => {
   if (routePath === '/my-quests') {

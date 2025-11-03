@@ -18,7 +18,7 @@ export const createInitialLoginState = (): LoginFormState => ({
     email: '',
     password: '',
     errorKey: '',
-    isLoading: false
+    isLoading: false,
 });
 
 export { getTranslatedErrorMessage };
@@ -30,13 +30,13 @@ export const handleLoginLogic = async (
     state.errorKey = '';
 
     if (!isValidEmail(state.email)) {
-        state.errorKey = createErrorKey(ERROR_PREFIX, 'invalidEmail');
+        state.errorKey = 'errors.invalidEmail';
         return;
     }
 
     const passwordError = validatePasswordLength(state.password);
     if (passwordError) {
-        state.errorKey = createErrorKey(ERROR_PREFIX, passwordError);
+        state.errorKey = `common.${passwordError}`;
         return;
     }
 
@@ -51,7 +51,12 @@ export const handleLoginLogic = async (
         setAccessToken(response.access_token);
         setUser(response.user);
 
-        await router.replace('/verify-email');
+        if (response.user.is_verified) {
+            await router.replace('/my-quests');
+        } else {
+            await router.replace('/verify-email');
+        }
+
     } catch (error: any) {
         if (error.response?.status === 401) {
             state.errorKey = createErrorKey(ERROR_PREFIX, 'invalidCredentials');
@@ -63,6 +68,8 @@ export const handleLoginLogic = async (
     }
 };
 
-export const handleGoogleLoginLogic = async (setErrorKey: (key: string) => void): Promise<void> => {
+export const handleGoogleLoginLogic = async (
+    setErrorKey: (key: string) => void
+): Promise<void> => {
     await handleGoogleAuthLogic(setErrorKey, ERROR_PREFIX);
 };

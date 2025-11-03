@@ -3,7 +3,11 @@ export default {
         login: 'Login',
         email: 'Email',
         logout: 'Logout',
+        register: 'Register',
         password: 'Password',
+        name: 'Name',
+        emailPlaceholder: 'Enter your email',
+        passwordPlaceholder: 'Enter your password',
     },
     auth: {
         welcome: {
@@ -29,26 +33,19 @@ export default {
         login: {
             title: 'Welcome to',
             brand: 'GoQuestly',
-            emailPlaceholder: 'Enter your email',
-            passwordPlaceholder: 'Enter your password',
             forgotPassword: 'Forgot Password?',
             loginButton: 'Login',
             loggingIn: 'Logging in...',
-            registerButton: 'Register',
             googleLogin: 'Sign in with Google',
             errors: {
                 failed: 'Login Failed',
                 invalidCredentials: 'Invalid email or password.',
-                passwordTooShort: 'Password must be at least 4 characters long.',
-                invalidEmail: 'Please enter a valid email address.',
             },
         },
         register: {
             title: 'GoQuestly',
             subtitle: 'Create and manage interactive quests',
             namePlaceholder: 'Name',
-            emailPlaceholder: 'Email',
-            passwordPlaceholder: 'Password',
             confirmPasswordPlaceholder: 'Confirm Password',
             registerButton: 'Register',
             registering: 'Registering...',
@@ -56,9 +53,6 @@ export default {
             alreadyHaveAccount: 'Already have an account?',
             errors: {
                 failed: 'Registration Failed',
-                invalidEmail: 'Please enter a valid email address',
-                passwordMismatch: 'Passwords do not match.',
-                passwordTooShort: 'Password must be at least 4 characters long.',
                 emailExists: 'Email already registered.',
             },
         },
@@ -79,7 +73,6 @@ export default {
         },
         resetPassword: {
             title: 'Reset password',
-            emailPlaceholder: 'Enter your email',
             sendButton: 'Send reset link',
             sending: 'Sending...',
             backToLogin: 'Back to Login',
@@ -87,7 +80,6 @@ export default {
             errors: {
                 failed: 'Request Failed',
                 emailNotFound: 'Email not found',
-                invalidEmail: 'Please enter a valid email address',
             },
         },
         changePassword: {
@@ -100,8 +92,6 @@ export default {
             passwordChangedSuccess: 'Password has been successfully changed',
             errors: {
                 failed: 'Change Failed',
-                passwordTooShort: 'Password must be at least 4 characters long',
-                passwordMismatch: 'Passwords do not match',
                 samePassword: 'New password must be different from the current password',
                 invalidToken: 'Invalid or expired reset link',
                 invalidPassword: 'Invalid password format',
@@ -132,6 +122,31 @@ export default {
         next: 'Next',
         noSessionData: 'No session data available yet.',
     },
+    profile: {
+        title: 'Edit profile',
+        subtitle: 'Manage your account details',
+        changePhoto: 'Change Photo',
+        uploading: 'Uploading...',
+        fileInfo: 'JPG, PNG or WEBP, up to 5MB',
+        fullName: 'Full Name',
+        fullNamePlaceholder: 'Enter your name',
+        cancel: 'Cancel',
+        saveChanges: 'Save Changes',
+        saving: 'Saving...',
+        success: {
+            updated: 'Profile updated successfully',
+            avatarUpdated: 'Photo updated successfully',
+        },
+        errors: {
+            failed: 'Update Failed',
+            noChanges: 'No changes to save',
+            loadFailed: 'Failed to load profile data',
+            uploadFailed: 'Failed to upload photo',
+            updateFailed: 'Failed to update profile',
+            avatarTooLarge: 'Photo must be less than 5MB',
+            avatarInvalidType: 'Only JPG, PNG and WEBP formats are allowed',
+        },
+    },
     navigation: {
         myquests: 'My Quests',
         profile: 'Profile'
@@ -144,6 +159,9 @@ export default {
     },
     errors: {
         sessionExpired: 'Your session has expired. Please log in again.',
+        invalidEmail: 'Please enter a valid email address',
+        passwordTooShort: 'Password must be at least 4 characters long',
+        passwordMismatch: 'Passwords do not match',
         generalFailed: 'Request Failed',
         general: 'An error occurred. Please try again.',
     }

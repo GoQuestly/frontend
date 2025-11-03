@@ -114,7 +114,7 @@ export const handleVerifyLogic = async (
     try {
         await authApi.verifyEmail(state.code);
         updateUserVerificationStatus(true);
-        await router.replace('/home');
+        await router.replace('/');
     } catch (error: any) {
         const isHandled = await handleUnauthorizedError(error, router);
         if (!isHandled) {

@@ -7,7 +7,7 @@
     background-color: var(--input-bg);
     color: var(--input-text);
     margin-bottom: 1rem;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
 }
 
 .base-input::placeholder {
@@ -19,6 +19,21 @@
     outline: none;
     box-shadow: 0 0 0 2px rgba(48, 183, 157, 0.15);
     background-color: var(--input-bg);
+}
+
+.base-input:disabled,
+.base-input-disabled {
+    cursor: not-allowed;
+    opacity: 1;
+    background-color: var(--input-disabled-bg);
+    border-color: var(--input-disabled-border);
+    color: var(--input-disabled-text);
+}
+
+.base-input:disabled:focus,
+.base-input-disabled:focus {
+    box-shadow: none;
+    border-color: var(--input-disabled-border);
 }
 
 @media (max-width: 900px) {

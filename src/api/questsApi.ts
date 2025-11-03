@@ -44,12 +44,4 @@ export const questsApi = {
 
         return response.data;
     },
-
-    async getQuestById(questId: number): Promise<QuestResponse> {
-        const response = await apiClient.get<QuestResponse>(
-            `/organizer/quests/${questId}`
-        );
-
-        return response.data;
-    }
 };

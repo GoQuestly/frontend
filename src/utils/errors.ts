@@ -4,11 +4,15 @@ import { clearAuth } from '@/utils/storage';
 export const getTranslatedErrorMessage = (
     errorKey: string,
     t: (key: string) => string
-): string =>
-{
+): string => {
     if (!errorKey) return '';
-    const [mainKey, detailKey] = errorKey.split('|');
-    return `${t(mainKey)}\n${t(detailKey)}`;
+
+    if (errorKey.includes('|')) {
+        const [mainKey, detailKey] = errorKey.split('|');
+        return `${t(mainKey)}\n${t(detailKey)}`;
+    }
+
+    return t(errorKey);
 };
 
 export const createErrorKey = (prefix: string, errorType: string): string => {

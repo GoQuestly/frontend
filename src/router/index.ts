@@ -73,6 +73,12 @@ const router = createRouter({
             }
         },
         {
+            path: '/profile-edit',
+            name: 'profile-edit',
+            component: () => import('../views/ProfileEditView/ProfileEditView.vue'),
+            meta: { requiresAuth: true, requiresVerification: true },
+        },
+        {
             path: '/:pathMatch(.*)*',
             name: 'NotFound',
             component: () => import('../views/NotFoundView/NotFoundView.vue'),
