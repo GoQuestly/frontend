@@ -318,31 +318,6 @@ export default {
             avatarInvalidType: 'Only JPG, PNG and WEBP formats allowed',
         },
     },
-    profile: {
-        title: 'Edit profile',
-        subtitle: 'Manage your account details',
-        changePhoto: 'Change Photo',
-        uploading: 'Uploading...',
-        fileInfo: 'JPG, PNG or WEBP, up to 5MB',
-        fullName: 'Full Name',
-        fullNamePlaceholder: 'Enter your name',
-        cancel: 'Cancel',
-        saveChanges: 'Save Changes',
-        saving: 'Saving...',
-        success: {
-            updated: 'Profile updated successfully',
-            avatarUpdated: 'Photo updated successfully',
-        },
-        errors: {
-            failed: 'Update Failed',
-            noChanges: 'No changes to save',
-            loadFailed: 'Failed to load profile data',
-            uploadFailed: 'Failed to upload photo',
-            updateFailed: 'Failed to update profile',
-            avatarTooLarge: 'Photo must be less than 5MB',
-            avatarInvalidType: 'Only JPG, PNG and WEBP formats are allowed',
-        },
-    },
     navigation: {
         myquests: 'My Quests',
         profile: 'Profile'
