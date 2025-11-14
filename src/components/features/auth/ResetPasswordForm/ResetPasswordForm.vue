@@ -9,7 +9,7 @@
       <form @submit.prevent="handleReset">
         <BaseInput
             v-model="state.email"
-            :placeholder="$t('auth.resetPassword.emailPlaceholder')"
+            :placeholder="$t('common.emailPlaceholder')"
             :maxlength="100"
             required
             :disabled="state.isLoading"
@@ -22,7 +22,7 @@
             class="send-button"
         >
           {{ state.isLoading
-            ? $t('auth.resetPassword.sending')
+            ? $t('common.sending')
             : $t('auth.resetPassword.sendButton')
           }}
         </BaseButton>
@@ -33,7 +33,7 @@
             @click="router.replace('/login');"
             class="back-button"
         >
-          {{ $t('auth.resetPassword.backToLogin') }}
+          {{ $t('common.backToLogin') }}
         </BaseButton>
       </form>
     </div>

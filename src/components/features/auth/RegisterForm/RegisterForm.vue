@@ -4,7 +4,7 @@
       <img src="@/assets/images/logo.png" alt="GoQuestly Logo" />
     </div>
 
-    <h1 class="register-title">{{ $t('auth.register.title') }}</h1>
+    <h1 class="register-title">{{ $t('common.brand') }}</h1>
     <p class="register-subtitle">{{ $t('auth.register.subtitle') }}</p>
 
     <ErrorBox :message="translatedErrorMessage" />
@@ -12,7 +12,7 @@
     <form @submit.prevent="handleRegister">
       <BaseInput
           v-model="state.name"
-          :placeholder="$t('auth.register.namePlaceholder')"
+          :placeholder="$t('common.name')"
           :maxlength="100"
           required
           :disabled="state.isLoading"
@@ -20,7 +20,7 @@
 
       <BaseInput
           v-model="state.email"
-          :placeholder="$t('auth.register.emailPlaceholder')"
+          :placeholder="$t('common.email')"
           :maxlength="100"
           required
           :disabled="state.isLoading"
@@ -28,7 +28,7 @@
 
       <BaseInput
           v-model="state.password"
-          :placeholder="$t('auth.register.passwordPlaceholder')"
+          :placeholder="$t('common.password')"
           :maxlength="255"
           required
           :disabled="state.isLoading"
@@ -43,7 +43,7 @@
       />
 
       <BaseButton type="submit" variant="primary" :disabled="state.isLoading">
-        {{ state.isLoading ? $t('auth.register.registering') : $t('auth.register.registerButton') }}
+        {{ state.isLoading ? $t('auth.register.registering') : $t('common.register') }}
       </BaseButton>
     </form>
 

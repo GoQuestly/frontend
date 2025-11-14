@@ -1,27 +1,27 @@
 <template>
   <div class="my-quests-form">
     <div class="page-header">
-      <h1>{{ $t('myQuests.title') }}</h1>
+      <h1>{{ $t('quests.myQuests.title') }}</h1>
       <BaseButton
           variant="primary"
-          @click="handleNewQuest"
           class="new-quest-button"
+          @click="navigateToCreateQuest"
       >
         <span class="plus-icon">+</span>
-        {{ $t('myQuests.newQuest') }}
+        {{ $t('quests.myQuests.newQuest') }}
       </BaseButton>
     </div>
 
     <div class="search-wrapper">
       <SearchInput
           v-model="state.searchQuery"
-          :placeholder="$t('myQuests.searchPlaceholder')"
+          :placeholder="$t('quests.myQuests.searchPlaceholder')"
           @input="handleSearchDebounced"
       />
     </div>
 
     <div v-if="state.isLoading" class="loading-state">
-      {{ $t('myQuests.loading') }}
+      {{ $t('common.loading') }}
     </div>
 
     <div v-else-if="state.error" class="error-state">
@@ -29,8 +29,8 @@
     </div>
 
     <div v-else-if="state.quests.length === 0" class="empty-state">
-      <h2 class="empty-state-title">{{ $t('myQuests.emptyState.title') }}</h2>
-      <p class="empty-state-subtitle">{{ $t('myQuests.emptyState.subtitle') }}</p>
+      <h2 class="empty-state-title">{{ $t('quests.myQuests.emptyState.title') }}</h2>
+      <p class="empty-state-subtitle">{{ $t('quests.myQuests.emptyState.subtitle') }}</p>
     </div>
 
     <div v-else class="quests-grid">
@@ -38,7 +38,6 @@
           v-for="quest in state.quests"
           :key="quest.id"
           :quest="quest"
-          @click="handleQuestClick"
       />
     </div>
 
@@ -67,8 +66,6 @@ import {
   fetchQuestsLogic,
   handleSearchLogic,
   handlePageChangeLogic,
-  handleNewQuestNavigation,
-  handleQuestClickNavigation,
 } from './MyQuestsForm.ts';
 import './MyQuestsForm.css';
 
@@ -100,6 +97,10 @@ const updateUrl = (page: number, search: string) => {
   }
 
   router.replace({ query });
+};
+
+const navigateToCreateQuest = (): void => {
+  router.replace({ name: 'create-quest' });
 };
 
 onMounted(async () => {
@@ -134,13 +135,5 @@ const handleSearchDebounced = async (value: string): Promise<void> => {
 const handlePageChange = async (page: number): Promise<void> => {
   updateUrl(page, state.searchQuery);
   await handlePageChangeLogic(state, page);
-};
-
-const handleNewQuest = (): void => {
-  handleNewQuestNavigation();
-};
-
-const handleQuestClick = (questId: string): void => {
-  handleQuestClickNavigation(questId);
 };
 </script>

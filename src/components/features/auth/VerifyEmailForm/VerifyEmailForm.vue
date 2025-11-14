@@ -28,7 +28,7 @@
           :disabled="!state.canResend || state.isResending"
           @click="handleResendCode"
       >
-        {{ state.isResending ? $t('auth.verifyEmail.resending') : $t('auth.verifyEmail.resendButton') }}
+        {{ state.isResending ? $t('common.resending') : $t('auth.verifyEmail.resendButton') }}
       </BaseButton>
 
       <BaseButton type="submit" variant="primary" :disabled="state.isLoading">

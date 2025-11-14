@@ -1,0 +1,211 @@
+.quiz-section {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.quiz-section :deep(.base-input) {
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.section-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 1rem 0;
+}
+
+.question-block {
+    background-color: var(--bg-form);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.question-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+
+.question-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.delete-question-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+}
+
+.delete-question-btn:hover {
+    opacity: 1;
+}
+
+.delete-question-btn img {
+    width: 18px;
+    height: 18px;
+}
+
+.field-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.field-error {
+    font-size: 0.8rem;
+    color: #f44;
+}
+
+.field-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.input-error {
+    border-color: #f44 !important;
+}
+
+.answer-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin: 1rem 0;
+}
+
+.answer-option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.delete-option-btn {
+    background: transparent;
+    border: none;
+    padding: 0.25rem;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.delete-option-btn img {
+    width: 16px;
+    height: 16px;
+}
+
+.delete-option-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.add-option-btn {
+    align-self: flex-start;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    background-color: transparent;
+    border: 1px dashed var(--border-color);
+    border-radius: 0.5rem;
+    color: var(--brand-color);
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.add-option-btn:hover:not(:disabled) {
+    border-color: var(--brand-color);
+    background-color: var(--bg-hover);
+}
+
+.add-option-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.radio-input {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    min-height: 20px;
+    flex-shrink: 0;
+    cursor: pointer;
+    margin: 0;
+    margin-top: -10px;
+    padding: 0;
+    appearance: none;
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    background-color: white;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.radio-input:checked {
+    border-color: var(--brand-color);
+}
+
+.radio-input:checked::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: var(--brand-color);
+}
+
+.radio-input:hover {
+    border-color: var(--brand-color);
+}
+
+.question-points {
+    margin-top: 1rem;
+}
+
+.add-question-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background-color: transparent;
+    border: 2px dashed var(--border-color);
+    border-radius: 0.5rem;
+    color: var(--brand-color);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.add-question-btn:hover {
+    border-color: var(--brand-color);
+    background-color: var(--bg-hover);
+}
+
+.plus-icon {
+    font-size: 1.2rem;
+    font-weight: bold;
+}

@@ -5,12 +5,18 @@ export const formatDuration = (
     t: ComposerTranslation | ((key: string) => string)
 ): string => {
     if (minutes < 60) {
-        return `${minutes} ${t('myQuests.duration.min')}`;
+        return `${minutes} ${t('common.min')}`;
     }
+
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
+
+    const hourKey = 'common.hr';
+    const minKey = 'common.min';
+
     if (mins === 0) {
-        return `${hours} ${t('myQuests.duration.hr')}`;
+        return `${hours} ${t(hourKey)}`;
     }
-    return `${hours} ${t('myQuests.duration.hr')} ${mins} ${t('myQuests.duration.min')}`;
+
+    return `${hours} ${t(hourKey)} ${mins} ${t(minKey)}`;
 };

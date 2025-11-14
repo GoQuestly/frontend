@@ -18,14 +18,14 @@
     <div class="quest-description">
       <p v-if="quest.description">{{ quest.description }}</p>
       <p v-else class="no-description">
-        {{ $t('myQuests.noDescription') }}
+        {{ $t('quests.myQuests.noDescription') }}
       </p>
     </div>
 
     <div class="quest-info">
       <div class="info-item">
         <img src="@/assets/images/flag-icon.png" alt="Checkpoints" class="info-icon" />
-        <span>{{ quest.checkpointsCount }} {{ $t('myQuests.checkpoints') }}</span>
+        <span>{{ quest.checkpointsCount }} {{ $t('quests.myQuests.checkpoints') }}</span>
       </div>
       <div class="info-item">
         <img src="@/assets/images/timer-icon.png" alt="Duration" class="info-icon" />
@@ -35,15 +35,15 @@
 
     <div class="quest-dates">
       <div v-if="quest.lastSessionDate" class="date-item">
-        <span class="date-label">{{ $t('myQuests.last') }}:</span>
+        <span class="date-label">{{ $t('common.last') }}:</span>
         <span class="date-value">{{ quest.lastSessionDate }}</span>
       </div>
       <div v-else class="date-item empty-date">
-        <span class="no-session">{{ $t('myQuests.noSessionData') }}</span>
+        <span class="no-session">{{ $t('quests.myQuests.noSessionData') }}</span>
       </div>
 
       <div v-if="quest.nextSessionDate" class="date-item">
-        <span class="date-label">{{ $t('myQuests.next') }}:</span>
+        <span class="date-label">{{ $t('common.next') }}:</span>
         <span class="date-value">{{ quest.nextSessionDate }}</span>
       </div>
     </div>

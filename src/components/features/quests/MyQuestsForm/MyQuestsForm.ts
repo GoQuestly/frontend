@@ -1,27 +1,7 @@
-import { questsApi, type QuestResponse } from '@/api/questsApi';
+import { questsApi } from '@/api/questsApi';
+import { type QuestResponse, Quest, MyQuestsState } from '@/types/quests';
 import { formatDuration } from '@/utils/format';
 
-export interface Quest {
-    id: string;
-    title: string;
-    subtitle: string;
-    description: string;
-    imageUrl?: string;
-    checkpointsCount: number;
-    estimatedDuration: number;
-    lastSessionDate?: string;
-    nextSessionDate?: string;
-}
-
-export interface MyQuestsState {
-    quests: Quest[];
-    searchQuery: string;
-    currentPage: number;
-    totalPages: number;
-    pageSize: number;
-    isLoading: boolean;
-    error: string | null;
-}
 
 export const createInitialMyQuestsState = (): MyQuestsState => ({
     quests: [],
@@ -65,7 +45,6 @@ export const fetchQuestsLogic = async (
         state.currentPage = response.pageNumber;
         state.totalPages = Math.ceil(response.total / response.pageSize);
     } catch (error) {
-        console.error('Failed to fetch quests:', error);
         state.error = 'Failed to load quests';
         state.quests = [];
         state.totalPages = 1;
@@ -92,10 +71,4 @@ export const handlePageChangeLogic = async (
 
 export { formatDuration };
 
-export const handleNewQuestNavigation = (): void => {
-    console.log('Navigate to create quest');
-};
 
-export const handleQuestClickNavigation = (questId: string): void => {
-    console.log('Navigate to quest:', questId);
-};

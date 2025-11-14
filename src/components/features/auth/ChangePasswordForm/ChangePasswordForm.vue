@@ -32,7 +32,7 @@
             class="send-button"
         >
           {{ state.isLoading
-            ? $t('auth.changePassword.confirming')
+            ? $t('common.confirming')
             : $t('auth.changePassword.confirmButton')
           }}
         </BaseButton>
@@ -43,7 +43,7 @@
             @click="router.replace('/login')"
             class="back-button"
         >
-          {{ $t('auth.changePassword.backToLogin') }}
+          {{ $t('common.backToLogin') }}
         </BaseButton>
       </form>
     </div>
