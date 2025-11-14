@@ -4,7 +4,7 @@
       <img src="@/assets/images/logo.png" alt="GoQuestly Logo" />
     </div>
 
-    <h1 class="register-title">{{ $t('auth.register.title') }}</h1>
+    <h1 class="register-title">{{ $t('common.brand') }}</h1>
     <p class="register-subtitle">{{ $t('auth.register.subtitle') }}</p>
 
     <ErrorBox :message="translatedErrorMessage" />

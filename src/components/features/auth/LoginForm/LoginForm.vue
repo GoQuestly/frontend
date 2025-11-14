@@ -1,7 +1,7 @@
 <template>
   <div class="login-form-wrapper">
     <div class="login-form-content">
-      <h2>{{ $t('auth.login.title') }} <br><span class="brand">{{ $t('auth.login.brand') }}</span></h2>
+      <h2>{{ $t('auth.login.title') }} <br><span class="brand">{{ $t('common.brand') }}</span></h2>
 
       <ErrorBox :message="translatedErrorMessage" />
 

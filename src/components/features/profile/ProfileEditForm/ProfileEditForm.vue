@@ -146,15 +146,15 @@ onMounted(async () => {
 });
 
 const changePhotoText = computed(() => $t('profile.changePhoto'));
-const uploadingText = computed(() => $t('profile.uploading'));
+const uploadingText = computed(() => $t('common.uploading'));
 const fileInfoText = computed(() => $t('profile.fileInfo'));
 const fullNameLabel = computed(() => $t('common.name'));
 const fullNamePlaceholder = computed(() => $t('profile.fullNamePlaceholder'));
 const emailLabel = computed(() => $t('common.email'));
 const emailPlaceholder = computed(() => $t('common.emailPlaceholder'));
-const cancelText = computed(() => $t('profile.cancel'));
+const cancelText = computed(() => $t('common.cancel'));
 const saveChangesText = computed(() => $t('profile.saveChanges'));
-const savingText = computed(() => $t('profile.saving'));
+const savingText = computed(() => $t('common.saving'));
 
 const triggerFileInput = () => {
   fileInput.value?.click();

@@ -1,0 +1,70 @@
+.task-assignment-step {
+    width: 100%;
+}
+
+.step-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 1.5rem 0;
+}
+
+.checkpoints-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.loading-message {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+}
+
+.no-task-message {
+    padding: 2rem 0;
+    text-align: center;
+}
+
+.no-task-message p {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    margin: 0 0 1.5rem 0;
+}
+
+.add-task-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background-color: transparent;
+    border: 2px dashed var(--brand-color);
+    border-radius: 0.5rem;
+    color: var(--brand-color);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.add-task-btn:hover {
+    background-color: var(--bg-hover);
+    border-color: var(--brand-color);
+}
+
+.plus-icon {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.no-checkpoints {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-secondary);
+}
+
+.no-checkpoints p {
+    font-size: 1rem;
+    margin: 0;
+}

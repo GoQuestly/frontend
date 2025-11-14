@@ -79,6 +79,12 @@ const router = createRouter({
             meta: { requiresAuth: true, requiresVerification: true },
         },
         {
+            path: '/create-quest',
+            name: 'create-quest',
+            component: () => import('../views/CreateQuestView/CreateQuestView.vue'),
+            meta: { requiresAuth: true, requiresVerification: true },
+        },
+        {
             path: '/:pathMatch(.*)*',
             name: 'NotFound',
             component: () => import('../views/NotFoundView/NotFoundView.vue'),

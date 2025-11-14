@@ -4,4 +4,8 @@
   </footer>
 </template>
 
-<style src="./Footer.css" scoped></style>
+<script setup lang="ts">
+import './Footer.css';
+</script>
+
+<style scoped> </style>

@@ -36,5 +36,23 @@ export const validatePasswordFields = (
     return null;
 };
 
+export interface ValidationResult {
+    isValid: boolean;
+    parsedValue: number;
+}
 
+export const validateNumberRange = (
+    value: string,
+    min: number,
+    max?: number
+): ValidationResult => {
+    const parsed = parseInt(value);
+    const isValid = !isNaN(parsed) && parsed >= min && (max === undefined || parsed <= max);
+    return { isValid, parsedValue: parsed };
+};
+
+export const parseNumber = (value: string, defaultValue: number = 0): number => {
+    const parsed = parseInt(value);
+    return isNaN(parsed) ? defaultValue : parsed;
+};
 

@@ -1,27 +1,7 @@
-import { questsApi, type QuestResponse } from '@/api/questsApi';
+import { questsApi } from '@/api/questsApi';
+import { type QuestResponse, Quest, MyQuestsState } from '@/types/quests';
 import { formatDuration } from '@/utils/format';
 
-export interface Quest {
-    id: string;
-    title: string;
-    subtitle: string;
-    description: string;
-    imageUrl?: string;
-    checkpointsCount: number;
-    estimatedDuration: number;
-    lastSessionDate?: string;
-    nextSessionDate?: string;
-}
-
-export interface MyQuestsState {
-    quests: Quest[];
-    searchQuery: string;
-    currentPage: number;
-    totalPages: number;
-    pageSize: number;
-    isLoading: boolean;
-    error: string | null;
-}
 
 export const createInitialMyQuestsState = (): MyQuestsState => ({
     quests: [],

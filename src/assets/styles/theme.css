@@ -50,6 +50,14 @@
 
     --background-secondary: #FFFFFF;
     --background-tertiary: #e9ecef;
+
+    --step-indicator-color: #9ca3af;
+
+    --checkpoint-number-default: #9ca3af;
+    --checkpoint-bg-expanded: #f0fdf9;
+
+    --card-bg: #f5f5f7;
+    --toggle-off-bg: #ccc;
 }
 
 :root.dark {
@@ -104,4 +112,12 @@
 
     --background-secondary: #0a0a0a;
     --background-tertiary: #2a2a2a;
+
+    --step-indicator-color: #ffffff;
+
+    --checkpoint-number-default: #9ca3af;
+    --checkpoint-bg-expanded: #1a3a32;
+
+    --card-bg: rgba(255, 255, 255, 0.05);
+    --toggle-off-bg: #4a4a4a;
 }
