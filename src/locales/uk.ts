@@ -56,6 +56,7 @@ export default {
         },
         login: {
             title: 'Ласкаво просимо до',
+            brand: 'GoQuestly',
             forgotPassword: 'Забули пароль?',
             loginButton: 'Увійти',
             loggingIn: 'Вхід...',
@@ -94,6 +95,11 @@ export default {
             title: 'Скидання пароля',
             sendButton: 'Надіслати посилання для скидання',
             successMessage: 'Посилання для скидання паролю надіслано на вашу пошту',
+            errors: {
+                failed: 'Помилка запиту',
+                emailNotFound: 'Електронну пошту не знайдено',
+                tooManyAttempts: 'Забагато спроб. Спробуйте пізніше',
+            },
         },
         changePassword: {
             title: 'Зміна пароля',
@@ -308,6 +314,9 @@ export default {
             avatarTooLarge: 'Розмір фото має бути менше 5МБ',
             avatarInvalidType: 'Дозволені лише формати JPG, PNG та WEBP',
         },
+        last: 'Остання',
+        next: 'Наступна',
+        noSessionData: 'Дані про сесії ще недоступні.',
     },
     navigation: {
         myquests: 'Мої Квести',

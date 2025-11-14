@@ -20,3 +20,4 @@ export const formatDuration = (
 
     return `${hours} ${t(hourKey)} ${mins} ${t(minKey)}`;
 };
+

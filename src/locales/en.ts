@@ -59,6 +59,7 @@ export default {
             forgotPassword: 'Forgot password?',
             loginButton: 'Sign In',
             loggingIn: 'Signing in...',
+            brand: 'GoQuestly',
             googleLogin: 'Sign in with Google',
             errors: {
                 failed: 'Login failed',
@@ -68,6 +69,8 @@ export default {
         register: {
             subtitle: 'Create and manage interactive quests',
             confirmPasswordPlaceholder: 'Confirm password',
+            namePlaceholder: 'Name',
+            registerButton: 'Register',
             registering: 'Registering...',
             googleRegister: 'Sign up with Google',
             alreadyHaveAccount: 'Already have an account?',
@@ -94,6 +97,12 @@ export default {
             title: 'Reset Password',
             sendButton: 'Send reset link',
             successMessage: 'Password reset link sent to your email',
+            sending: 'Sending...',
+            backToLogin: 'Back to Login',
+            errors: {
+                failed: 'Request Failed',
+                emailNotFound: 'Email not found',
+            },
         },
         changePassword: {
             title: 'Change Password',
@@ -307,6 +316,31 @@ export default {
             updateFailed: 'Failed to update profile',
             avatarTooLarge: 'Photo size must be less than 5MB',
             avatarInvalidType: 'Only JPG, PNG and WEBP formats allowed',
+        },
+    },
+    profile: {
+        title: 'Edit profile',
+        subtitle: 'Manage your account details',
+        changePhoto: 'Change Photo',
+        uploading: 'Uploading...',
+        fileInfo: 'JPG, PNG or WEBP, up to 5MB',
+        fullName: 'Full Name',
+        fullNamePlaceholder: 'Enter your name',
+        cancel: 'Cancel',
+        saveChanges: 'Save Changes',
+        saving: 'Saving...',
+        success: {
+            updated: 'Profile updated successfully',
+            avatarUpdated: 'Photo updated successfully',
+        },
+        errors: {
+            failed: 'Update Failed',
+            noChanges: 'No changes to save',
+            loadFailed: 'Failed to load profile data',
+            uploadFailed: 'Failed to upload photo',
+            updateFailed: 'Failed to update profile',
+            avatarTooLarge: 'Photo must be less than 5MB',
+            avatarInvalidType: 'Only JPG, PNG and WEBP formats are allowed',
         },
     },
     navigation: {
