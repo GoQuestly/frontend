@@ -1,0 +1,52 @@
+.verify-email-form {
+    background-color: var(--verify-form-bg);
+    padding: 2.5rem 2rem;
+    border-radius: 12px;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.verify-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    line-height: 1.4;
+    transition: color 0.3s ease;
+}
+
+form {
+    margin-top: 0;
+}
+
+.verify-email-form .base-input {
+    background-color: var(--verify-input-bg);
+    border-color: var(--input-border);
+    transition: background-color 0.3s ease, border-color 0.2s, box-shadow 0.2s;
+}
+
+@media (max-width: 768px) {
+    .verify-email-form {
+        padding: 2rem 1.5rem;
+    }
+
+    .verify-title {
+        font-size: 1.1rem;
+        margin-bottom: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .verify-email-form {
+        padding: 1.5rem 1rem;
+        max-width: 100%;
+    }
+
+    .verify-title {
+        font-size: 1rem;
+        margin-bottom: 1rem;
+    }
+}

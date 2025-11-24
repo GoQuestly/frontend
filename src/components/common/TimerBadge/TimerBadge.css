@@ -1,0 +1,33 @@
+.timer-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
+    height: 100px;
+    background-color: var(--timer-bg);
+    color: var(--timer-text);
+    border-radius: 50%;
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    box-shadow: 0 2px 8px rgba(48, 183, 157, 0.15);
+}
+
+@media (max-width: 768px) {
+    .timer-badge {
+        width: 90px;
+        height: 90px;
+        font-size: 1.2rem;
+        margin-bottom: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .timer-badge {
+        width: 80px;
+        height: 80px;
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+    }
+}

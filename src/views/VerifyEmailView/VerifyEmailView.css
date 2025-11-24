@@ -1,0 +1,30 @@
+.verify-email-view {
+    min-height: 100vh;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-primary);
+    transition: background-color 0.3s ease;
+    overflow: hidden;
+}
+
+.verify-email-main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+    .verify-email-main {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .verify-email-main {
+        padding: 1rem;
+    }
+}

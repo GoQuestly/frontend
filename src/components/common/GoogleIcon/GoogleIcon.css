@@ -1,0 +1,46 @@
+.google-icon-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 1rem 0;
+    flex-shrink: 0;
+}
+
+.google-icon {
+    width: 48px;
+    height: 48px;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    flex-shrink: 0;
+}
+
+.google-icon:hover {
+    transform: scale(1.1);
+    opacity: 0.9;
+}
+
+.google-icon:active {
+    transform: scale(0.95);
+}
+
+@media (max-width: 900px) {
+    .google-icon-container {
+        margin: 0.8rem 0;
+    }
+
+    .google-icon {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+@media (max-width: 480px) {
+    .google-icon-container {
+        margin: 0.6rem 0;
+    }
+
+    .google-icon {
+        width: 36px;
+        height: 36px;
+    }
+}
