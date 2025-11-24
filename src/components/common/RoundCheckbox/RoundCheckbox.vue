@@ -22,7 +22,7 @@ interface Emits {
   (e: 'update:modelValue', value: boolean): void;
 }
 
-const props = defineProps<Props>();
+defineProps<Props>();
 const emit = defineEmits<Emits>();
 
 const handleChange = (event: Event): void => {

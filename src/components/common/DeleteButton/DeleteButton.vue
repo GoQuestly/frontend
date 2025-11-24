@@ -10,8 +10,6 @@
 </template>
 
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n';
-
 interface Props {
   title?: string;
 }
@@ -21,7 +19,6 @@ defineEmits<{
   (e: 'click'): void;
 }>();
 
-const { t } = useI18n();
 </script>
 
 <style scoped src="./DeleteButton.css"></style>
