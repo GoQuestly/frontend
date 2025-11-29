@@ -10,9 +10,10 @@
       }"
       @click="handleClick"
   >
+    <SuccessBox v-if="successMessage" :message="successMessage" class="checkpoint-success" />
     <div class="checkpoint-header">
       <div class="checkpoint-left">
-        <div v-if="mode === 'edit'" class="drag-handle-column">
+        <div v-if="mode === 'edit' && canReorder" class="drag-handle-column">
           <img src="@/assets/images/drag-handle.png" alt="Drag" class="drag-icon" />
         </div>
 
@@ -21,7 +22,7 @@
             <span class="checkpoint-number">{{ number }}.</span>
 
             <BaseInput
-                v-if="mode === 'edit' && isExpanded"
+                v-if="mode === 'edit' && isExpanded && allowNameEdit"
                 ref="nameInputRef"
                 v-model="localCheckpoint.name"
                 :placeholder="$t('quests.createQuest.step2.checkpointNamePlaceholder')"
@@ -42,7 +43,7 @@
         </div>
       </div>
 
-      <div v-if="mode === 'edit'" class="checkpoint-actions">
+      <div v-if="mode === 'edit' && canDelete" class="checkpoint-actions">
         <DeleteButton @click="$emit('delete')" />
       </div>
 
@@ -69,7 +70,7 @@
     </div>
 
     <div
-        v-if="isExpanded && mode === 'edit'"
+        v-if="isExpanded && mode === 'edit' && allowNameEdit"
         class="checkpoint-details"
     >
       <div class="coordinate-row">
@@ -82,11 +83,6 @@
           <span class="coordinate-value">{{ localCheckpoint.longitude.toFixed(4) }}</span>
         </div>
       </div>
-
-      <RoundCheckbox
-          v-model="localCheckpoint.requiredForNext"
-          :label="$t('quests.createQuest.step2.requiredForNext')"
-      />
 
       <BaseButton
           variant="primary"
@@ -108,8 +104,8 @@ import { ref } from 'vue';
 import type { ComponentPublicInstance } from 'vue';
 import BaseInput from '@/components/base/BaseInput/BaseInput.vue';
 import BaseButton from '@/components/base/BaseButton/BaseButton.vue';
-import RoundCheckbox from '@/components/common/RoundCheckbox/RoundCheckbox.vue';
 import DeleteButton from '@/components/common/DeleteButton/DeleteButton.vue';
+import SuccessBox from '@/components/common/SuccessBox/SuccessBox.vue';
 import { useCheckpointCard, type Checkpoint } from './CheckpointCard';
 
 interface Props {
@@ -118,12 +114,20 @@ interface Props {
   isSelected?: boolean;
   mode?: 'edit' | 'accordion' | 'view';
   expanded?: boolean;
+  canDelete?: boolean;
+  canReorder?: boolean;
+  allowNameEdit?: boolean;
+  successMessage?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   isSelected: false,
   mode: 'edit',
   expanded: false,
+  canDelete: true,
+  canReorder: true,
+  allowNameEdit: true,
+  successMessage: '',
 });
 
 const emit = defineEmits<{

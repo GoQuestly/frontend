@@ -1,4 +1,5 @@
 import { questsApi } from '@/api/questsApi';
+import { sessionApi } from '@/api/sessionApi';
 import { type QuestResponse, Quest, MyQuestsState } from '@/types/quests';
 import { formatDuration } from '@/utils/format';
 
@@ -15,16 +16,58 @@ export const createInitialMyQuestsState = (): MyQuestsState => ({
 
 const mapQuestResponseToQuest = (questResponse: QuestResponse): Quest => {
     return {
-        id: questResponse.questId.toString(),
+        id: questResponse.questId,
         title: questResponse.title,
         subtitle: '',
         description: questResponse.description,
         imageUrl: questResponse.photoUrl || undefined,
-        checkpointsCount: 0,
+        checkpointsCount: questResponse.questPointCount || 0,
         estimatedDuration: questResponse.maxDurationMinutes,
-        lastSessionDate: undefined,
-        nextSessionDate: undefined,
+        lastSessionDate: questResponse.lastSessionDate,
+        nextSessionDate: questResponse.nextSessionDate,
     };
+};
+
+const formatSessionDate = (dateString: string | null): string | undefined => {
+    if (!dateString) return undefined;
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
+const fetchQuestAdditionalData = async (questId: number): Promise<{ lastSessionDate?: string; nextSessionDate?: string; checkpointsCount: number }> => {
+    try {
+        const [sessionsResponse, checkpoints] = await Promise.all([
+            sessionApi.getQuestSessions(questId, 1, 100),
+            questsApi.getCheckpoints(questId)
+        ]);
+
+        const sessions = sessionsResponse.items || [];
+        const checkpointsCount = checkpoints.length;
+
+        if (sessions.length === 0) {
+            return { checkpointsCount };
+        }
+
+        const now = new Date().getTime();
+        const pastSessions = sessions
+            .filter(s => s.startDate && new Date(s.startDate).getTime() < now)
+            .sort((a, b) => new Date(b.startDate || '').getTime() - new Date(a.startDate || '').getTime());
+
+        const futureSessions = sessions
+            .filter(s => s.startDate && new Date(s.startDate).getTime() >= now)
+            .sort((a, b) => new Date(a.startDate || '').getTime() - new Date(b.startDate || '').getTime());
+
+        return {
+            lastSessionDate: pastSessions[0]?.startDate ? formatSessionDate(pastSessions[0].startDate) : undefined,
+            nextSessionDate: futureSessions[0]?.startDate ? formatSessionDate(futureSessions[0].startDate) : undefined,
+            checkpointsCount,
+        };
+    } catch (error) {
+        return { checkpointsCount: 0 };
+    }
 };
 
 export const fetchQuestsLogic = async (
@@ -41,7 +84,21 @@ export const fetchQuestsLogic = async (
             pageSize: state.pageSize,
         });
 
-        state.quests = response.items.map(mapQuestResponseToQuest);
+        const quests = response.items.map(mapQuestResponseToQuest);
+
+        const questsWithSessions = await Promise.all(
+            quests.map(async (quest) => {
+                const additionalData = await fetchQuestAdditionalData(quest.id);
+                return {
+                    ...quest,
+                    lastSessionDate: additionalData.lastSessionDate,
+                    nextSessionDate: additionalData.nextSessionDate,
+                    checkpointsCount: additionalData.checkpointsCount,
+                };
+            })
+        );
+
+        state.quests = questsWithSessions;
         state.currentPage = response.pageNumber;
         state.totalPages = Math.ceil(response.total / response.pageSize);
     } catch (error) {

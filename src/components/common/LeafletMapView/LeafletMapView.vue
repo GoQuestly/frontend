@@ -65,7 +65,7 @@ const initMap = () => {
 
   const center = props.checkpoints.length > 0
       ? [props.checkpoints[0].latitude, props.checkpoints[0].longitude] as L.LatLngExpression
-      : [40.7128, -74.0060] as L.LatLngExpression;
+      : [49.9935, 36.2304] as L.LatLngExpression;
 
   const mapOptions: L.MapOptions = {
     dragging: props.interactive,

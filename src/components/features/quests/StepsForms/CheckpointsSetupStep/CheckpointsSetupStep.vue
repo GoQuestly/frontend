@@ -1,8 +1,7 @@
 <template>
   <div class="checkpoints-setup-step">
-    <h2 class="step-title">{{ $t('quests.createQuest.step2.title') }}</h2>
+    <h2 class="step-title">{{ stepTitle }}</h2>
     <div class="step-feedback">
-      <SuccessBox v-if="successMessage" :message="successMessage" class="step-success" />
       <ErrorBox v-if="error" :message="error" class="step-error" />
     </div>
 
@@ -17,6 +16,10 @@
               :is-selected="selectedCheckpointId === checkpoint.id"
               class="checkpoint-item"
               :data-id="checkpoint.id"
+              :can-delete="true"
+              :can-reorder="true"
+              :allow-name-edit="true"
+              :success-message="lastSavedCheckpointId === checkpoint.id ? successMessage : ''"
               @select="selectCheckpoint(checkpoint.id)"
               @delete="deleteCheckpoint(checkpoint.id)"
               @save="updateCheckpoint"
@@ -39,6 +42,8 @@
         <LeafletMapView
             :checkpoints="localData.checkpoints"
             :selected-checkpoint-id="selectedCheckpointId"
+            :interactive="true"
+            :editable="true"
             @update-coordinates="updateCheckpointCoordinates"
             @marker-click="selectCheckpoint"
         />
@@ -52,9 +57,10 @@
 import CheckpointCard from '@/components/common/CheckpointCard/CheckpointCard.vue';
 import LeafletMapView from '@/components/common/LeafletMapView/LeafletMapView.vue';
 import ErrorBox from '@/components/common/ErrorBox/ErrorBox.vue';
-import SuccessBox from '@/components/common/SuccessBox/SuccessBox.vue';
+import { computed } from 'vue';
 import { useCheckpointsSetup } from './CheckpointsSetupStep';
 import type { QuestFormData } from '@/types/form'
+import { useI18n } from 'vue-i18n';
 import './CheckpointsSetupStep.css';
 
 interface Props {
@@ -74,6 +80,7 @@ const {
   isCreating,
   error,
   successMessage,
+  lastSavedCheckpointId,
   selectCheckpoint,
   updateCheckpoint,
   updateCheckpointCoordinates,
@@ -81,6 +88,9 @@ const {
   addNewCheckpoint,
   getCheckpoints,
 } = useCheckpointsSetup(props, emit);
+
+const { t: $t } = useI18n();
+const stepTitle = computed(() => $t('quests.createQuest.step2.title'));
 
 defineExpose({
   getCheckpoints,

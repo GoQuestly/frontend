@@ -9,6 +9,10 @@
     box-sizing: border-box;
 }
 
+.checkpoint-success {
+    margin-bottom: 0.75rem;
+}
+
 .checkpoint-card.edit-mode {
     border-left: 4px solid transparent;
     padding: 1rem;

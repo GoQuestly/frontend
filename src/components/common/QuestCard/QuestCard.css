@@ -135,6 +135,13 @@
     font-size: 0.8rem;
 }
 
+.date-grid {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    gap: 1rem;
+}
+
 .date-item {
     display: flex;
     gap: 0.35rem;

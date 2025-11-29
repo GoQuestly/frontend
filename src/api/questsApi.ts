@@ -186,4 +186,10 @@ export const questsApi = {
             `/organizer/quest-tasks/${questTaskId}`
         );
     },
+
+    async deleteQuest(questId: number): Promise<void> {
+        await apiClient.delete(
+            `/organizer/quest/${questId}`
+        );
+    },
 };

@@ -48,16 +48,6 @@
             </div>
           </div>
 
-          <div class="meta-card">
-            <div class="toggle-row">
-              <span class="meta-label">{{ $t('quests.createQuest.step4.publicProgress') }}</span>
-              <div class="toggle-display">
-                <span class="toggle-text">{{ formData.publicProgressVisibility ? $t('common.on') : $t('common.off') }}</span>
-                <div class="toggle-indicator" :class="{ active: formData.publicProgressVisibility }"></div>
-              </div>
-            </div>
-          </div>
-
           <div class="starting-location">
             <h4>{{ $t('quests.createQuest.step4.startingLocation') }}</h4>
             <div class="location-map">
@@ -86,19 +76,12 @@
             v-for="(checkpoint, index) in formData.checkpoints"
             :key="checkpoint.id"
             class="checkpoint-item"
-            :class="{ required: checkpoint.requiredForNext }"
         >
           <div class="checkpoint-number">{{ index + 1 }}</div>
           <div class="checkpoint-info">
             <div class="checkpoint-name-row">
               <span class="checkpoint-name">{{ checkpoint.name }}</span>
               <span class="checkpoint-coords">({{ checkpoint.latitude.toFixed(4) }}° N, {{ checkpoint.longitude.toFixed(4) }}° E)</span>
-              <span v-if="checkpoint.requiredForNext" class="checkpoint-status required">
-                {{ $t('quests.createQuest.step4.requiredForNext') }}
-              </span>
-              <span v-else class="checkpoint-status optional">
-                {{ $t('quests.createQuest.step4.optional') }}
-              </span>
             </div>
           </div>
         </div>
@@ -136,7 +119,7 @@
             <div class="task-content">
               <div class="task-item-title">{{ getTaskTypeLabel(task.type) }}: {{ task.title || $t('quests.createQuest.step4.untitledTask') }}</div>
               <div class="task-item-details">
-                {{ $t('quests.createQuest.step4.maxPoints') }}: {{ task.maxPoints }}<template v-if="task.duration">, {{ $t('common.duration') }}: {{ task.duration }} {{ $t('common.min') }}</template><template v-if="task.successThreshold">, {{ $t('quests.createQuest.step4.success') }}: {{ task.successThreshold }}%</template>
+                {{ $t('quests.createQuest.step4.maxPoints') }}: {{ task.maxPoints }}<template v-if="task.duration">, {{ $t('common.duration') }}: {{ task.duration }} {{ $t('common.min') }}</template><template v-if="task.type === 'quiz' && task.successThreshold">, {{ $t('quests.createQuest.step4.success') }}: {{ task.successThreshold }}%</template>
               </div>
             </div>
           </div>

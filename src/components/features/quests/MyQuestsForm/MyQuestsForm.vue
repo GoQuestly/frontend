@@ -38,6 +38,7 @@
           v-for="quest in state.quests"
           :key="quest.id"
           :quest="quest"
+          @click="openQuestSessions"
       />
     </div>
 
@@ -77,6 +78,32 @@ const state = reactive(createInitialMyQuestsState());
 
 let searchTimeout: ReturnType<typeof setTimeout> | null = null;
 
+const QUEST_DRAFT_STORAGE_KEY = 'createQuestDraft';
+
+interface QuestDraftSnapshot {
+  currentStep: number;
+  questId: number | null;
+  photoUrl: string;
+  formData: any;
+}
+
+const readQuestDraft = (): QuestDraftSnapshot | null => {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  const storedDraft = window.localStorage.getItem(QUEST_DRAFT_STORAGE_KEY);
+  if (!storedDraft) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(storedDraft) as QuestDraftSnapshot;
+  } catch {
+    return null;
+  }
+};
+
 const initializeFromUrl = () => {
   const pageFromUrl = parseInt(route.query.page as string) || 1;
   const searchFromUrl = (route.query.search as string) || '';
@@ -101,6 +128,17 @@ const updateUrl = (page: number, search: string) => {
 
 const navigateToCreateQuest = (): void => {
   router.replace({ name: 'create-quest' });
+};
+
+const openQuestSessions = (questId: number): void => {
+  const draft = readQuestDraft();
+
+  if (draft?.questId === questId) {
+    router.push({ name: 'create-quest' });
+    return;
+  }
+
+  router.push({ name: 'quest-sessions', params: { questId } });
 };
 
 onMounted(async () => {

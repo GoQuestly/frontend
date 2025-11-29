@@ -12,7 +12,7 @@
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 2rem;
+    gap: 1.8rem;
     margin-top: 2rem;
 }
 
@@ -32,10 +32,18 @@
     font-size: 0.9rem;
     font-weight: 500;
     color: var(--text-primary);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    white-space: nowrap;
 }
 
 .required {
     color: #EF4444;
+}
+
+.quest-information-step--limited .required {
+    display: none;
 }
 
 .base-textarea {
@@ -64,6 +72,11 @@
     cursor: pointer;
     transition: all 0.3s ease;
     background-color: var(--bg-secondary);
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .file-upload-area:hover {
@@ -76,6 +89,7 @@
     border: 1px solid var(--border-color);
     border-style: solid;
     background-color: var(--bg-secondary);
+    min-height: 200px;
 }
 
 .upload-icon img {
@@ -221,6 +235,11 @@
     border-radius: 0.5rem;
     overflow: hidden;
     border: 1px solid var(--border-color);
+}
+
+.map-wrapper--disabled {
+    pointer-events: none;
+    opacity: 0.9;
 }
 
 .map-hint {

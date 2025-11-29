@@ -5,8 +5,8 @@ import type { Options } from 'sortablejs';
 import { questsApi } from '@/api/questsApi';
 import type { QuestFormData } from '@/types/form';
 import { showTemporaryMessage } from '@/utils/messages';
-import { confirmWithTranslation } from '@/utils/dialogs';
 import type { QuestCheckpoint } from '@/types/checkpoint';
+import { useConfirmDialog } from '@/composables/useConfirmDialog';
 
 export type Checkpoint = QuestCheckpoint;
 
@@ -21,6 +21,7 @@ interface Emit {
 
 export const useCheckpointsSetup = (props: Props, emit: Emit) => {
     const { t } = useI18n();
+    const confirmDialog = useConfirmDialog();
 
     const localData = reactive({
         checkpoints: [] as Checkpoint[],
@@ -35,6 +36,7 @@ export const useCheckpointsSetup = (props: Props, emit: Emit) => {
 
     const error = computed(() => errorKey.value ? t(errorKey.value) : '');
     const successMessage = ref('');
+    const lastSavedCheckpointId = ref<string | null>(null);
 
     const updateParent = (): void => {
         emit('update:modelValue', {
@@ -60,7 +62,6 @@ export const useCheckpointsSetup = (props: Props, emit: Emit) => {
                 name: cp.name,
                 latitude: cp.latitude,
                 longitude: cp.longitude,
-                requiredForNext: false,
                 questPointId: cp.questPointId,
             }));
 
@@ -186,6 +187,7 @@ export const useCheckpointsSetup = (props: Props, emit: Emit) => {
                 orderNum: index + 1,
             });
 
+            lastSavedCheckpointId.value = normalizedCheckpoint.id;
             showTemporaryMessage(successMessage, t('quests.createQuest.step2.checkpointSaveSuccess'), 3000);
         } catch (err: any) {
 
@@ -208,11 +210,24 @@ export const useCheckpointsSetup = (props: Props, emit: Emit) => {
     const deleteCheckpoint = async (id: string): Promise<void> => {
         errorKey.value = '';
 
+        if (localData.checkpoints.length <= 1) {
+            errorKey.value = 'quests.createQuest.step2.errors.cannotDeleteLastCheckpoint';
+            return;
+        }
+
         const checkpoint = localData.checkpoints.find(cp => cp.id === id);
 
         if (!checkpoint) return;
 
-        if (!confirmWithTranslation(t, 'quests.createQuest.confirmations.deleteCheckpoint')) {
+        const confirmed = await confirmDialog({
+            title: t('common.delete'),
+            message: t('quests.createQuest.confirmations.deleteCheckpoint'),
+            confirmText: t('common.delete'),
+            cancelText: t('common.cancel'),
+            tone: 'danger',
+        });
+
+        if (!confirmed) {
             return;
         }
 
@@ -250,8 +265,8 @@ export const useCheckpointsSetup = (props: Props, emit: Emit) => {
             const checkpointNumber = localData.checkpoints.length + 1;
             const defaultName = `Checkpoint ${checkpointNumber}`;
 
-            const defaultLat = props.modelValue.startingLat || 40.7128;
-            const defaultLng = props.modelValue.startingLng || -74.0060;
+            const defaultLat = props.modelValue.startingLat || 49.9935;
+            const defaultLng = props.modelValue.startingLng || 36.2304;
 
             const data = await questsApi.createCheckpoint(props.questId, {
                 name: defaultName,
@@ -265,7 +280,6 @@ export const useCheckpointsSetup = (props: Props, emit: Emit) => {
                 name: data.name,
                 latitude: data.latitude,
                 longitude: data.longitude,
-                requiredForNext: false,
                 questPointId: data.questPointId,
             };
 
@@ -300,6 +314,7 @@ export const useCheckpointsSetup = (props: Props, emit: Emit) => {
         isLoading,
         error,
         successMessage,
+        lastSavedCheckpointId,
         selectCheckpoint,
         updateCheckpoint,
         updateCheckpointCoordinates,

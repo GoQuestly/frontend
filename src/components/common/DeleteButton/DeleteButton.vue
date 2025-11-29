@@ -21,7 +21,7 @@ defineEmits<{
   (e: 'click'): void;
 }>();
 
-const { t } = useI18n();
+const { t: $t } = useI18n();
 </script>
 
 <style scoped src="./DeleteButton.css"></style>

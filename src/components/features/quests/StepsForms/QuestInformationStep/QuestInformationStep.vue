@@ -1,6 +1,6 @@
 <template>
   <div class="quest-information-step">
-    <h2 class="step-title">{{ $t('quests.createQuest.step1.title') }}</h2>
+    <h2 class="step-title">{{ stepTitle }}</h2>
 
     <form ref="formRef" @submit.prevent>
       <div class="form-grid">
@@ -56,7 +56,7 @@
                   @change="handleFileSelect"
               />
 
-              <template v-if="!coverImageFile && !coverImagePreview">
+              <template v-if="(!coverImageFile && !coverImagePreview) || imageLoadError">
                 <div class="upload-icon">
                   <img src="@/assets/images/cloud-upload.png" alt="Upload" />
                 </div>
@@ -69,7 +69,7 @@
 
               <template v-else>
                 <div class="preview-container">
-                  <img :src="coverImagePreview" alt="Cover preview" class="cover-preview" />
+                  <img :src="coverImagePreview" alt="Cover preview" class="cover-preview" @error="handleImageError" />
                   <div class="preview-overlay">
                     <p v-if="coverImageFile?.name" class="preview-filename">{{ coverImageFile?.name }}</p>
                     <button type="button" class="remove-btn" @click.stop="removeCoverImage">
@@ -78,22 +78,6 @@
                   </div>
                 </div>
               </template>
-            </div>
-          </div>
-
-          <div class="form-field">
-            <div class="form-field-inline">
-              <label class="field-label">
-                {{ $t('quests.createQuest.step1.publicProgress') }}
-              </label>
-              <label class="toggle-switch">
-                <input
-                    type="checkbox"
-                    v-model="localData.publicProgressVisibility"
-                    @change="updateField('publicProgressVisibility', localData.publicProgressVisibility)"
-                />
-                <span class="toggle-slider"></span>
-              </label>
             </div>
           </div>
 
@@ -115,6 +99,8 @@
                     :model-value="localData.minParticipants === 0 || localData.minParticipants ? String(localData.minParticipants) : ''"
                     type="number"
                     numbers-only
+                    :min="1"
+                    :max="100"
                     required
                     @update:model-value="handleNumberInput('minParticipants', $event)"
                 />
@@ -132,6 +118,8 @@
                     :model-value="localData.maxParticipants === 0 || localData.maxParticipants ? String(localData.maxParticipants) : ''"
                     type="number"
                     numbers-only
+                    :min="1"
+                    :max="100"
                     required
                     @update:model-value="handleNumberInput('maxParticipants', $event)"
                 />
@@ -149,6 +137,8 @@
                     :model-value="localData.maxDuration === 0 || localData.maxDuration ? String(localData.maxDuration) : ''"
                     type="number"
                     numbers-only
+                    :min="10"
+                    :max="1440"
                     required
                     @update:model-value="handleNumberInput('maxDuration', $event)"
                 />
@@ -168,7 +158,9 @@
                   :checkpoints="[startingPointCheckpoint]"
                   :selected-checkpoint-id="'starting-point'"
                   :show-instructions="false"
-                  @update-coordinates="updateStartingCoordinates"
+                  :interactive="true"
+                  :editable="true"
+                  @update-coordinates="handleMapUpdate"
               />
               <p class="map-hint">{{ $t('quests.createQuest.step1.mapPlaceholder') }}</p>
             </div>
@@ -190,39 +182,40 @@
                 :model-value="localData.startRadius === 0 || localData.startRadius ? String(localData.startRadius) : ''"
                 type="number"
                 numbers-only
+                :min="20"
+                :max="10000"
                 required
                 @update:model-value="handleNumberInput('startRadius', $event)"
             />
           </div>
         </div>
       </div>
+      <div class="quest-information-step__actions">
+        <SuccessBox
+            v-if="successMessage"
+            :message="successMessage"
+            class="quest-information-step__success"
+        />
+        <BaseButton
+            class="save-changes-button"
+            variant="primary"
+            @click="$emit('save')"
+        >
+          {{ $t('quests.createQuest.step1.saveChanges') }}
+        </BaseButton>
+      </div>
     </form>
-
-    <div class="quest-information-step__actions">
-      <SuccessBox
-          v-if="successMessageToShow"
-          :message="successMessageToShow"
-          class="quest-information-step__success"
-      />
-      <BaseButton
-          variant="secondary"
-          class="save-changes-button"
-          :disabled="isSaving"
-          @click="handleSaveClick"
-      >
-        {{ $t('quests.createQuest.step1.saveChanges') }}
-      </BaseButton>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import BaseButton from '@/components/base/BaseButton/BaseButton.vue';
 import BaseInput from '@/components/base/BaseInput/BaseInput.vue';
+import BaseButton from '@/components/base/BaseButton/BaseButton.vue';
 import ErrorBox from '@/components/common/ErrorBox/ErrorBox.vue';
 import SuccessBox from '@/components/common/SuccessBox/SuccessBox.vue';
 import LeafletMapView from '@/components/common/LeafletMapView/LeafletMapView.vue';
+import { useI18n } from 'vue-i18n';
 import { useQuestInformationStep } from './QuestInformationStep';
 import type { QuestFormData } from '@/types/form';
 import './QuestInformationStep.css';
@@ -231,13 +224,11 @@ interface Props {
   modelValue: QuestFormData;
   questId?: number | null;
   existingPhotoUrl?: string;
-  isSaving?: boolean;
   successMessage?: string;
 }
 
 const props = defineProps<Props>();
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: QuestFormData): void;
   (e: 'cover-image-change', file: File | null): void;
   (e: 'save'): void;
 }>();
@@ -248,6 +239,7 @@ const {
   fileInputRef,
   coverImageFile,
   coverImagePreview,
+  imageLoadError,
   errors,
   startingPointCheckpoint,
   triggerFileInput,
@@ -258,20 +250,20 @@ const {
   handleNumberInput,
   updateStartingCoordinates,
   validate,
+  getFormValues,
+  resetToModelValue,
+  handleImageError,
 } = useQuestInformationStep(props, emit);
 
-const isSaving = computed(() => props.isSaving ?? false);
-const successMessageToShow = computed(() => props.successMessage ?? '');
+const { t: $t } = useI18n();
+const stepTitle = computed(() => $t('quests.createQuest.step1.title'));
+const handleMapUpdate = (id: string, lat: number, lng: number) => {
+  updateStartingCoordinates(id, lat, lng);
+};
 
 defineExpose({
   validate,
-  getCoverImageFile: () => coverImageFile.value,
+  getFormValues,
+  resetToModelValue,
 });
-
-const handleSaveClick = (): void => {
-  if (!validate()) {
-    return;
-  }
-  emit('save');
-};
 </script>

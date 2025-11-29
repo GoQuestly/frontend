@@ -1,7 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import { getUser, getAccessToken, setAccessToken, removePendingUserId } from '@/utils/storage';
+import {
+    getUser,
+    getAccessToken,
+    setAccessToken,
+    removePendingUserId,
+    setUser,
+    clearAuth
+} from '@/utils/storage';
 import { isValidToken } from '@/utils/validation';
-import { authApi } from "@/api/authApi.ts";
+import { authApi } from '@/api/authApi.ts';
+import { profileApi } from '@/api/profileApi';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.VITE_BASE_URL),
@@ -15,6 +23,24 @@ const router = createRouter({
             path: '/my-quests',
             name: 'my-quests',
             component: () => import('../views/MyQuestsView/MyQuestsView.vue'),
+            meta: { requiresAuth: true, requiresVerification: true },
+        },
+        {
+            path: '/quests/:questId/sessions',
+            name: 'quest-sessions',
+            component: () => import('../views/QuestSessionsView/QuestSessionsView.vue'),
+            meta: { requiresAuth: true, requiresVerification: true },
+        },
+        {
+            path: '/quests/:questId/sessions/:sessionId/manage',
+            name: 'quest-session-manage',
+            component: () => import('../views/ManageSessionFormView/ManageSessionFormView.vue'),
+            meta: { requiresAuth: true, requiresVerification: true },
+        },
+        {
+            path: '/quests/:questId/edit',
+            name: 'quest-edit',
+            component: () => import('../views/QuestEditView/QuestEditView.vue'),
             meta: { requiresAuth: true, requiresVerification: true },
         },
         {
@@ -92,7 +118,7 @@ const router = createRouter({
     ],
 });
 
-router.beforeEach((to, _from, next) => {
+router.beforeEach(async (to, _from, next) => {
     const token = getAccessToken();
     const tokenValid = isValidToken(token);
     const user = getUser();
@@ -102,6 +128,23 @@ router.beforeEach((to, _from, next) => {
         if (callbackToken) {
             setAccessToken(callbackToken);
             removePendingUserId();
+            try {
+                const profile = await profileApi.getProfile();
+                setUser({
+                    id: profile.userId,
+                    name: profile.name,
+                    email: profile.email,
+                    photo_url: profile.photoUrl || undefined,
+                    is_verified: profile.isEmailVerified,
+                });
+            } catch (error) {
+                clearAuth();
+                return next({
+                    name: 'auth-error',
+                    query: { error: 'profile_fetch_failed', messageKey: 'auth.error.default' },
+                    replace: true
+                });
+            }
             return next({ path: '/my-quests', replace: true });
         }
         return next({
