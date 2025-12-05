@@ -1,7 +1,10 @@
 import { questsApi } from '@/api/questsApi';
 import { sessionApi } from '@/api/sessionApi';
 import { type QuestResponse, Quest, MyQuestsState } from '@/types/quests';
+import { type QuestSessionResponse } from '@/types/session';
 import { formatDuration } from '@/utils/format';
+
+const API_URL = import.meta.env.VITE_API_URL || '';
 
 
 export const createInitialMyQuestsState = (): MyQuestsState => ({
@@ -9,18 +12,26 @@ export const createInitialMyQuestsState = (): MyQuestsState => ({
     searchQuery: '',
     currentPage: 1,
     totalPages: 1,
-    pageSize: 3,
+    pageSize: 10,
     isLoading: false,
     error: null,
 });
 
 const mapQuestResponseToQuest = (questResponse: QuestResponse): Quest => {
+    let imageUrl: string | undefined = undefined;
+
+    if (questResponse.photoUrl) {
+        imageUrl = questResponse.photoUrl.startsWith('http')
+            ? questResponse.photoUrl
+            : `${API_URL}${questResponse.photoUrl.startsWith('/') ? questResponse.photoUrl.slice(1) : questResponse.photoUrl}`;
+    }
+
     return {
         id: questResponse.questId,
         title: questResponse.title,
         subtitle: '',
         description: questResponse.description,
-        imageUrl: questResponse.photoUrl || undefined,
+        imageUrl,
         checkpointsCount: questResponse.questPointCount || 0,
         estimatedDuration: questResponse.maxDurationMinutes,
         lastSessionDate: questResponse.lastSessionDate,
@@ -37,14 +48,30 @@ const formatSessionDate = (dateString: string | null): string | undefined => {
     return `${year}-${month}-${day}`;
 };
 
+const fetchAllSessions = async (questId: number): Promise<QuestSessionResponse[]> => {
+    const pageSize = 100;
+    let page = 1;
+    let allSessions: QuestSessionResponse[] = [];
+
+    while (true) {
+        const response = await sessionApi.getQuestSessions(questId, page, pageSize);
+        allSessions = allSessions.concat(response.items || []);
+
+        if (page * pageSize >= response.total) {
+            break;
+        }
+        page++;
+    }
+
+    return allSessions;
+};
+
 const fetchQuestAdditionalData = async (questId: number): Promise<{ lastSessionDate?: string; nextSessionDate?: string; checkpointsCount: number }> => {
     try {
-        const [sessionsResponse, checkpoints] = await Promise.all([
-            sessionApi.getQuestSessions(questId, 1, 100),
+        const [sessions, checkpoints] = await Promise.all([
+            fetchAllSessions(questId),
             questsApi.getCheckpoints(questId)
         ]);
-
-        const sessions = sessionsResponse.items || [];
         const checkpointsCount = checkpoints.length;
 
         if (sessions.length === 0) {

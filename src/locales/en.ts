@@ -123,6 +123,7 @@ export default {
             title: 'Authentication Error',
             default: 'An authentication error occurred.',
             authRequired: 'Authentication required. Please sign in to access this page.',
+            goToHome: 'Go to Home',
         },
     },
     quests: {

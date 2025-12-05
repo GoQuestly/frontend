@@ -15,6 +15,8 @@ const triggerStorageUpdate = (): void => {
         key: null,
         storageArea: localStorage
     }));
+
+    window.dispatchEvent(new CustomEvent('local-storage-change'));
 };
 
 export const getAccessToken = (): string | null => getItem('accessToken');

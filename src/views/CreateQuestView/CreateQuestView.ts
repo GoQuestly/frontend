@@ -5,21 +5,27 @@ import { questsApi } from '@/api/questsApi';
 import { sessionApi } from '@/api/sessionApi';
 import { showTemporaryMessage } from '@/utils/messages';
 import { provideConfirmDialog, type ConfirmOptions } from '@/composables/useConfirmDialog';
+import { getDefaultCoordinates } from '@/utils/geolocation';
 import type { QuestFormData, CreateQuestState } from '@/types/form';
 
-const createInitialFormData = (): QuestFormData => ({
-  title: '',
-  description: '',
-  coverImage: null,
-  startingLat: 49.9935,
-  startingLng: 36.2304,
-  startRadius: 50,
-  minParticipants: 1,
-  maxParticipants: 50,
-  maxDuration: 120,
-  checkpoints: [],
-  tasks: [],
-});
+const API_URL = import.meta.env.VITE_API_URL || '';
+
+const createInitialFormData = (): QuestFormData => {
+  const defaultCoords = getDefaultCoordinates();
+  return {
+    title: '',
+    description: '',
+    coverImage: null,
+    startingLat: defaultCoords.lat,
+    startingLng: defaultCoords.lng,
+    startRadius: 50,
+    minParticipants: 1,
+    maxParticipants: 50,
+    maxDuration: 120,
+    checkpoints: [],
+    tasks: [],
+  };
+};
 
 const createInitialState = (): CreateQuestState => ({
   currentStep: 1,
@@ -343,7 +349,15 @@ export const useCreateQuestView = (props: Props) => {
       const quest = await questsApi.getQuestById(questId);
 
       state.questId = quest.questId;
-      state.photoUrl = quest.photoUrl || '';
+
+      // Fix photoUrl if it's a relative path
+      if (quest.photoUrl) {
+        state.photoUrl = quest.photoUrl.startsWith('http')
+          ? quest.photoUrl
+          : `${API_URL}${quest.photoUrl.startsWith('/') ? quest.photoUrl.slice(1) : quest.photoUrl}`;
+      } else {
+        state.photoUrl = '';
+      }
 
       state.formData = {
         ...state.formData,

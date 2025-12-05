@@ -7,17 +7,15 @@ export const handleWelcomeStartClick = (router: Router): void => {
     const tokenValid = isValidToken(token);
     const user = getUser();
 
-    if (!tokenValid) {
-        router.replace('/login');
+    if (!tokenValid || !user) {
+        router.push('/login');
         return;
     }
 
-    if (user && !user.is_verified) {
-        router.replace('/verify-email');
+    if (!user.is_verified) {
+        router.push('/verify-email');
         return;
     }
 
-    if (tokenValid && user?.is_verified) {
-        router.replace('/my-quests');
-    }
+    router.push('/my-quests');
 };

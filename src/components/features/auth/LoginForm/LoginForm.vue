@@ -26,14 +26,14 @@
         />
 
         <div class="forgot">
-          <a href="#" @click.prevent="router.replace('/reset-password')">{{ $t('auth.login.forgotPassword') }}</a>
+          <a href="#" @click.prevent="router.push('/reset-password')">{{ $t('auth.login.forgotPassword') }}</a>
         </div>
 
         <BaseButton type="submit" variant="primary" :disabled="state.isLoading">
           {{ state.isLoading ? $t('auth.login.loggingIn') : $t('auth.login.loginButton') }}
         </BaseButton>
 
-        <BaseButton type="button" variant="secondary" @click="router.replace('/register')">
+        <BaseButton type="button" variant="secondary" @click="router.push('/register')">
           {{ $t('common.register') }}
         </BaseButton>
       </form>

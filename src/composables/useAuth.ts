@@ -18,16 +18,22 @@ const handleStorageChange = (e: StorageEvent) => {
     }
 };
 
+const handleLocalStorageChange = () => {
+    updateAuthState();
+};
+
 export const useAuth = () => {
     const router = useRouter();
 
     onMounted(() => {
         updateAuthState();
         window.addEventListener('storage', handleStorageChange);
+        window.addEventListener('local-storage-change', handleLocalStorageChange);
     });
 
     onUnmounted(() => {
         window.removeEventListener('storage', handleStorageChange);
+        window.removeEventListener('local-storage-change', handleLocalStorageChange);
     });
 
     const isAuthenticated = computed(() => isValidToken(token.value));

@@ -63,6 +63,7 @@ export interface QuestSessionsState {
         title: string;
         description: string;
         maxParticipants?: number;
+        maxDurationMinutes?: number;
     } | null;
     sessions: Session[];
     isLoading: boolean;

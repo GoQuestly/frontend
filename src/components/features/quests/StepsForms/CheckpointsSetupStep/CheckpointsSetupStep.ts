@@ -5,6 +5,8 @@ import type { Options } from 'sortablejs';
 import { questsApi } from '@/api/questsApi';
 import type { QuestFormData } from '@/types/form';
 import { showTemporaryMessage } from '@/utils/messages';
+import { MESSAGE_TIMEOUT_MS } from '@/utils/constants';
+import { getDefaultCoordinates } from '@/utils/geolocation';
 import type { QuestCheckpoint } from '@/types/checkpoint';
 import { useConfirmDialog } from '@/composables/useConfirmDialog';
 
@@ -188,7 +190,7 @@ export const useCheckpointsSetup = (props: Props, emit: Emit) => {
             });
 
             lastSavedCheckpointId.value = normalizedCheckpoint.id;
-            showTemporaryMessage(successMessage, t('quests.createQuest.step2.checkpointSaveSuccess'), 3000);
+            showTemporaryMessage(successMessage, t('quests.createQuest.step2.checkpointSaveSuccess'), MESSAGE_TIMEOUT_MS);
         } catch (err: any) {
 
             if (err.response?.status === 401) {
@@ -265,8 +267,9 @@ export const useCheckpointsSetup = (props: Props, emit: Emit) => {
             const checkpointNumber = localData.checkpoints.length + 1;
             const defaultName = `Checkpoint ${checkpointNumber}`;
 
-            const defaultLat = props.modelValue.startingLat || 49.9935;
-            const defaultLng = props.modelValue.startingLng || 36.2304;
+            const defaultCoords = getDefaultCoordinates();
+            const defaultLat = props.modelValue.startingLat || defaultCoords.lat;
+            const defaultLng = props.modelValue.startingLng || defaultCoords.lng;
 
             const data = await questsApi.createCheckpoint(props.questId, {
                 name: defaultName,

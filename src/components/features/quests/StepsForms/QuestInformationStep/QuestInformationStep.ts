@@ -2,6 +2,7 @@ import { reactive, ref, computed, watch, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { QuestFormData } from '@/types/form';
 import { createStartingPointCheckpoint } from '@/utils/checkpoints';
+import { getDefaultCoordinates } from '@/utils/geolocation';
 
 interface Props {
     modelValue: QuestFormData;
@@ -27,14 +28,16 @@ interface Emit {
 export const useQuestInformationStep = (props: Props, emit: Emit) => {
     const { t } = useI18n();
 
+    const defaultCoords = getDefaultCoordinates();
+
     const localData = reactive({
         title: '',
         description: '',
         minParticipants: 0,
         maxParticipants: 0,
         maxDuration: 0,
-        startingLat: 49.9935,
-        startingLng: 36.2304,
+        startingLat: defaultCoords.lat,
+        startingLng: defaultCoords.lng,
         startRadius: 0,
     });
 
@@ -44,8 +47,8 @@ export const useQuestInformationStep = (props: Props, emit: Emit) => {
         localData.minParticipants = model.minParticipants || 0;
         localData.maxParticipants = model.maxParticipants || 0;
         localData.maxDuration = model.maxDuration || 0;
-        localData.startingLat = model.startingLat || 49.9935;
-        localData.startingLng = model.startingLng || 36.2304;
+        localData.startingLat = model.startingLat || defaultCoords.lat;
+        localData.startingLng = model.startingLng || defaultCoords.lng;
         localData.startRadius = model.startRadius || 0;
     };
 

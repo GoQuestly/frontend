@@ -18,6 +18,7 @@
 import { ref, onMounted, watch, onBeforeUnmount, withDefaults } from 'vue';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { getDefaultCoordinates } from '@/utils/geolocation';
 import type { ParticipantLocation } from '@/types/session';
 
 interface Checkpoint {
@@ -44,7 +45,7 @@ const props = withDefaults(defineProps<Props>(), {
   showCheckpoints: true,
   showPaths: false,
   showLegend: true,
-  center: () => ({ lat: 49.9935, lng: 36.2304 }),
+  center: () => getDefaultCoordinates(),
   zoom: 12,
 });
 
@@ -84,9 +85,10 @@ onMounted(() => {
 const initMap = () => {
   if (!mapRef.value) return;
 
+  const defaultCoords = getDefaultCoordinates();
   const mapCenter = props.center
     ? [props.center.lat, props.center.lng] as L.LatLngExpression
-    : [49.9935, 36.2304] as L.LatLngExpression;
+    : [defaultCoords.lat, defaultCoords.lng] as L.LatLngExpression;
 
   map = L.map(mapRef.value, {
     dragging: true,

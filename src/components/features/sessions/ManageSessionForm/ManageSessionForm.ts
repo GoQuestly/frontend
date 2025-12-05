@@ -6,6 +6,7 @@ import { sessionApi } from '@/api/sessionApi';
 import { useActiveSession } from '@/composables/useActiveSession';
 import { useSessionEvents } from '@/composables/useSessionEvents';
 import { showTemporaryMessage } from '@/utils/messages';
+import { MESSAGE_TIMEOUT_MS } from '@/utils/constants';
 import type {
     QuestSessionDetail,
     SessionParticipant,
@@ -193,7 +194,7 @@ export const useManageSessionForm = () => {
             if (copyState.value === 'copied') {
                 copyTimer = window.setTimeout(() => {
                     copyState.value = 'idle';
-                }, 2200);
+                }, MESSAGE_TIMEOUT_MS);
             }
         }
     };
@@ -280,7 +281,7 @@ export const useManageSessionForm = () => {
 
 const getMinStartDate = (): string => {
     const date = new Date();
-    date.setMinutes(date.getMinutes() + 3);
+    date.setMinutes(date.getMinutes() + 1);
     date.setSeconds(0, 0);
     const pad = (n: number) => `${n}`.padStart(2, '0');
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
@@ -318,6 +319,17 @@ const translateWithFallback = (key: string, fallback: string): string => {
     const handleEditSubmit = async (): Promise<void> => {
         if (!sessionId.value || !editModal.startDate) {
             editModal.error = $t('quests.sessions.startDateRequired');
+            return;
+        }
+
+        // Dynamic validation: check if start date is at least 1 minute in the future
+        const selectedDate = new Date(editModal.startDate);
+        const minAllowedDate = new Date();
+        minAllowedDate.setMinutes(minAllowedDate.getMinutes() + 1);
+        minAllowedDate.setSeconds(0, 0);
+
+        if (selectedDate < minAllowedDate) {
+            editModal.error = translateWithFallback('quests.sessions.startDateTooEarly', 'Start time must be in the future');
             return;
         }
 

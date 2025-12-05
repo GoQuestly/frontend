@@ -1,4 +1,5 @@
 import { ref, computed, watch, onUnmounted, readonly } from 'vue';
+import { TIMER_INTERVAL_MS } from '@/utils/constants';
 
 type EmitFunction = {
     (event: 'complete'): void;
@@ -41,7 +42,7 @@ export function useTimerBadge(
                 stopTimer();
                 emit('complete');
             }
-        }, 1000);
+        }, TIMER_INTERVAL_MS);
     };
 
     const reset = (): void => {

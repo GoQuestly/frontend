@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router';
 import { questsApi } from '@/api/questsApi';
 import { sessionApi } from '@/api/sessionApi';
 import { showTemporaryMessage } from '@/utils/messages';
+import { MESSAGE_TIMEOUT_MS } from '@/utils/constants';
 import type { SessionCardProps } from '@/components/common/SessionCard/SessionCard';
 import type {
     CreateQuestSessionRequest,
@@ -26,7 +27,7 @@ export const useQuestSessionsForm = () => {
         error: null,
         currentPage: 1,
         totalPages: 1,
-        pageSize: 3,
+        pageSize: 10,
     });
 
     const isCreateModalOpen = ref(false);
@@ -38,11 +39,10 @@ export const useQuestSessionsForm = () => {
     const editError = ref('');
     const sessionStartTimes = ref<number[]>([]);
     const checkpointsCount = ref(0);
-    const MIN_SESSION_GAP_MS = 120 * 60 * 1000;
 
     const getMinStartDate = (): Date => {
         const date = new Date();
-        date.setMinutes(date.getMinutes() + 3);
+        date.setMinutes(date.getMinutes() + 1);
         date.setSeconds(0, 0);
         return date;
     };
@@ -107,6 +107,7 @@ export const useQuestSessionsForm = () => {
                 title: quest.title,
                 description: quest.description,
                 maxParticipants: quest.maxParticipantCount,
+                maxDurationMinutes: quest.maxDurationMinutes,
             };
 
             const [sessionsResponse, checkpoints] = await Promise.all([
@@ -141,7 +142,7 @@ export const useQuestSessionsForm = () => {
                     'quests.sessions.noCheckpointsError',
                     'Cannot create session. Please add at least one checkpoint to the quest first.'
                 ),
-                5000
+                MESSAGE_TIMEOUT_MS
             );
             return;
         }
@@ -179,14 +180,44 @@ export const useQuestSessionsForm = () => {
             return;
         }
 
-        const startMs = new Date(startDateIso).getTime();
+        // Dynamic validation: check if start date is at least 1 minute in the future
+        const selectedDate = new Date(startDateIso);
+        const minAllowedDate = getMinStartDate();
 
-        const hasConflict = sessionStartTimes.value.some((existingStart) =>
-            Math.abs(existingStart - startMs) < MIN_SESSION_GAP_MS
-        );
-        if (hasConflict) {
-            createForm.error = translateWithFallback('quests.sessions.minGapError', 'Sessions must be at least 120 minutes apart.');
+        if (selectedDate < minAllowedDate) {
+            createForm.error = translateWithFallback('quests.sessions.startDateTooEarly', 'Start time must be in the future');
             return;
+        }
+
+        // Validate minimum gap between sessions based on estimated duration
+        if (state.quest?.maxDurationMinutes) {
+            const newSessionTime = selectedDate.getTime();
+            const estimatedDurationMs = state.quest.maxDurationMinutes * 60 * 1000;
+
+            // Fetch all sessions to check for conflicts
+            const allSessions = await fetchAllSessionsForQuest(questId);
+
+            // Only consider scheduled and active sessions (exclude completed and cancelled)
+            const activeSessions = allSessions.filter((session) => {
+                // Session is completed if it has an endDate or is cancelled
+                return !session.endDate && session.endReason !== 'cancelled';
+            });
+
+            const hasConflict = activeSessions.some((session) => {
+                if (!session.startDate) return false;
+                const existingSessionTime = new Date(session.startDate).getTime();
+                const timeDifference = Math.abs(newSessionTime - existingSessionTime);
+                return timeDifference < estimatedDurationMs;
+            });
+
+            if (hasConflict) {
+                const durationInMinutes = state.quest.maxDurationMinutes;
+                createForm.error = translateWithFallback(
+                    'quests.sessions.minGapError',
+                    `Sessions must be at least ${durationInMinutes} minutes apart`
+                );
+                return;
+            }
         }
 
         createForm.isSubmitting = true;
@@ -205,12 +236,30 @@ export const useQuestSessionsForm = () => {
         }
     };
 
+    const fetchAllSessionsForQuest = async (questId: number): Promise<QuestSessionResponse[]> => {
+        const pageSize = 100;
+        let page = 1;
+        let allSessions: QuestSessionResponse[] = [];
+
+        while (true) {
+            const response = await sessionApi.getQuestSessions(questId, page, pageSize);
+            allSessions = allSessions.concat(response.items || []);
+
+            if (page * pageSize >= response.total) {
+                break;
+            }
+            page++;
+        }
+
+        return allSessions;
+    };
+
     const handleEditQuest = (): void => {
         const checkAndNavigate = async () => {
             if (!state.quest?.id) return;
             try {
-                const sessionsResponse = await sessionApi.getQuestSessions(state.quest.id, 1, 100);
-                const hasActiveSession = (sessionsResponse.items || []).some(
+                const sessions = await fetchAllSessionsForQuest(state.quest.id);
+                const hasActiveSession = sessions.some(
                     (session: QuestSessionResponse) => session.isActive
                 );
                 if (hasActiveSession) {
@@ -248,15 +297,30 @@ export const useQuestSessionsForm = () => {
     };
 
     let minDateUpdateInterval: number | undefined;
+    let minDateUpdateTimeout: number | undefined;
+
+    const scheduleMinDateUpdate = () => {
+        const now = new Date();
+        const msUntilNextMinute = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
+
+        minDateUpdateTimeout = window.setTimeout(() => {
+            minStartDate.value = formatDateTimeLocal(getMinStartDate());
+
+            minDateUpdateInterval = window.setInterval(() => {
+                minStartDate.value = formatDateTimeLocal(getMinStartDate());
+            }, 60000);
+        }, msUntilNextMinute);
+    };
 
     onMounted(() => {
         loadQuestData();
-        minDateUpdateInterval = window.setInterval(() => {
-            minStartDate.value = formatDateTimeLocal(getMinStartDate());
-        }, 60000);
+        scheduleMinDateUpdate();
     });
 
     onUnmounted(() => {
+        if (minDateUpdateTimeout) {
+            clearTimeout(minDateUpdateTimeout);
+        }
         if (minDateUpdateInterval) {
             clearInterval(minDateUpdateInterval);
         }

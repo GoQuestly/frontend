@@ -16,6 +16,7 @@ export interface Emits {
 }
 
 const MAX_TASK_DURATION_SECONDS = 86400;
+const MAX_POINTS = 10000;
 
 export function useTaskForm(props: Props, emit: Emits) {
     const { t } = useI18n();
@@ -112,7 +113,7 @@ export function useTaskForm(props: Props, emit: Emits) {
         clearValidationErrors();
         let isValid = true;
 
-        const thresholdValidation = validateNumberRange(localTask.value.successThreshold, 0, 100);
+        const thresholdValidation = validateNumberRange(localTask.value.successThreshold, 0, 100); // Percentage
         if (!thresholdValidation.isValid) {
             errorKeys.value.successThreshold = 'quests.createQuest.step3.errors.successThresholdRange';
             isValid = false;
@@ -124,7 +125,7 @@ export function useTaskForm(props: Props, emit: Emits) {
             const q = localTask.value.questions[i];
             const qErrors = { text: '', points: '', answers: '' };
 
-            const pointsValidation = validateNumberRange(q.points, 0, 100);
+            const pointsValidation = validateNumberRange(q.points, 0, MAX_POINTS);
             if (!pointsValidation.isValid) {
                 qErrors.points = 'quests.createQuest.step3.errors.questionPointsRange';
                 isValid = false;
@@ -145,7 +146,7 @@ export function useTaskForm(props: Props, emit: Emits) {
     const validatePhoto = (): boolean => {
         clearValidationErrors();
         let isValid = true;
-        const pointsValidation = validateNumberRange(localTask.value.maxPoints, 0);
+        const pointsValidation = validateNumberRange(localTask.value.maxPoints, 0, MAX_POINTS);
         if (!pointsValidation.isValid) {
             errorKeys.value.maxPoints = 'quests.createQuest.step3.errors.scorePointsMin';
             isValid = false;
@@ -164,7 +165,7 @@ export function useTaskForm(props: Props, emit: Emits) {
             isValid = false;
         }
 
-        const pointsValidation = validateNumberRange(localTask.value.maxPoints, 0);
+        const pointsValidation = validateNumberRange(localTask.value.maxPoints, 0, MAX_POINTS);
         if (!pointsValidation.isValid) {
             errorKeys.value.maxPoints = 'quests.createQuest.step3.errors.scorePointsMin';
             isValid = false;
