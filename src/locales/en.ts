@@ -428,6 +428,10 @@ export default {
         myquests: 'My Quests',
         profile: 'Profile'
     },
+    invite: {
+        title: 'Mobile App Required',
+        description: 'To join this quest session, please use the GoQuestly mobile app. This invitation link will automatically open in the app when accessed from your mobile device.',
+    },
     notFound: {
         message: 'Sorry, the page you are looking for could not be found.',
     },

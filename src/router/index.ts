@@ -111,6 +111,11 @@ const router = createRouter({
             meta: { requiresAuth: true, requiresVerification: true },
         },
         {
+            path: '/invite/:token',
+            name: 'invite',
+            component: () => import('../views/InviteView/InviteView.vue'),
+        },
+        {
             path: '/:pathMatch(.*)*',
             name: 'NotFound',
             component: () => import('../views/NotFoundView/NotFoundView.vue'),

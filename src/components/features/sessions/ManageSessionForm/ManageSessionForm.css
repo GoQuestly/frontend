@@ -290,16 +290,16 @@
     justify-content: space-between;
     gap: 0.75rem;
     padding: 0.75rem 1rem;
-    background: #f9fafb;
-    border: 1px solid #e5e7eb;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .invite-link-wrapper:hover {
-    background: #f3f4f6;
-    border-color: #d1d5db;
+    background: var(--bg-tertiary);
+    border-color: var(--border-hover);
 }
 
 .invite-link-text {
@@ -317,7 +317,7 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    color: #6b7280;
+    color: var(--text-secondary);
     transition: all 0.2s ease;
 }
 
@@ -326,7 +326,7 @@
 }
 
 .invite-link-wrapper:hover .copy-icon {
-    color: #374151;
+    color: var(--text-primary);
 }
 
 .copy-icon.copied {
