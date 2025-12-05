@@ -77,7 +77,7 @@ interface ManageSessionState {
 const buildInviteLink = (token?: string): string => {
     if (!token) return '';
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
-    return `${origin}/join/${token}`;
+    return `${origin}/invite/${token}`;
 };
 
 const mapStatus = (data: QuestSessionDetail): SessionStatus => {
