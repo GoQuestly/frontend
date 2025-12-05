@@ -9,7 +9,7 @@ export const mapBackendTaskToLocal = (backendTask: TaskResponse): Task => {
     const baseTask = {
         questTaskId: backendTask.questTaskId,
         title: backendTask.description || '',
-        maxPoints: String(backendTask.maxScorePointsCount ?? backendTask.scorePointsCount ?? DEFAULT_MAX_POINTS),
+        maxPoints: String(backendTask.scorePointsCount ?? backendTask.maxScorePointsCount ?? DEFAULT_MAX_POINTS),
         duration: backendTask.maxDurationSeconds
             ? String(Math.floor(backendTask.maxDurationSeconds / 60))
             : String(DEFAULT_DURATION_MINUTES),

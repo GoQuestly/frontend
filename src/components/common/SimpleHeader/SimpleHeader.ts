@@ -1,6 +1,6 @@
-import type { ComputedRef } from 'vue';
+import type { ComputedRef, Ref } from 'vue';
 import type { RouteLocationNormalizedLoaded, Router } from 'vue-router';
-import { computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { getUser } from '@/utils/storage';
 import type { User } from '@/types/user';
 
@@ -28,14 +28,31 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
 ];
 
 export interface UserData {
-    user: ComputedRef<User | null>;
+    user: Ref<User | null>;
     isAuthenticated: ComputedRef<boolean>;
     isLoggedIn: ComputedRef<boolean>;
     userInitial: ComputedRef<string>;
 }
 
+const handleStorageChange = (e: StorageEvent, user: Ref<User | null>) => {
+    if (e.key === 'user' || e.key === null) {
+        user.value = getUser();
+    }
+};
+
 export const getUserData = (): UserData => {
-    const user = computed(() => getUser());
+    const user = ref<User | null>(getUser());
+
+    onMounted(() => {
+        user.value = getUser();
+        const storageHandler = (e: StorageEvent) => handleStorageChange(e, user);
+        window.addEventListener('storage', storageHandler);
+    });
+
+    onUnmounted(() => {
+        const storageHandler = (e: StorageEvent) => handleStorageChange(e, user);
+        window.removeEventListener('storage', storageHandler);
+    });
 
     const isAuthenticated = computed(() => {
         const currentUser = user.value;

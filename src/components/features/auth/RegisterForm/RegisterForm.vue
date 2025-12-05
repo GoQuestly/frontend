@@ -51,7 +51,7 @@
 
     <p class="login-link">
       {{ $t('auth.register.alreadyHaveAccount') }}
-      <a href="#" @click.prevent="router.replace('/login')" class="link">{{ $t('common.login') }}</a>
+      <a href="#" @click.prevent="router.push('/login')" class="link">{{ $t('common.login') }}</a>
     </p>
   </div>
 </template>

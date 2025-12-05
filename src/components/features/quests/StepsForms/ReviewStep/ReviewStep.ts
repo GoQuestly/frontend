@@ -51,7 +51,6 @@ export const useReviewStep = (props: Props) => {
                     maxDurationSeconds: point.task.maxDurationSeconds,
                     isRequiredForNextPoint: point.task.isRequiredForNextPoint,
                     scorePointsCount: point.task.scorePointsCount,
-                    maxScorePointsCount: point.task.maxScorePointsCount,
                     successScorePointsPercent: point.task.successScorePointsPercent,
                     codeWord: point.task.codeWord,
                     quizQuestions: point.task.quizQuestions,

@@ -1,6 +1,7 @@
 import { getUser, setUser } from '@/utils/storage';
 import { createErrorKey, handleUnauthorizedError } from '@/utils/errors';
 import { profileApi } from '@/api/profileApi';
+import { MESSAGE_TIMEOUT_MS } from '@/utils/constants';
 import type { Router } from 'vue-router';
 import type { User } from '@/types/user';
 
@@ -18,8 +19,6 @@ export interface ProfileEditState {
     successMessage: string | null;
     hasChanges: boolean;
 }
-
-const AUTO_CLEAR_MESSAGE_DELAY = 3000;
 
 export const createInitialProfileEditState = (): ProfileEditState => {
     const user = getUser();
@@ -58,7 +57,7 @@ const clearMessageAfterDelay = (state: ProfileEditState, messageType: 'error' | 
         } else {
             state.error = null;
         }
-    }, AUTO_CLEAR_MESSAGE_DELAY);
+    }, MESSAGE_TIMEOUT_MS);
 };
 
 const validateAvatarFile = (file: File): string | null => {

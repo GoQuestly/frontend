@@ -48,6 +48,5 @@ export interface QuestCheckpoint {
     name: string;
     latitude: number;
     longitude: number;
-    requiredForNext: boolean;
     questPointId?: number;
 }

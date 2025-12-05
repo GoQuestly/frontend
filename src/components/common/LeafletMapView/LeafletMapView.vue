@@ -15,6 +15,7 @@ import { ref, onMounted, watch, computed, withDefaults, toRefs } from 'vue';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { QuestCheckpoint } from '@/types/checkpoint';
+import { getDefaultCoordinates } from '@/utils/geolocation';
 
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -63,9 +64,10 @@ onMounted(() => {
 const initMap = () => {
   if (!mapRef.value) return;
 
+  const defaultCoords = getDefaultCoordinates();
   const center = props.checkpoints.length > 0
       ? [props.checkpoints[0].latitude, props.checkpoints[0].longitude] as L.LatLngExpression
-      : [40.7128, -74.0060] as L.LatLngExpression;
+      : [defaultCoords.lat, defaultCoords.lng] as L.LatLngExpression;
 
   const mapOptions: L.MapOptions = {
     dragging: props.interactive,

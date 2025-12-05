@@ -9,5 +9,4 @@ export const createStartingPointCheckpoint = (
     name,
     latitude,
     longitude,
-    requiredForNext: false,
 });

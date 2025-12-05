@@ -1,8 +1,8 @@
-import { formatDuration } from '@/utils/format';
+import { formatDuration, formatCheckpoints } from '@/utils/format';
 
 export interface QuestCardProps {
     quest: {
-        id: string;
+        id: number;
         title: string;
         subtitle: string;
         description: string;
@@ -15,7 +15,8 @@ export interface QuestCardProps {
 }
 
 export interface QuestCardEmits {
-    (e: 'click', questId: string): void;
+    (e: 'click', questId: number): void;
 }
 
 export const formatDurationForCard = formatDuration;
+export const formatCheckpointsForCard = formatCheckpoints;

@@ -1,6 +1,6 @@
 <template>
   <div class="task-assignment-step">
-    <h2 class="step-title">{{ $t('quests.createQuest.step3.title') }}</h2>
+    <h2 class="step-title">{{ stepTitle }}</h2>
 
     <ErrorBox :message="errorMessage" />
     <SuccessBox :message="successMessage" />
@@ -54,8 +54,10 @@ import CheckpointCard from '@/components/common/CheckpointCard/CheckpointCard.vu
 import TaskForm from '@/components/common/TaskForm/TaskForm.vue';
 import ErrorBox from '@/components/common/ErrorBox/ErrorBox.vue';
 import SuccessBox from '@/components/common/SuccessBox/SuccessBox.vue';
+import { computed } from 'vue';
 import { useTaskAssignment } from './TaskAssignmentStep';
 import type { QuestFormData } from '@/types/form';
+import { useI18n } from 'vue-i18n';
 import './TaskAssignmentStep.css';
 
 interface Props {
@@ -80,6 +82,9 @@ const {
   updateTask,
   saveAllTasks,
 } = useTaskAssignment(props, emit);
+
+const { t: $t } = useI18n();
+const stepTitle = computed(() => $t('quests.createQuest.step3.title'));
 
 defineExpose({
   saveAllTasks,

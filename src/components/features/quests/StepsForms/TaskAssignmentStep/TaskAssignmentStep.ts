@@ -8,8 +8,8 @@ import type {
     TaskResponse
 } from '@/types/task';
 import { mapBackendTaskToLocal } from '@/utils/taskMapping';
-import { confirmWithTranslation } from '@/utils/dialogs';
 import { parseNumber } from '@/utils/validation';
+import { useConfirmDialog } from '@/composables/useConfirmDialog';
 
 
 interface Props {
@@ -43,6 +43,7 @@ interface Emit {
 
 export const useTaskAssignment = (props: Props, emit: Emit) => {
     const { t } = useI18n();
+    const confirmDialog = useConfirmDialog();
     const expandedCheckpointId = ref<string | null>(null);
     const checkpointTasks = ref<Map<string, Task | null>>(new Map());
     const isSaving = ref(false);
@@ -85,7 +86,6 @@ export const useTaskAssignment = (props: Props, emit: Emit) => {
                     maxDurationSeconds: point.task.maxDurationSeconds,
                     isRequiredForNextPoint: point.task.isRequiredForNextPoint,
                     scorePointsCount: point.task.scorePointsCount,
-                    maxScorePointsCount: point.task.maxScorePointsCount,
                     successScorePointsPercent: point.task.successScorePointsPercent,
                     codeWord: point.task.codeWord,
                     quizQuestions: point.task.quizQuestions,
@@ -187,7 +187,6 @@ export const useTaskAssignment = (props: Props, emit: Emit) => {
                 case 'quiz': {
                     const quizData = {
                         ...baseData,
-                        maxScorePointsCount: parseNumber(task.maxPoints, 100),
                         successScorePointsPercent: parseNumber(task.successThreshold, 80),
                         quizQuestions: task.questions
                             .filter(q => q.text.trim() && q.options.some(opt => opt.text.trim()))
@@ -229,7 +228,6 @@ export const useTaskAssignment = (props: Props, emit: Emit) => {
             case 'quiz': {
                 const quizData: CreateQuizTaskRequest = {
                     ...baseData,
-                    maxScorePointsCount: parseNumber(task.maxPoints, 100),
                     successScorePointsPercent: parseNumber(task.successThreshold, 80),
                     quizQuestions: task.questions
                         .filter(q => q.text.trim() && q.options.some(opt => opt.text.trim()))
@@ -278,7 +276,15 @@ export const useTaskAssignment = (props: Props, emit: Emit) => {
     };
 
     const removeTask = async (checkpointId: string): Promise<void> => {
-        if (!confirmWithTranslation(t, 'quests.createQuest.confirmations.deleteTask')) {
+        const confirmed = await confirmDialog({
+            title: t('common.delete'),
+            message: t('quests.createQuest.confirmations.deleteTask'),
+            confirmText: t('common.delete'),
+            cancelText: t('common.cancel'),
+            tone: 'danger',
+        });
+
+        if (!confirmed) {
             return;
         }
 
@@ -310,7 +316,6 @@ export const useTaskAssignment = (props: Props, emit: Emit) => {
                 latitude: cp.latitude,
                 longitude: cp.longitude,
                 questPointId: cp.questPointId,
-                requiredForNext: cp.id === checkpointId ? updatedTask.requiredToUnlock : cp.requiredForNext,
             })),
         });
     };

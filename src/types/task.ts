@@ -68,7 +68,6 @@ export interface CreateQuizTaskRequest {
     description: string;
     maxDurationSeconds?: number;
     isRequiredForNextPoint: boolean;
-    maxScorePointsCount: number;
     successScorePointsPercent: number;
     quizQuestions: QuizQuestion[];
 }
@@ -77,7 +76,6 @@ export interface UpdateQuizTaskRequest {
     description?: string;
     maxDurationSeconds?: number;
     isRequiredForNextPoint?: boolean;
-    maxScorePointsCount?: number;
     successScorePointsPercent?: number;
     quizQuestions?: QuizQuestion[];
 }

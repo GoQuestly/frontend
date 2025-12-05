@@ -8,8 +8,11 @@
       :maxlength="maxlength"
       :inputmode="inputmode"
       :pattern="pattern"
+      :min="min"
+      :max="max"
       @input="handleInput"
-      @keypress="handleKeypress"
+      @keydown="handleKeydown"
+      @blur="handleBlur"
       class="base-input"
   />
 </template>
@@ -19,7 +22,8 @@ import { computed } from 'vue';
 import {
   baseInputDefaults,
   handleInputLogic,
-  handleKeypressLogic,
+  handleKeydownLogic,
+  handleBlurLogic,
   getInputMode,
   getPattern
 } from './BaseInput';
@@ -38,8 +42,13 @@ const handleInput = (event: Event): void => {
   handleInputLogic(event, props.numbersOnly, emit);
 };
 
-const handleKeypress = (event: KeyboardEvent): void => {
-  handleKeypressLogic(event, props.numbersOnly);
+const handleKeydown = (event: KeyboardEvent): void => {
+  handleKeydownLogic(event, props.numbersOnly);
+};
+
+const handleBlur = (): void => {
+  if (!props.numbersOnly) return;
+  handleBlurLogic(props.modelValue ?? '', emit, props.min, props.max);
 };
 </script>
 
