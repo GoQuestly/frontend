@@ -4,8 +4,6 @@ import Sortable from 'sortablejs';
 import type { Options } from 'sortablejs';
 import { questsApi } from '@/api/questsApi';
 import type { QuestFormData } from '@/types/form';
-import { showTemporaryMessage } from '@/utils/messages';
-import { MESSAGE_TIMEOUT_MS } from '@/utils/constants';
 import { getDefaultCoordinates } from '@/utils/geolocation';
 import type { QuestCheckpoint } from '@/types/checkpoint';
 import { useConfirmDialog } from '@/composables/useConfirmDialog';
@@ -188,11 +186,7 @@ export const useCheckpointsSetup = (props: Props, emit: Emit) => {
                 longitude: normalizedCheckpoint.longitude,
                 orderNum: index + 1,
             });
-
-            lastSavedCheckpointId.value = normalizedCheckpoint.id;
-            showTemporaryMessage(successMessage, t('quests.createQuest.step2.checkpointSaveSuccess'), MESSAGE_TIMEOUT_MS);
         } catch (err: any) {
-
             if (err.response?.status === 401) {
                 errorKey.value = 'quests.createQuest.errors.sessionExpired';
             } else {
@@ -201,11 +195,34 @@ export const useCheckpointsSetup = (props: Props, emit: Emit) => {
         }
     };
 
-    const updateCheckpointCoordinates = (id: string, lat: number, lng: number): void => {
+    const updateCheckpointCoordinates = async (id: string, lat: number, lng: number): Promise<void> => {
         const index = localData.checkpoints.findIndex(cp => cp.id === id);
-        if (index !== -1) {
-            localData.checkpoints[index].latitude = lat;
-            localData.checkpoints[index].longitude = lng;
+        if (index === -1) return;
+
+        const checkpoint = localData.checkpoints[index];
+
+        localData.checkpoints[index].latitude = lat;
+        localData.checkpoints[index].longitude = lng;
+        updateParent();
+
+        if (!checkpoint.questPointId) {
+            return;
+        }
+
+        errorKey.value = '';
+        try {
+            await questsApi.updateCheckpoint(checkpoint.questPointId, {
+                name: checkpoint.name,
+                latitude: lat,
+                longitude: lng,
+                orderNum: index + 1,
+            });
+        } catch (err: any) {
+            if (err.response?.status === 401) {
+                errorKey.value = 'quests.createQuest.errors.sessionExpired';
+            } else {
+                errorKey.value = 'quests.createQuest.step2.errors.checkpointUpdateFailed';
+            }
         }
     };
 

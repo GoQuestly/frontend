@@ -42,6 +42,8 @@
         <LeafletMapView
             :checkpoints="localData.checkpoints"
             :selected-checkpoint-id="selectedCheckpointId"
+            :starting-lat="props.modelValue.startingLat"
+            :starting-lng="props.modelValue.startingLng"
             :interactive="true"
             :editable="true"
             @update-coordinates="updateCheckpointCoordinates"

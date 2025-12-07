@@ -196,13 +196,6 @@
             :message="successMessage"
             class="quest-information-step__success"
         />
-        <BaseButton
-            class="save-changes-button"
-            variant="primary"
-            @click="$emit('save')"
-        >
-          {{ $t('quests.createQuest.step1.saveChanges') }}
-        </BaseButton>
       </div>
     </form>
   </div>
@@ -211,7 +204,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import BaseInput from '@/components/base/BaseInput/BaseInput.vue';
-import BaseButton from '@/components/base/BaseButton/BaseButton.vue';
 import ErrorBox from '@/components/common/ErrorBox/ErrorBox.vue';
 import SuccessBox from '@/components/common/SuccessBox/SuccessBox.vue';
 import LeafletMapView from '@/components/common/LeafletMapView/LeafletMapView.vue';
@@ -224,6 +216,7 @@ interface Props {
   modelValue: QuestFormData;
   questId?: number | null;
   existingPhotoUrl?: string;
+  existingCoverFile?: File | null;
   successMessage?: string;
 }
 

@@ -350,12 +350,11 @@ export const useCreateQuestView = (props: Props) => {
 
       state.questId = quest.questId;
 
-      // Fix photoUrl if it's a relative path
       if (quest.photoUrl) {
         state.photoUrl = quest.photoUrl.startsWith('http')
           ? quest.photoUrl
           : `${API_URL}${quest.photoUrl.startsWith('/') ? quest.photoUrl.slice(1) : quest.photoUrl}`;
-      } else {
+      } else if (!state.coverImageFile) {
         state.photoUrl = '';
       }
 
@@ -370,7 +369,10 @@ export const useCreateQuestView = (props: Props) => {
         maxParticipants: quest.maxParticipantCount,
         maxDuration: quest.maxDurationMinutes,
       };
-      clearPendingCoverImage();
+
+      if (quest.photoUrl) {
+        clearPendingCoverImage();
+      }
     } catch (error: any) {
       state.uploadError = $t('quests.createQuest.errors.loadFailed');
     } finally {
@@ -603,14 +605,19 @@ export const useCreateQuestView = (props: Props) => {
 
     state.questId = questId;
 
+    state.formData = {
+      ...state.formData,
+      ...formValues,
+    };
+
     if (state.coverImageFile) {
       const uploadSuccess = await uploadCoverImage(questId, state.coverImageFile);
       if (!uploadSuccess) {
         return false;
       }
+    } else {
+      await loadExistingQuest(questId);
     }
-
-    await loadExistingQuest(questId);
 
     showTemporaryMessage(successMessage, $t('quests.createQuest.step1.saveSuccess'), 3000);
     return true;
@@ -622,7 +629,8 @@ export const useCreateQuestView = (props: Props) => {
 
   const handleNext = async (): Promise<void> => {
     if (state.currentStep === 1) {
-      if (!prepareNavigationToStep(state.currentStep + 1)) {
+      const saved = await saveQuestInformation();
+      if (!saved) {
         return;
       }
 
