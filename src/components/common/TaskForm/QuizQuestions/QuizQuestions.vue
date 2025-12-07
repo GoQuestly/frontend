@@ -16,7 +16,7 @@
             :disabled="props.disabled"
             @click="deleteQuestion(question.id)"
         >
-          <img src="../../../../assets/images/delete-icon.png" alt="Delete" />
+          <img :src="deleteIcon" alt="Delete" />
         </button>
       </div>
 
@@ -111,6 +111,7 @@ import ErrorBox from '@/components/common/ErrorBox/ErrorBox.vue';
 import RoundCheckbox from '@/components/common/RoundCheckbox/RoundCheckbox.vue';
 import type { Question } from '@/types/task.ts';
 import { useConfirmDialog } from '@/composables/useConfirmDialog';
+import { deleteIcon } from '@/assets/images';
 
 interface Props {
   modelValue: Question[];

@@ -1,6 +1,6 @@
 <template>
   <div class="search-input-wrapper">
-    <img src="@/assets/images/search-icon.png" alt="Search" class="search-icon" />
+    <img :src="searchIcon" alt="Search" class="search-icon" />
     <input
         type="text"
         :value="modelValue"
@@ -14,6 +14,7 @@
 <script setup lang="ts">
 import { searchInputDefaults, handleInputChange } from './SearchInput';
 import type { SearchInputProps, SearchInputEmits } from './SearchInput';
+import { searchIcon } from '@/assets/images';
 import './SearchInput.css';
 
 const { modelValue, placeholder } = withDefaults(defineProps<SearchInputProps>(), searchInputDefaults);

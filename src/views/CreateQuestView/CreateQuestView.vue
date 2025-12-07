@@ -23,7 +23,7 @@
                 :disabled="!hasQuestId || state.isSubmitting || state.isLoadingQuest"
                 @click="openDeleteConfirm"
             >
-              <img src="@/assets/images/delete-icon.png" alt="Delete" class="header-delete-icon" />
+              <img :src="deleteIcon" alt="Delete" class="header-delete-icon" />
               <span>{{ $t('common.delete') }}</span>
             </BaseButton>
             <BaseButton
@@ -195,6 +195,7 @@ import CheckpointsSetupStep from '@/components/features/quests/StepsForms/Checkp
 import TaskAssignmentStep from '@/components/features/quests/StepsForms/TaskAssignmentStep/TaskAssignmentStep.vue';
 import ReviewStep from '@/components/features/quests/StepsForms/ReviewStep/ReviewStep.vue';
 import { useCreateQuestView } from './CreateQuestView';
+import { deleteIcon } from '@/assets/images';
 import './CreateQuestView.css';
 
 const props = withDefaults(defineProps<{

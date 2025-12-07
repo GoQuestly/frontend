@@ -58,7 +58,7 @@
 
               <template v-if="(!coverImageFile && !coverImagePreview) || imageLoadError">
                 <div class="upload-icon">
-                  <img src="@/assets/images/cloud-upload.png" alt="Upload" />
+                  <img :src="cloudUpload" alt="Upload" />
                 </div>
                 <p class="upload-text">
                   <span class="upload-link">{{ $t('quests.createQuest.step1.uploadFile') }}</span>
@@ -210,6 +210,7 @@ import LeafletMapView from '@/components/common/LeafletMapView/LeafletMapView.vu
 import { useI18n } from 'vue-i18n';
 import { useQuestInformationStep } from './QuestInformationStep';
 import type { QuestFormData } from '@/types/form';
+import { cloudUpload } from '@/assets/images';
 import './QuestInformationStep.css';
 
 interface Props {

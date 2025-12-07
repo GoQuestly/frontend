@@ -14,7 +14,7 @@
     <div class="checkpoint-header">
       <div class="checkpoint-left">
         <div v-if="mode === 'edit' && canReorder" class="drag-handle-column">
-          <img src="@/assets/images/drag-handle.png" alt="Drag" class="drag-icon" />
+          <img :src="dragHandle" alt="Drag" class="drag-icon" />
         </div>
 
         <div class="checkpoint-info">
@@ -99,6 +99,7 @@ import BaseInput from '@/components/base/BaseInput/BaseInput.vue';
 import DeleteButton from '@/components/common/DeleteButton/DeleteButton.vue';
 import SuccessBox from '@/components/common/SuccessBox/SuccessBox.vue';
 import { useCheckpointCard, type Checkpoint } from './CheckpointCard';
+import { dragHandle } from '@/assets/images';
 
 interface Props {
   checkpoint: Checkpoint;
