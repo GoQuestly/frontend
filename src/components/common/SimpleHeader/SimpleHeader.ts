@@ -3,9 +3,10 @@ import type { RouteLocationNormalizedLoaded, Router } from 'vue-router';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { getUser } from '@/utils/storage';
 import type { User } from '@/types/user';
+import logoImage from '@/assets/images/logo.png';
 
 export const HEADER_CONFIG = {
-    logoSrc: '/src/assets/images/logo.png',
+    logoSrc: logoImage,
     logoAlt: 'GoQuestly',
     logoText: 'GoQuestly',
     homeRoute: '/',

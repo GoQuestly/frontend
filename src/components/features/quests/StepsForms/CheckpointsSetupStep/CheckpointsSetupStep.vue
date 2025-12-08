@@ -31,7 +31,7 @@
             @click="addNewCheckpoint"
             :disabled="isCreating"
         >
-          <img src="@/assets/images/add-checkpoint-icon.png" alt="Add" class="add-icon" />
+          <img :src="addCheckpointIcon" alt="Add" class="add-icon" />
           {{ isCreating ? $t('common.creating') : $t('quests.createQuest.step2.addNewCheckpoint') }}
         </button>
 
@@ -42,6 +42,8 @@
         <LeafletMapView
             :checkpoints="localData.checkpoints"
             :selected-checkpoint-id="selectedCheckpointId"
+            :starting-lat="props.modelValue.startingLat"
+            :starting-lng="props.modelValue.startingLng"
             :interactive="true"
             :editable="true"
             @update-coordinates="updateCheckpointCoordinates"
@@ -59,7 +61,8 @@ import LeafletMapView from '@/components/common/LeafletMapView/LeafletMapView.vu
 import ErrorBox from '@/components/common/ErrorBox/ErrorBox.vue';
 import { computed } from 'vue';
 import { useCheckpointsSetup } from './CheckpointsSetupStep';
-import type { QuestFormData } from '@/types/form'
+import type { QuestFormData } from '@/types/form';
+import { addCheckpointIcon } from '@/assets/images'
 import { useI18n } from 'vue-i18n';
 import './CheckpointsSetupStep.css';
 

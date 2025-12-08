@@ -6,7 +6,7 @@
       </div>
       <div v-else class="quest-placeholder">
         <div class="placeholder-content">
-          <img src="@/assets/images/camera-icon.png" alt="No image" class="camera-icon" />
+          <img :src="cameraIcon" alt="No image" class="camera-icon" />
         </div>
       </div>
 
@@ -24,11 +24,11 @@
 
     <div class="quest-info">
       <div class="info-item">
-        <img src="@/assets/images/flag-icon.png" alt="Checkpoints" class="info-icon" />
+        <img :src="flagIcon" alt="Checkpoints" class="info-icon" />
         <span>{{ formatCheckpointsForCard(quest.checkpointsCount, $t) }}</span>
       </div>
       <div class="info-item">
-        <img src="@/assets/images/timer-icon.png" alt="Duration" class="info-icon" />
+        <img :src="timerIcon" alt="Duration" class="info-icon" />
         <span>{{ formatDurationForCard(quest.estimatedDuration, $t) }}</span>
       </div>
     </div>
@@ -61,6 +61,7 @@
 <script setup lang="ts">
 import { formatDurationForCard, formatCheckpointsForCard } from './QuestCard';
 import type { QuestCardProps, QuestCardEmits } from './QuestCard';
+import { cameraIcon, flagIcon, timerIcon } from '@/assets/images';
 import './QuestCard.css';
 import { ref } from 'vue';
 

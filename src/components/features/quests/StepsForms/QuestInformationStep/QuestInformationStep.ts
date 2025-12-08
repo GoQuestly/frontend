@@ -8,6 +8,7 @@ interface Props {
     modelValue: QuestFormData;
     questId?: number | null;
     existingPhotoUrl?: string;
+    existingCoverFile?: File | null;
 }
 
 type QuestInformationFields = Pick<QuestFormData,
@@ -94,7 +95,12 @@ export const useQuestInformationStep = (props: Props, emit: Emit) => {
     }));
 
     onMounted(() => {
-        applyExistingPhoto(props.existingPhotoUrl);
+        if (props.existingCoverFile) {
+            coverImageFile.value = props.existingCoverFile;
+            coverImagePreview.value = URL.createObjectURL(props.existingCoverFile);
+        } else {
+            applyExistingPhoto(props.existingPhotoUrl);
+        }
     });
 
     watch(() => props.modelValue, (newValue) => {
@@ -102,7 +108,16 @@ export const useQuestInformationStep = (props: Props, emit: Emit) => {
     }, { deep: true });
 
     watch(() => props.existingPhotoUrl, (newUrl) => {
-        applyExistingPhoto(newUrl);
+        if (!coverImageFile.value && !props.existingCoverFile) {
+            applyExistingPhoto(newUrl);
+        }
+    });
+
+    watch(() => props.existingCoverFile, (newFile) => {
+        if (newFile && newFile !== coverImageFile.value) {
+            coverImageFile.value = newFile;
+            coverImagePreview.value = URL.createObjectURL(newFile);
+        }
     });
 
     const startingPointCheckpoint = computed(() =>
@@ -165,12 +180,7 @@ export const useQuestInformationStep = (props: Props, emit: Emit) => {
         }
 
         coverImageFile.value = file;
-
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            coverImagePreview.value = e.target?.result as string;
-        };
-        reader.readAsDataURL(file);
+        coverImagePreview.value = URL.createObjectURL(file);
 
         emit('cover-image-change', file);
     };

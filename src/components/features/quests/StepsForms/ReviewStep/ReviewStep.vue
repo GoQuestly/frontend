@@ -19,7 +19,7 @@
                 class="cover-image"
             />
             <div v-else class="cover-placeholder">
-              <img src="@/assets/images/camera-icon.png" alt="No image" class="camera-icon" />
+              <img :src="cameraIcon" alt="No image" class="camera-icon" />
             </div>
 
             <div class="cover-title">
@@ -138,6 +138,7 @@ import { computed } from 'vue';
 import LeafletMapView from '@/components/common/LeafletMapView/LeafletMapView.vue';
 import { useReviewStep } from './ReviewStep';
 import type { QuestFormData } from '@/types/form';
+import { cameraIcon } from '@/assets/images';
 import './ReviewStep.css';
 
 interface Props {

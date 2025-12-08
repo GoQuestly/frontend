@@ -18,7 +18,7 @@
               />
               <img
                   v-else
-                  src="@/assets/images/default-avatar.png"
+                  :src="defaultAvatar"
                   alt="Default Avatar"
                   class="avatar-image default"
               />
@@ -133,6 +133,7 @@ import {
   checkForChanges,
   resetChanges,
 } from './ProfileEditForm.ts';
+import { defaultAvatar } from '@/assets/images';
 import './ProfileEditForm.css';
 
 const router = useRouter();

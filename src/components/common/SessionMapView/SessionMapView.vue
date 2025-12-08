@@ -54,6 +54,8 @@ let map: L.Map | null = null;
 let checkpointMarkers: Map<string, L.Marker> = new Map();
 let participantMarkers: Map<number, L.Marker> = new Map();
 let pathPolyline: L.Polyline | null = null;
+let isInitialBoundsSet = false;
+let markerAnimations: Map<number, number> = new Map();
 
 const COLORS = [
   '#3b82f6',
@@ -76,6 +78,49 @@ const getInitialsFromName = (name: string): string => {
     return (parts[0][0] + parts[1][0]).toUpperCase();
   }
   return name.substring(0, 2).toUpperCase();
+};
+
+// Функція для плавного переміщення маркера
+const animateMarkerMove = (
+  marker: L.Marker,
+  participantId: number,
+  newLatLng: L.LatLng,
+  duration: number = 1000
+) => {
+  const existingAnimationId = markerAnimations.get(participantId);
+  if (existingAnimationId) {
+    cancelAnimationFrame(existingAnimationId);
+  }
+
+  const startLatLng = marker.getLatLng();
+  const startLat = startLatLng.lat;
+  const startLng = startLatLng.lng;
+  const endLat = newLatLng.lat;
+  const endLng = newLatLng.lng;
+
+  const startTime = Date.now();
+
+  const animate = () => {
+    const elapsed = Date.now() - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+
+    const easeProgress = 1 - Math.pow(1 - progress, 3);
+
+    const currentLat = startLat + (endLat - startLat) * easeProgress;
+    const currentLng = startLng + (endLng - startLng) * easeProgress;
+
+    marker.setLatLng([currentLat, currentLng]);
+
+    if (progress < 1) {
+      const animationId = requestAnimationFrame(animate);
+      markerAnimations.set(participantId, animationId);
+    } else {
+      markerAnimations.delete(participantId);
+    }
+  };
+
+  const animationId = requestAnimationFrame(animate);
+  markerAnimations.set(participantId, animationId);
 };
 
 onMounted(() => {
@@ -134,36 +179,50 @@ const createCheckpointIcon = (order: number): L.DivIcon => {
   });
 };
 
-const createParticipantIcon = (initials: string, color: string): L.DivIcon => {
+const createParticipantIcon = (initials: string, color: string, photoUrl?: string | null, isActive: boolean = true): L.DivIcon => {
+  const hasValidPhoto = photoUrl && photoUrl.trim().length > 0;
+
+  const onlineIndicator = isActive ? `<div style="
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background-color: #22c55e;
+    border: 2px solid white;
+    z-index: 10;
+  "></div>` : '';
+
+  const avatarContent = hasValidPhoto
+    ? `<img src="${photoUrl}" alt="${initials}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" onerror="this.style.display='none'; this.parentElement.style.backgroundColor='${color}'; this.parentElement.innerHTML='<span style=\\'display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;\\' >${initials}</span>';" />`
+    : initials;
+
+  const backgroundColor = hasValidPhoto ? 'transparent' : color;
+
   return L.divIcon({
     className: 'custom-participant-marker',
     html: `
-      <div style="
-        width: 44px;
-        height: 44px;
-        border-radius: 50%;
-        background-color: ${color};
-        border: 4px solid white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        color: white;
-        font-size: 15px;
-        box-shadow: 0 3px 10px rgba(0,0,0,0.4);
-        position: relative;
-      ">
-        ${initials}
+      <div style="position: relative; width: 44px; height: 44px;">
         <div style="
-          position: absolute;
-          bottom: -2px;
-          right: -2px;
-          width: 14px;
-          height: 14px;
+          width: 44px;
+          height: 44px;
           border-radius: 50%;
-          background-color: #22c55e;
-          border: 2px solid white;
-        "></div>
+          background-color: ${backgroundColor};
+          border: 4px solid white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: bold;
+          color: white;
+          font-size: 15px;
+          box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+          position: relative;
+          overflow: hidden;
+        ">
+          ${avatarContent}
+        </div>
+        ${onlineIndicator}
       </div>
     `,
     iconSize: [44, 44],
@@ -262,15 +321,24 @@ const updateParticipants = () => {
   });
 
   props.participants?.forEach((participant, index) => {
-    const { participantId, latitude, longitude, userName, timestamp } = participant;
+    const { participantId, latitude, longitude, userName, timestamp, photoUrl, isActive } = participant;
     let marker = participantMarkers.get(participantId);
 
     const initials = getInitialsFromName(userName);
     const color = getColorForParticipant(index);
+    const hasValidPhoto = photoUrl && photoUrl.trim().length > 0;
 
     if (marker) {
-      marker.setLatLng([latitude, longitude]);
-      marker.setIcon(createParticipantIcon(initials, color));
+      const newLatLng = L.latLng(latitude, longitude);
+      animateMarkerMove(marker, participantId, newLatLng);
+
+      marker.setIcon(createParticipantIcon(initials, color, photoUrl, isActive));
+
+      const avatarHtml = hasValidPhoto
+        ? `<img src="${photoUrl}" alt="${userName}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" />`
+        : initials;
+
+      const avatarBg = hasValidPhoto ? 'transparent' : color;
 
       const popupContent = `
         <div style="font-family: inherit;">
@@ -279,15 +347,16 @@ const updateParticipants = () => {
               width: 32px;
               height: 32px;
               border-radius: 50%;
-              background-color: ${color};
+              background-color: ${avatarBg};
               display: flex;
               align-items: center;
               justify-content: center;
               font-weight: bold;
               color: white;
               font-size: 13px;
+              overflow: hidden;
             ">
-              ${initials}
+              ${avatarHtml}
             </div>
             <strong>${userName}</strong>
           </div>
@@ -304,11 +373,17 @@ const updateParticipants = () => {
       marker = L.marker(
         [latitude, longitude],
         {
-          icon: createParticipantIcon(initials, color),
+          icon: createParticipantIcon(initials, color, photoUrl, isActive),
           title: userName,
           zIndexOffset: 1000,
         }
       ).addTo(map!);
+
+      const avatarHtml = hasValidPhoto
+        ? `<img src="${photoUrl}" alt="${userName}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" />`
+        : initials;
+
+      const avatarBg = hasValidPhoto ? 'transparent' : color;
 
       const popupContent = `
         <div style="font-family: inherit;">
@@ -317,15 +392,16 @@ const updateParticipants = () => {
               width: 32px;
               height: 32px;
               border-radius: 50%;
-              background-color: ${color};
+              background-color: ${avatarBg};
               display: flex;
               align-items: center;
               justify-content: center;
               font-weight: bold;
               color: white;
               font-size: 13px;
+              overflow: hidden;
             ">
-              ${initials}
+              ${avatarHtml}
             </div>
             <strong>${userName}</strong>
           </div>
@@ -347,7 +423,7 @@ const updateParticipants = () => {
 };
 
 const adjustMapBounds = () => {
-  if (!map) return;
+  if (!map || isInitialBoundsSet) return;
 
   const allPoints: L.LatLngExpression[] = [];
 
@@ -364,6 +440,7 @@ const adjustMapBounds = () => {
   if (allPoints.length > 0) {
     const bounds = L.latLngBounds(allPoints);
     map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+    isInitialBoundsSet = true;
   }
 };
 
@@ -389,6 +466,11 @@ watch(() => props.showPaths, () => {
 });
 
 onBeforeUnmount(() => {
+  markerAnimations.forEach((animationId) => {
+    cancelAnimationFrame(animationId);
+  });
+  markerAnimations.clear();
+
   if (map) {
     map.remove();
     map = null;

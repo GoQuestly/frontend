@@ -4,7 +4,11 @@ import type {
     ParticipantLocation,
     CreateQuestSessionRequest,
     QuestSessionResponse,
-    QuestSessionsResponse
+    QuestSessionsResponse,
+    SessionScoresResponse,
+    PendingPhotoForModeration,
+    ModeratePhotoRequest,
+    ModeratePhotoResponse
 } from '@/types/session';
 
 export const sessionApi = {
@@ -57,6 +61,30 @@ export const sessionApi = {
 
     async getLatestLocations(sessionId: number): Promise<ParticipantLocation[]> {
         const response = await apiClient.get<ParticipantLocation[]>(`/organizer/sessions/${sessionId}/locations/latest`);
+        return response.data;
+    },
+
+    async getSessionScores(sessionId: number): Promise<SessionScoresResponse> {
+        const response = await apiClient.get<SessionScoresResponse>(`/organizer/sessions/${sessionId}/scores`);
+        return response.data;
+    },
+
+    async getPendingPhotos(sessionId: number): Promise<PendingPhotoForModeration[]> {
+        const response = await apiClient.get<PendingPhotoForModeration[]>(
+            `/organizer/sessions/${sessionId}/photos/pending`
+        );
+        return response.data;
+    },
+
+    async moderatePhoto(
+        sessionId: number,
+        photoId: number,
+        data: ModeratePhotoRequest
+    ): Promise<ModeratePhotoResponse> {
+        const response = await apiClient.post<ModeratePhotoResponse>(
+            `/organizer/sessions/${sessionId}/photos/${photoId}/moderate`,
+            data
+        );
         return response.data;
     },
 };

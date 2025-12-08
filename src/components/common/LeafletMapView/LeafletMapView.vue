@@ -36,6 +36,8 @@ interface Props {
   interactive?: boolean;
   showInstructions?: boolean;
   editable?: boolean;
+  startingLat?: number;
+  startingLng?: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -65,9 +67,15 @@ const initMap = () => {
   if (!mapRef.value) return;
 
   const defaultCoords = getDefaultCoordinates();
-  const center = props.checkpoints.length > 0
-      ? [props.checkpoints[0].latitude, props.checkpoints[0].longitude] as L.LatLngExpression
-      : [defaultCoords.lat, defaultCoords.lng] as L.LatLngExpression;
+  let center: L.LatLngExpression;
+
+  if (props.checkpoints.length > 0) {
+    center = [props.checkpoints[0].latitude, props.checkpoints[0].longitude];
+  } else if (props.startingLat && props.startingLng) {
+    center = [props.startingLat, props.startingLng];
+  } else {
+    center = [defaultCoords.lat, defaultCoords.lng];
+  }
 
   const mapOptions: L.MapOptions = {
     dragging: props.interactive,

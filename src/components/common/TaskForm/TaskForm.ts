@@ -1,9 +1,9 @@
-import { ref, computed } from 'vue';
-import { questsApi } from '@/api/questsApi';
-import { useI18n } from 'vue-i18n';
+import {ref, computed} from 'vue';
+import {questsApi} from '@/api/questsApi';
+import {useI18n} from 'vue-i18n';
 import {createNotificationHelpers} from '@/utils/messages';
-import { validateNumberRange, parseNumber } from '@/utils/validation';
-import type { CheckpointWithTask, Task } from '@/types/task';
+import {validateNumberRange, parseNumber} from '@/utils/validation';
+import type {CheckpointWithTask, Task} from '@/types/task';
 
 export interface Props {
     checkpoint: CheckpointWithTask;
@@ -12,6 +12,7 @@ export interface Props {
 
 export interface Emits {
     (e: 'update-task', task: Task): void;
+
     (e: 'remove-task'): void;
 }
 
@@ -19,9 +20,9 @@ const MAX_TASK_DURATION_SECONDS = 86400;
 const MAX_POINTS = 10000;
 
 export function useTaskForm(props: Props, emit: Emits) {
-    const { t } = useI18n();
+    const {t} = useI18n();
 
-    const localTask = ref<Task>({ ...props.checkpoint.task! });
+    const localTask = ref<Task>({...props.checkpoint.task!});
     const isSaving = ref(false);
     const errorMessage = ref('');
     const successMessage = ref('');
@@ -40,7 +41,7 @@ export function useTaskForm(props: Props, emit: Emits) {
         type: errorKeys.value.type ? t(errorKeys.value.type) : '',
         title: errorKeys.value.title ? t(errorKeys.value.title) : '',
         maxPoints: errorKeys.value.maxPoints ? t(errorKeys.value.maxPoints) : '',
-        duration: errorKeys.value.duration ? t(errorKeys.value.duration, { max: MAX_TASK_DURATION_SECONDS / 60 }) : '',
+        duration: errorKeys.value.duration ? t(errorKeys.value.duration, {max: MAX_TASK_DURATION_SECONDS / 60}) : '',
         successThreshold: errorKeys.value.successThreshold ? t(errorKeys.value.successThreshold) : '',
         codeWord: errorKeys.value.codeWord ? t(errorKeys.value.codeWord) : '',
         questions: Object.keys(errorKeys.value.questions).reduce((acc, key) => {
@@ -55,7 +56,7 @@ export function useTaskForm(props: Props, emit: Emits) {
         }, {} as { [key: number]: { text: string; points: string; answers: string } }),
     }));
 
-    const { showError, showSuccess } = createNotificationHelpers(errorMessage, successMessage);
+    const {showError} = createNotificationHelpers(errorMessage, successMessage);
 
     const clearValidationErrors = () => {
         errorKeys.value = {
@@ -70,7 +71,7 @@ export function useTaskForm(props: Props, emit: Emits) {
     };
 
     const emitUpdate = (): void => {
-        emit('update-task', { ...localTask.value });
+        emit('update-task', {...localTask.value});
     };
 
     const handleTypeChange = (): void => {
@@ -84,8 +85,8 @@ export function useTaskForm(props: Props, emit: Emits) {
                         text: '',
                         points: '50',
                         options: [
-                            { id: '1', text: '', isCorrect: true },
-                            { id: '2', text: '', isCorrect: false },
+                            {id: '1', text: '', isCorrect: true},
+                            {id: '2', text: '', isCorrect: false},
                         ],
                     },
                 ];
@@ -123,7 +124,7 @@ export function useTaskForm(props: Props, emit: Emits) {
 
         for (let i = 0; i < (localTask.value.questions?.length || 0); i++) {
             const q = localTask.value.questions[i];
-            const qErrors = { text: '', points: '', answers: '' };
+            const qErrors = {text: '', points: '', answers: ''};
 
             const pointsValidation = validateNumberRange(q.points, 0, MAX_POINTS);
             if (!pointsValidation.isValid) {
@@ -285,7 +286,6 @@ export function useTaskForm(props: Props, emit: Emits) {
             }
 
             clearValidationErrors();
-            showSuccess(t('quests.createQuest.step3.errors.taskSaved'));
             emitUpdate();
         } catch (error: any) {
             showError(error?.response?.data?.message || t('quests.createQuest.step3.errors.taskSaveFailed'));

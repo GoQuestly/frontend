@@ -58,7 +58,7 @@
 
               <template v-if="(!coverImageFile && !coverImagePreview) || imageLoadError">
                 <div class="upload-icon">
-                  <img src="@/assets/images/cloud-upload.png" alt="Upload" />
+                  <img :src="cloudUpload" alt="Upload" />
                 </div>
                 <p class="upload-text">
                   <span class="upload-link">{{ $t('quests.createQuest.step1.uploadFile') }}</span>
@@ -196,13 +196,6 @@
             :message="successMessage"
             class="quest-information-step__success"
         />
-        <BaseButton
-            class="save-changes-button"
-            variant="primary"
-            @click="$emit('save')"
-        >
-          {{ $t('quests.createQuest.step1.saveChanges') }}
-        </BaseButton>
       </div>
     </form>
   </div>
@@ -211,19 +204,20 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import BaseInput from '@/components/base/BaseInput/BaseInput.vue';
-import BaseButton from '@/components/base/BaseButton/BaseButton.vue';
 import ErrorBox from '@/components/common/ErrorBox/ErrorBox.vue';
 import SuccessBox from '@/components/common/SuccessBox/SuccessBox.vue';
 import LeafletMapView from '@/components/common/LeafletMapView/LeafletMapView.vue';
 import { useI18n } from 'vue-i18n';
 import { useQuestInformationStep } from './QuestInformationStep';
 import type { QuestFormData } from '@/types/form';
+import { cloudUpload } from '@/assets/images';
 import './QuestInformationStep.css';
 
 interface Props {
   modelValue: QuestFormData;
   questId?: number | null;
   existingPhotoUrl?: string;
+  existingCoverFile?: File | null;
   successMessage?: string;
 }
 
