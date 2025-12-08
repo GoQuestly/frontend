@@ -1,12 +1,12 @@
 <template>
   <div class="quest-card" @click="handleClick">
     <div class="quest-header">
-      <div v-if="quest.imageUrl" class="quest-image">
-        <img :src="quest.imageUrl" :alt="quest.title" />
+      <div v-if="quest.imageUrl && !imageError" class="quest-image">
+        <img :src="quest.imageUrl" :alt="quest.title" @error="handleImageError" />
       </div>
       <div v-else class="quest-placeholder">
         <div class="placeholder-content">
-          <img src="@/assets/images/camera-icon.png" alt="No image" class="camera-icon" />
+          <img :src="cameraIcon" alt="No image" class="camera-icon" />
         </div>
       </div>
 
@@ -24,41 +24,56 @@
 
     <div class="quest-info">
       <div class="info-item">
-        <img src="@/assets/images/flag-icon.png" alt="Checkpoints" class="info-icon" />
-        <span>{{ quest.checkpointsCount }} {{ $t('quests.myQuests.checkpoints') }}</span>
+        <img :src="flagIcon" alt="Checkpoints" class="info-icon" />
+        <span>{{ formatCheckpointsForCard(quest.checkpointsCount, $t) }}</span>
       </div>
       <div class="info-item">
-        <img src="@/assets/images/timer-icon.png" alt="Duration" class="info-icon" />
+        <img :src="timerIcon" alt="Duration" class="info-icon" />
         <span>{{ formatDurationForCard(quest.estimatedDuration, $t) }}</span>
       </div>
     </div>
 
     <div class="quest-dates">
-      <div v-if="quest.lastSessionDate" class="date-item">
-        <span class="date-label">{{ $t('common.last') }}:</span>
-        <span class="date-value">{{ quest.lastSessionDate }}</span>
+      <div v-if="quest.lastSessionDate || quest.nextSessionDate" class="date-grid">
+        <div v-if="quest.lastSessionDate" class="date-item">
+          <span class="date-label">{{ $t('common.last') }}:</span>
+          <span class="date-value">{{ quest.lastSessionDate }}</span>
+        </div>
+        <div v-else class="date-item">
+          <span class="date-label"></span>
+        </div>
+
+        <div v-if="quest.nextSessionDate" class="date-item">
+          <span class="date-label">{{ $t('common.nextSession') }}:</span>
+          <span class="date-value">{{ quest.nextSessionDate }}</span>
+        </div>
+        <div v-else class="date-item">
+          <span class="date-label"></span>
+        </div>
       </div>
       <div v-else class="date-item empty-date">
         <span class="no-session">{{ $t('quests.myQuests.noSessionData') }}</span>
-      </div>
-
-      <div v-if="quest.nextSessionDate" class="date-item">
-        <span class="date-label">{{ $t('common.next') }}:</span>
-        <span class="date-value">{{ quest.nextSessionDate }}</span>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { formatDurationForCard } from './QuestCard';
+import { formatDurationForCard, formatCheckpointsForCard } from './QuestCard';
 import type { QuestCardProps, QuestCardEmits } from './QuestCard';
+import { cameraIcon, flagIcon, timerIcon } from '@/assets/images';
 import './QuestCard.css';
+import { ref } from 'vue';
 
 const { quest } = defineProps<QuestCardProps>();
 const emit = defineEmits<QuestCardEmits>();
+const imageError = ref(false);
 
 const handleClick = () => {
   emit('click', quest.id);
+};
+
+const handleImageError = () => {
+  imageError.value = true;
 };
 </script>

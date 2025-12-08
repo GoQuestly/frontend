@@ -1,8 +1,23 @@
 import type { User } from '@/types/user';
 
 const getItem = (key: string): string | null => localStorage.getItem(key);
-const setItem = (key: string, value: string): void => localStorage.setItem(key, value);
-const removeItem = (key: string): void => localStorage.removeItem(key);
+const setItem = (key: string, value: string): void => {
+    localStorage.setItem(key, value);
+    triggerStorageUpdate();
+};
+const removeItem = (key: string): void => {
+    localStorage.removeItem(key);
+    triggerStorageUpdate();
+};
+
+const triggerStorageUpdate = (): void => {
+    window.dispatchEvent(new StorageEvent('storage', {
+        key: null,
+        storageArea: localStorage
+    }));
+
+    window.dispatchEvent(new CustomEvent('local-storage-change'));
+};
 
 export const getAccessToken = (): string | null => getItem('accessToken');
 export const setAccessToken = (token: string): void => setItem('accessToken', token);

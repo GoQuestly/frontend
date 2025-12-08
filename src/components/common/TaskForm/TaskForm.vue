@@ -1,8 +1,12 @@
 <template>
-  <div class="task-form" @click.stop>
+  <form class="task-form" ref="formRef" @click.stop @submit.prevent="handleSubmit">
     <div class="task-details-header">
       <h3>{{ $t('quests.createQuest.step3.taskDetails') }}</h3>
-      <DeleteButton @click="$emit('remove-task')" :title="$t('quests.createQuest.step3.removeTask')" />
+      <DeleteButton
+          v-if="!isTitleOnly"
+          @click="$emit('remove-task')"
+          :title="$t('quests.createQuest.step3.removeTask')"
+      />
     </div>
 
     <ErrorBox :message="errorMessage" />
@@ -19,7 +23,7 @@
             v-model="localTask.type"
             class="base-select"
             @change="handleTypeChange"
-            :disabled="!!localTask.questTaskId"
+            :disabled="!!localTask.questTaskId || isTitleOnly"
         >
           <option value="quiz">{{ $t('quests.createQuest.step3.quiz') }}</option>
           <option value="photo">{{ $t('quests.createQuest.step3.photo') }}</option>
@@ -35,22 +39,22 @@
           {{ $t('quests.createQuest.step3.taskTitle') }}
           <span class="required-star">*</span>
         </label>
-        <ErrorBox :message="errors.title" />
         <BaseInput
             v-model="localTask.title"
             :placeholder="$t('quests.createQuest.step3.taskTitlePlaceholder')"
             :maxlength="300"
             required
+            :disabled="isTitleOnly"
             @update:model-value="emitUpdate"
         />
       </div>
     </div>
 
-    <template v-if="localTask.type === 'photo'">
+    <template v-if="localTask.type === 'photo' && !isTitleOnly">
       <div class="form-row">
         <div class="form-field">
           <label class="field-label">
-            {{ $t('quests.createQuest.step3.maximumPoints') }}
+            {{ $t('quests.createQuest.step3.points') }}
             <span class="required-star">*</span>
           </label>
           <ErrorBox :message="errors.maxPoints" />
@@ -60,26 +64,51 @@
               numbers-only
               :maxlength="9"
               inputmode="numeric"
+              :min="0"
+              :max="100"
               placeholder="100"
+              required
               @update:model-value="emitUpdate"
           />
         </div>
 
-        <div class="form-field checkbox-field">
-          <RoundCheckbox
-              v-model="localTask.requiredToUnlock"
-              :label="$t('quests.createQuest.step3.requiredToUnlock')"
+        <div class="form-field">
+          <label class="field-label">
+            {{ $t('quests.createQuest.step3.taskDuration') }}
+            <span class="required-star">*</span>
+          </label>
+          <ErrorBox :message="errors.duration" />
+          <BaseInput
+              v-model="localTask.duration"
+              type="number"
+              numbers-only
+              :min="1"
+              :max="1440"
+              :placeholder="$t('quests.createQuest.step3.taskDurationPlaceholder')"
+              required
               @update:model-value="emitUpdate"
+          />
+        </div>
+
+      </div>
+
+        <div class="form-row checkbox-row">
+          <div class="form-field checkbox-field">
+            <RoundCheckbox
+                v-model="localTask.requiredToUnlock"
+                :label="$t('quests.createQuest.step3.requiredToUnlock')"
+                :disabled="isTitleOnly"
+                @update:model-value="emitUpdate"
           />
         </div>
       </div>
     </template>
 
-    <template v-else-if="localTask.type === 'code_word'">
+    <template v-else-if="localTask.type === 'code_word' && !isTitleOnly">
       <div class="form-row">
         <div class="form-field">
           <label class="field-label">
-            {{ $t('quests.createQuest.step3.maximumPoints') }}
+            {{ $t('quests.createQuest.step3.points') }}
             <span class="required-star">*</span>
           </label>
           <ErrorBox :message="errors.maxPoints" />
@@ -89,7 +118,10 @@
               numbers-only
               :maxlength="9"
               inputmode="numeric"
+              :min="0"
+              :max="100"
               placeholder="100"
+              required
               @update:model-value="emitUpdate"
           />
         </div>
@@ -104,95 +136,105 @@
               v-model="localTask.codeWord"
               :placeholder="$t('quests.createQuest.step3.codeWordPlaceholder')"
               :maxlength="200"
+              required
+              @update:model-value="emitUpdate"
+          />
+        </div>
+
+        <div class="form-field">
+          <label class="field-label">
+            {{ $t('quests.createQuest.step3.taskDuration') }}
+            <span class="required-star">*</span>
+          </label>
+          <ErrorBox :message="errors.duration" />
+          <BaseInput
+              v-model="localTask.duration"
+              type="number"
+              numbers-only
+              :min="1"
+              :max="1440"
+              :placeholder="$t('quests.createQuest.step3.taskDurationPlaceholder')"
+              required
               @update:model-value="emitUpdate"
           />
         </div>
       </div>
 
-      <div class="form-row">
-        <div class="form-field checkbox-field" style="grid-column: 1 / -1;">
-          <RoundCheckbox
-              v-model="localTask.requiredToUnlock"
-              :label="$t('quests.createQuest.step3.requiredToUnlock')"
+        <div class="form-row checkbox-row">
+          <div class="form-field checkbox-field">
+            <RoundCheckbox
+                v-model="localTask.requiredToUnlock"
+                :label="$t('quests.createQuest.step3.requiredToUnlock')"
+                :disabled="isTitleOnly"
               @update:model-value="emitUpdate"
           />
         </div>
       </div>
     </template>
 
-    <template v-else-if="localTask.type === 'quiz'">
-      <div class="form-row">
-        <div class="form-field">
-          <label class="field-label">
-            {{ $t('quests.createQuest.step3.maximumPoints') }}
-            <span class="required-star">*</span>
-          </label>
-          <ErrorBox :message="errors.maxPoints" />
-          <BaseInput
-              v-model="localTask.maxPoints"
-              type="text"
-              numbers-only
-              :maxlength="9"
-              inputmode="numeric"
-              placeholder="100"
-              @update:model-value="emitUpdate"
-          />
-        </div>
-
-        <div class="form-field">
-          <label class="field-label">{{ $t('quests.createQuest.step3.taskDuration') }}</label>
-          <ErrorBox :message="errors.duration" />
-          <BaseInput
-              v-model="localTask.duration"
-              type="number"
-              numbers-only
-              :placeholder="$t('quests.createQuest.step3.taskDurationPlaceholder')"
-              @update:model-value="emitUpdate"
-          />
-        </div>
+    <template v-else-if="localTask.type === 'quiz' && !isTitleOnly">
+      <div class="form-field">
+        <label class="field-label">
+          {{ $t('quests.createQuest.step3.taskDuration') }}
+          <span class="required-star">*</span>
+        </label>
+        <ErrorBox :message="errors.duration" />
+        <BaseInput
+            v-model="localTask.duration"
+            type="number"
+            numbers-only
+            :min="1"
+            :max="1440"
+            :placeholder="$t('quests.createQuest.step3.taskDurationPlaceholder')"
+            required
+            @update:model-value="emitUpdate"
+        />
       </div>
 
-      <div class="form-row">
-        <div class="form-field">
-          <label class="field-label">
-            {{ $t('quests.createQuest.step3.successThreshold') }}
-            <span class="required-star">*</span>
-          </label>
-          <ErrorBox :message="errors.successThreshold" />
-          <BaseInput
-              v-model="localTask.successThreshold"
-              type="number"
-              numbers-only
-              placeholder="80"
-              @update:model-value="emitUpdate"
-          />
-        </div>
+      <div class="form-field">
+        <label class="field-label">
+          {{ $t('quests.createQuest.step3.successThreshold') }}
+          <span class="required-star">*</span>
+        </label>
+        <ErrorBox :message="errors.successThreshold" />
+        <BaseInput
+            v-model="localTask.successThreshold"
+            type="number"
+            numbers-only
+            :min="0"
+            :max="100"
+            placeholder="80"
+            required
+            @update:model-value="emitUpdate"
+        />
+      </div>
 
-        <div class="form-field checkbox-field">
-          <RoundCheckbox
-              v-model="localTask.requiredToUnlock"
-              :label="$t('quests.createQuest.step3.requiredToUnlock')"
-              @update:model-value="emitUpdate"
-          />
-        </div>
+      <div class="form-field checkbox-field checkbox-center">
+        <RoundCheckbox
+            v-model="localTask.requiredToUnlock"
+            :label="$t('quests.createQuest.step3.requiredToUnlock')"
+            :disabled="isTitleOnly"
+            @update:model-value="emitUpdate"
+        />
       </div>
 
       <QuizQuestions
           v-model="localTask.questions"
           :errors="errors.questions"
+          :editable="true"
           @update:model-value="emitUpdate"
       />
     </template>
 
     <BaseButton
         variant="primary"
-        @click="handleSave"
+        type="submit"
         :disabled="isSaving"
         class="save-task-btn"
     >
       {{ isSaving ? $t('common.saving') : $t('common.save') }}
     </BaseButton>
-  </div>
+  </form>
 </template>
 
 <script setup lang="ts">
@@ -202,11 +244,14 @@ import RoundCheckbox from '@/components/common/RoundCheckbox/RoundCheckbox.vue';
 import DeleteButton from '@/components/common/DeleteButton/DeleteButton.vue';
 import ErrorBox from '@/components/common/ErrorBox/ErrorBox.vue';
 import SuccessBox from '@/components/common/SuccessBox/SuccessBox.vue';
+import { ref, computed } from 'vue';
 import QuizQuestions from './QuizQuestions/QuizQuestions.vue';
 import { useTaskForm, type Props, type Emits } from './TaskForm';
 import './TaskForm.css';
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  titleOnly: false,
+});
 const emit = defineEmits<Emits>();
 
 const {
@@ -219,6 +264,16 @@ const {
   handleSave,
   emitUpdate,
 } = useTaskForm(props, emit);
+
+const formRef = ref<HTMLFormElement | null>(null);
+const isTitleOnly = computed(() => props.titleOnly ?? false);
+
+const handleSubmit = (): void => {
+  if (formRef.value && !formRef.value.reportValidity()) {
+    return;
+  }
+  handleSave();
+};
 </script>
 
 <style scoped src="./TaskForm.css"></style>

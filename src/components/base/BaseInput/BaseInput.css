@@ -36,6 +36,12 @@
     border-color: var(--input-disabled-border);
 }
 
+.base-input::-webkit-calendar-picker-indicator {
+    filter: var(--input-icon-filter, none);
+    opacity: 0.85;
+    cursor: pointer;
+}
+
 @media (max-width: 900px) {
     .base-input {
         margin-bottom: 0.5rem;

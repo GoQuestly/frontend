@@ -1,5 +1,5 @@
 export interface Quest {
-    id: string;
+    id: number;
     title: string;
     subtitle: string;
     description: string;
@@ -8,6 +8,7 @@ export interface Quest {
     estimatedDuration: number;
     lastSessionDate?: string;
     nextSessionDate?: string;
+    isDraft?: boolean;
 }
 
 export interface MyQuestsState {
@@ -34,6 +35,9 @@ export interface QuestResponse {
     minParticipantCount: number;
     maxParticipantCount: number;
     organizerId: number;
+    questPointCount?: number;
+    lastSessionDate?: string;
+    nextSessionDate?: string;
 }
 
 export interface CreateQuestRequest {

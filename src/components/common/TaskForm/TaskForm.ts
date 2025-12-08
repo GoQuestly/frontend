@@ -1,25 +1,28 @@
-import { ref, computed } from 'vue';
-import { questsApi } from '@/api/questsApi';
-import { useI18n } from 'vue-i18n';
+import {ref, computed} from 'vue';
+import {questsApi} from '@/api/questsApi';
+import {useI18n} from 'vue-i18n';
 import {createNotificationHelpers} from '@/utils/messages';
-import { validateNumberRange, parseNumber } from '@/utils/validation';
-import type { CheckpointWithTask, Task } from '@/types/task';
+import {validateNumberRange, parseNumber} from '@/utils/validation';
+import type {CheckpointWithTask, Task} from '@/types/task';
 
 export interface Props {
     checkpoint: CheckpointWithTask;
+    titleOnly?: boolean;
 }
 
 export interface Emits {
     (e: 'update-task', task: Task): void;
+
     (e: 'remove-task'): void;
 }
 
 const MAX_TASK_DURATION_SECONDS = 86400;
+const MAX_POINTS = 10000;
 
 export function useTaskForm(props: Props, emit: Emits) {
-    const { t } = useI18n();
+    const {t} = useI18n();
 
-    const localTask = ref<Task>({ ...props.checkpoint.task! });
+    const localTask = ref<Task>({...props.checkpoint.task!});
     const isSaving = ref(false);
     const errorMessage = ref('');
     const successMessage = ref('');
@@ -38,7 +41,7 @@ export function useTaskForm(props: Props, emit: Emits) {
         type: errorKeys.value.type ? t(errorKeys.value.type) : '',
         title: errorKeys.value.title ? t(errorKeys.value.title) : '',
         maxPoints: errorKeys.value.maxPoints ? t(errorKeys.value.maxPoints) : '',
-        duration: errorKeys.value.duration ? t(errorKeys.value.duration, { max: MAX_TASK_DURATION_SECONDS / 60 }) : '',
+        duration: errorKeys.value.duration ? t(errorKeys.value.duration, {max: MAX_TASK_DURATION_SECONDS / 60}) : '',
         successThreshold: errorKeys.value.successThreshold ? t(errorKeys.value.successThreshold) : '',
         codeWord: errorKeys.value.codeWord ? t(errorKeys.value.codeWord) : '',
         questions: Object.keys(errorKeys.value.questions).reduce((acc, key) => {
@@ -53,7 +56,7 @@ export function useTaskForm(props: Props, emit: Emits) {
         }, {} as { [key: number]: { text: string; points: string; answers: string } }),
     }));
 
-    const { showError, showSuccess } = createNotificationHelpers(errorMessage, successMessage);
+    const {showError} = createNotificationHelpers(errorMessage, successMessage);
 
     const clearValidationErrors = () => {
         errorKeys.value = {
@@ -68,7 +71,7 @@ export function useTaskForm(props: Props, emit: Emits) {
     };
 
     const emitUpdate = (): void => {
-        emit('update-task', { ...localTask.value });
+        emit('update-task', {...localTask.value});
     };
 
     const handleTypeChange = (): void => {
@@ -82,8 +85,8 @@ export function useTaskForm(props: Props, emit: Emits) {
                         text: '',
                         points: '50',
                         options: [
-                            { id: '1', text: '', isCorrect: false },
-                            { id: '2', text: '', isCorrect: false },
+                            {id: '1', text: '', isCorrect: true},
+                            {id: '2', text: '', isCorrect: false},
                         ],
                     },
                 ];
@@ -94,6 +97,7 @@ export function useTaskForm(props: Props, emit: Emits) {
             if (!localTask.value.duration) {
                 localTask.value.duration = '5';
             }
+            localTask.value.maxPoints = '0';
         }
 
         if (localTask.value.type !== 'code_word') {
@@ -110,73 +114,31 @@ export function useTaskForm(props: Props, emit: Emits) {
         clearValidationErrors();
         let isValid = true;
 
-
-        if (!localTask.value.title || localTask.value.title.trim().length === 0) {
-            errorKeys.value.title = 'quests.createQuest.step3.errors.titleRequired';
-            isValid = false;
-        }
-
-        const maxPointsValidation = validateNumberRange(localTask.value.maxPoints, 0, 100);
-        if (!maxPointsValidation.isValid) {
-            errorKeys.value.maxPoints = 'quests.createQuest.step3.errors.maxPointsRange';
-            isValid = false;
-        }
-
-        const thresholdValidation = validateNumberRange(localTask.value.successThreshold, 0, 100);
+        const thresholdValidation = validateNumberRange(localTask.value.successThreshold, 0, 100); // Percentage
         if (!thresholdValidation.isValid) {
             errorKeys.value.successThreshold = 'quests.createQuest.step3.errors.successThresholdRange';
             isValid = false;
         }
 
-        if (localTask.value.duration) {
-            const durationSeconds = parseNumber(localTask.value.duration) * 60;
-            if (durationSeconds < 0 || durationSeconds > MAX_TASK_DURATION_SECONDS) {
-                errorKeys.value.duration = 'quests.createQuest.step3.errors.durationRange';
+        const questionErrors: { [key: number]: { text: string; points: string; answers: string } } = {};
+
+        for (let i = 0; i < (localTask.value.questions?.length || 0); i++) {
+            const q = localTask.value.questions[i];
+            const qErrors = {text: '', points: '', answers: ''};
+
+            const pointsValidation = validateNumberRange(q.points, 0, MAX_POINTS);
+            if (!pointsValidation.isValid) {
+                qErrors.points = 'quests.createQuest.step3.errors.questionPointsRange';
                 isValid = false;
+            }
+
+            if (qErrors.text || qErrors.points || qErrors.answers) {
+                questionErrors[i] = qErrors;
             }
         }
 
-        if (!localTask.value.questions || localTask.value.questions.length === 0) {
-            errorKeys.value.questions = { 0: { text: 'quests.createQuest.step3.errors.questionRequired', points: '', answers: '' } };
-            isValid = false;
-        } else {
-            const questionErrors: { [key: number]: { text: string; points: string; answers: string } } = {};
-
-            for (let i = 0; i < localTask.value.questions.length; i++) {
-                const q = localTask.value.questions[i];
-                const qErrors = { text: '', points: '', answers: '' };
-
-                if (!q.text || q.text.trim().length === 0) {
-                    qErrors.text = 'quests.createQuest.step3.errors.questionTextRequired';
-                    isValid = false;
-                }
-
-                const pointsValidation = validateNumberRange(q.points, 0, 100);
-                if (!pointsValidation.isValid) {
-                    qErrors.points = 'quests.createQuest.step3.errors.questionPointsRange';
-                    isValid = false;
-                }
-
-                const filledOptions = q.options.filter(opt => opt.text.trim().length > 0);
-                if (filledOptions.length < 2) {
-                    qErrors.answers = 'quests.createQuest.step3.errors.twoAnswersRequired';
-                    isValid = false;
-                } else {
-                    const hasCorrectAnswer = filledOptions.some(opt => opt.isCorrect);
-                    if (!hasCorrectAnswer) {
-                        qErrors.answers = 'quests.createQuest.step3.errors.correctAnswerRequired';
-                        isValid = false;
-                    }
-                }
-
-                if (qErrors.text || qErrors.points || qErrors.answers) {
-                    questionErrors[i] = qErrors;
-                }
-            }
-
-            if (Object.keys(questionErrors).length > 0) {
-                errorKeys.value.questions = questionErrors;
-            }
+        if (Object.keys(questionErrors).length > 0) {
+            errorKeys.value.questions = questionErrors;
         }
 
         return isValid;
@@ -185,14 +147,7 @@ export function useTaskForm(props: Props, emit: Emits) {
     const validatePhoto = (): boolean => {
         clearValidationErrors();
         let isValid = true;
-
-
-        if (!localTask.value.title || localTask.value.title.trim().length === 0) {
-            errorKeys.value.title = 'quests.createQuest.step3.errors.titleRequired';
-            isValid = false;
-        }
-
-        const pointsValidation = validateNumberRange(localTask.value.maxPoints, 0);
+        const pointsValidation = validateNumberRange(localTask.value.maxPoints, 0, MAX_POINTS);
         if (!pointsValidation.isValid) {
             errorKeys.value.maxPoints = 'quests.createQuest.step3.errors.scorePointsMin';
             isValid = false;
@@ -206,17 +161,12 @@ export function useTaskForm(props: Props, emit: Emits) {
         let isValid = true;
 
 
-        if (!localTask.value.title || localTask.value.title.trim().length === 0) {
-            errorKeys.value.title = 'quests.createQuest.step3.errors.titleRequired';
-            isValid = false;
-        }
-
         if (!localTask.value.codeWord || localTask.value.codeWord.trim().length === 0) {
             errorKeys.value.codeWord = 'quests.createQuest.step3.errors.codeWordRequired';
             isValid = false;
         }
 
-        const pointsValidation = validateNumberRange(localTask.value.maxPoints, 0);
+        const pointsValidation = validateNumberRange(localTask.value.maxPoints, 0, MAX_POINTS);
         if (!pointsValidation.isValid) {
             errorKeys.value.maxPoints = 'quests.createQuest.step3.errors.scorePointsMin';
             isValid = false;
@@ -286,14 +236,12 @@ export function useTaskForm(props: Props, emit: Emits) {
                     if (taskId) {
                         await questsApi.updateQuizTask(taskId, {
                             ...baseData,
-                            maxScorePointsCount: parseNumber(localTask.value.maxPoints),
                             successScorePointsPercent: parseNumber(localTask.value.successThreshold),
                             quizQuestions,
                         });
                     } else {
                         const response = await questsApi.createQuizTask(props.checkpoint.questPointId, {
                             ...baseData,
-                            maxScorePointsCount: parseNumber(localTask.value.maxPoints),
                             successScorePointsPercent: parseNumber(localTask.value.successThreshold),
                             quizQuestions,
                         });
@@ -338,7 +286,6 @@ export function useTaskForm(props: Props, emit: Emits) {
             }
 
             clearValidationErrors();
-            showSuccess(t('quests.createQuest.step3.errors.taskSaved'));
             emitUpdate();
         } catch (error: any) {
             showError(error?.response?.data?.message || t('quests.createQuest.step3.errors.taskSaveFailed'));

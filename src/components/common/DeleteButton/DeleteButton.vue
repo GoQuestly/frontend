@@ -5,12 +5,13 @@
       @click.stop="$emit('click')"
       :title="title || $t('common.delete')"
   >
-    <img src="@/assets/images/delete-icon.png" alt="Delete" />
+    <img :src="deleteIcon" alt="Delete" />
   </button>
 </template>
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
+import { deleteIcon } from '@/assets/images';
 
 interface Props {
   title?: string;
@@ -21,7 +22,7 @@ defineEmits<{
   (e: 'click'): void;
 }>();
 
-const { t } = useI18n();
+const { t: $t } = useI18n();
 </script>
 
 <style scoped src="./DeleteButton.css"></style>

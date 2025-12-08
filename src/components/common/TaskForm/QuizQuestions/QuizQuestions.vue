@@ -10,51 +10,53 @@
       <div class="question-header">
         <span class="question-label">{{ $t('quests.createQuest.step3.question') }} {{ qIndex + 1 }}</span>
         <button
-            v-if="localQuestions.length > 1"
+            v-if="props.editable && localQuestions.length > 1"
             class="delete-question-btn"
             type="button"
+            :disabled="props.disabled"
             @click="deleteQuestion(question.id)"
         >
-          <img src="../../../../assets/images/delete-icon.png" alt="Delete" />
+          <img :src="deleteIcon" alt="Delete" />
         </button>
       </div>
 
       <div class="form-field">
-        <ErrorBox :message="errors?.[qIndex]?.text || ''" />
         <BaseInput
             v-model="question.text"
             :placeholder="$t('quests.createQuest.step3.questionPlaceholder')"
             :maxlength="300"
             required
+            :disabled="props.disabled"
             @update:model-value="emitUpdate"
         />
       </div>
 
       <div class="answer-options">
-        <ErrorBox :message="errors?.[qIndex]?.answers || ''" />
         <div
             v-for="(option, oIndex) in question.options"
             :key="option.id"
             class="answer-option"
         >
-          <input
-              type="radio"
-              :name="`question-${question.id}`"
-              :checked="option.isCorrect"
-              @change="selectCorrectAnswer(question.id, option.id)"
-              class="radio-input"
+          <RoundCheckbox
+              :model-value="option.isCorrect"
+              class="correct-answer-checkbox"
+              :disabled="props.disabled"
+              @update:model-value="(value) => toggleCorrectAnswer(question.id, option.id, value)"
           />
           <BaseInput
               v-model="option.text"
               :placeholder="`${$t('quests.createQuest.step3.answerOption')} ${oIndex + 1}`"
               :maxlength="200"
+              required
+              :disabled="props.disabled"
               @update:model-value="emitUpdate"
           />
           <button
+              v-if="props.editable"
               class="delete-option-btn"
               type="button"
-              :disabled="question.options.length <= MIN_OPTIONS || option.isCorrect"
-              :title="option.isCorrect ? $t('quests.createQuest.step3.cannotDeleteCorrectAnswer') : $t('quests.createQuest.step3.removeAnswerOption')"
+              :disabled="question.options.length <= MIN_OPTIONS || props.disabled"
+              :title="$t('quests.createQuest.step3.removeAnswerOption')"
               @click="deleteOption(question.id, option.id)"
           >
             <img src="../../../../assets/images/delete-icon.png" alt="Delete option" />
@@ -62,9 +64,10 @@
         </div>
 
         <button
+            v-if="props.editable"
             class="add-option-btn"
             type="button"
-            :disabled="question.options.length >= MAX_OPTIONS"
+            :disabled="question.options.length >= MAX_OPTIONS || props.disabled"
             @click="addOption(question.id)"
         >
           <span class="plus-icon">+</span>
@@ -81,12 +84,19 @@
             numbers-only
             placeholder="50"
             style="max-width: 200px;"
+            :disabled="props.disabled"
             @update:model-value="emitUpdate"
         />
       </div>
     </div>
 
-    <button class="add-question-btn" type="button" @click="addQuestion">
+    <button
+        v-if="props.editable"
+        class="add-question-btn"
+        type="button"
+        :disabled="props.disabled"
+        @click="addQuestion"
+    >
       <span class="plus-icon">+</span>
       {{ $t('quests.createQuest.step3.addQuestion') }}
     </button>
@@ -94,36 +104,59 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, watch } from 'vue';
+import { reactive, watch, withDefaults } from 'vue';
 import { useI18n } from 'vue-i18n';
 import BaseInput from '@/components/base/BaseInput/BaseInput.vue';
 import ErrorBox from '@/components/common/ErrorBox/ErrorBox.vue';
+import RoundCheckbox from '@/components/common/RoundCheckbox/RoundCheckbox.vue';
 import type { Question } from '@/types/task.ts';
-import { confirmWithTranslation } from '@/utils/dialogs';
+import { useConfirmDialog } from '@/composables/useConfirmDialog';
+import { deleteIcon } from '@/assets/images';
 
 interface Props {
   modelValue: Question[];
   errors?: { [key: number]: { text: string; points: string; answers: string } };
+  disabled?: boolean;
+  editable?: boolean;
 }
 
 const MIN_OPTIONS = 2;
 const MAX_OPTIONS = 6;
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  disabled: false,
+  editable: true,
+});
 
 const emit = defineEmits<{
   (e: 'update:modelValue', questions: Question[]): void;
 }>();
 
 const { t } = useI18n();
+const confirmDialog = useConfirmDialog();
 
-const localQuestions = reactive<Question[]>([...props.modelValue]);
+const localQuestions = reactive<Question[]>(props.modelValue.map(q => normalizeQuestion(q)));
+
+function normalizeQuestion(question: Question): Question {
+  const normalizedOptions = question.options && question.options.length > 0 ? [...question.options] : [
+    { id: '1', text: '', isCorrect: true },
+    { id: '2', text: '', isCorrect: false },
+  ];
+
+  if (!normalizedOptions.some(o => o.isCorrect)) {
+    normalizedOptions[0].isCorrect = true;
+  }
+
+  return {
+    ...question,
+    options: normalizedOptions,
+  };
+}
 
 watch(() => props.modelValue, (newQuestions) => {
-  localQuestions.splice(0, localQuestions.length, ...newQuestions);
+  const normalized = newQuestions.map(q => normalizeQuestion(q));
+  localQuestions.splice(0, localQuestions.length, ...normalized);
 }, { deep: true });
-
-const confirmAction = (key: string): boolean => confirmWithTranslation(t, key);
 
 const addQuestion = (): void => {
   const newQuestion: Question = {
@@ -131,7 +164,7 @@ const addQuestion = (): void => {
     text: '',
     points: '50',
     options: [
-      { id: '1', text: '', isCorrect: false },
+      { id: '1', text: '', isCorrect: true },
       { id: '2', text: '', isCorrect: false },
     ],
   };
@@ -140,8 +173,15 @@ const addQuestion = (): void => {
   emitUpdate();
 };
 
-const deleteQuestion = (questionId: string): void => {
-  if (!confirmAction('quests.createQuest.confirmations.deleteQuestion')) {
+const deleteQuestion = async (questionId: string): Promise<void> => {
+  const confirmed = await confirmDialog({
+    title: t('common.delete'),
+    message: t('quests.createQuest.confirmations.deleteQuestion'),
+    confirmText: t('common.delete'),
+    cancelText: t('common.cancel'),
+    tone: 'danger',
+  });
+  if (!confirmed) {
     return;
   }
   const index = localQuestions.findIndex(q => q.id === questionId);
@@ -151,13 +191,29 @@ const deleteQuestion = (questionId: string): void => {
   }
 };
 
-const selectCorrectAnswer = (questionId: string, optionId: string): void => {
+const toggleCorrectAnswer = (questionId: string, optionId: string, value: boolean): void => {
   const question = localQuestions.find(q => q.id === questionId);
   if (!question) return;
 
-  question.options.forEach(option => {
-    option.isCorrect = option.id === optionId;
-  });
+  if (value) {
+    question.options.forEach(option => {
+      option.isCorrect = option.id === optionId;
+    });
+  } else {
+    const hasOtherCorrect = question.options.some(opt => opt.isCorrect && opt.id !== optionId);
+    if (!hasOtherCorrect) {
+      question.options.forEach(opt => opt.isCorrect = false);
+      if (question.options.length > 0) {
+        question.options[0].isCorrect = true;
+      }
+    } else {
+      question.options.forEach(option => {
+        if (option.id === optionId) {
+          option.isCorrect = false;
+        }
+      });
+    }
+  }
 
   emitUpdate();
 };
@@ -182,18 +238,21 @@ const addOption = (questionId: string): void => {
   emitUpdate();
 };
 
-const deleteOption = (questionId: string, optionId: string): void => {
+const deleteOption = async (questionId: string, optionId: string): Promise<void> => {
   const question = localQuestions.find(q => q.id === questionId);
   if (!question || question.options.length <= MIN_OPTIONS) {
     return;
   }
 
-  const option = question.options.find(opt => opt.id === optionId);
-  if (!option || option.isCorrect) {
-    return;
-  }
+  const confirmed = await confirmDialog({
+    title: t('common.delete'),
+    message: t('quests.createQuest.confirmations.deleteAnswerOption'),
+    confirmText: t('common.delete'),
+    cancelText: t('common.cancel'),
+    tone: 'danger',
+  });
 
-  if (!confirmAction('quests.createQuest.confirmations.deleteAnswerOption')) {
+  if (!confirmed) {
     return;
   }
 
@@ -202,12 +261,10 @@ const deleteOption = (questionId: string, optionId: string): void => {
     return;
   }
 
-  const [removedOption] = question.options.splice(optionIndex, 1);
+  question.options.splice(optionIndex, 1);
 
-  if (removedOption?.isCorrect) {
-    question.options.forEach(option => {
-      option.isCorrect = false;
-    });
+  if (!question.options.some(opt => opt.isCorrect) && question.options.length > 0) {
+    question.options[0].isCorrect = true;
   }
 
   emitUpdate();

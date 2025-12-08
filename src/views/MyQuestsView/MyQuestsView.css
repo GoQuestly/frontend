@@ -1,11 +1,9 @@
 .my-quests-view {
     min-height: 100vh;
-    height: 100vh;
     display: flex;
     flex-direction: column;
     background-color: var(--bg-primary);
     transition: background-color 0.3s ease;
-    overflow: hidden;
 }
 
 :global(.light-theme) .my-quests-view {
@@ -17,8 +15,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    overflow-y: auto;
     padding: 1.25rem 1.75rem 0.75rem;
+    width: 100%;
 }
 
 @media (max-width: 1024px) {

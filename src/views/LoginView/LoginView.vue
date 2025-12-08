@@ -6,7 +6,7 @@
     </div>
 
     <div class="login-illustration">
-      <img src="../../assets/images/login-illustration.png" alt="Traveler illustration" />
+      <img :src="loginIllustration" alt="Traveler illustration" />
     </div>
 
     <LoginForm />
@@ -17,5 +17,6 @@
 import LoginForm from '@/components/features/auth/LoginForm/LoginForm.vue';
 import ThemeToggle from '@/components/common/ThemeToggle/ThemeToggle.vue';
 import LocaleToggle from '@/components/common/LocaleToggle/LocaleToggle.vue';
+import { loginIllustration } from '@/assets/images';
 import './LoginView.css';
 </script>

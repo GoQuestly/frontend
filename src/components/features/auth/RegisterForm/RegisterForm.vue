@@ -1,7 +1,7 @@
 <template>
   <div class="register-form-wrapper">
     <div class="register-logo">
-      <img src="@/assets/images/logo.png" alt="GoQuestly Logo" />
+      <img :src="logo" alt="GoQuestly Logo" />
     </div>
 
     <h1 class="register-title">{{ $t('common.brand') }}</h1>
@@ -51,7 +51,7 @@
 
     <p class="login-link">
       {{ $t('auth.register.alreadyHaveAccount') }}
-      <a href="#" @click.prevent="router.replace('/login')" class="link">{{ $t('common.login') }}</a>
+      <a href="#" @click.prevent="router.push('/login')" class="link">{{ $t('common.login') }}</a>
     </p>
   </div>
 </template>
@@ -70,6 +70,7 @@ import {
   handleRegisterLogic,
   handleGoogleRegisterLogic
 } from './RegisterForm';
+import { logo } from '@/assets/images';
 import './RegisterForm.css';
 
 const router = useRouter();

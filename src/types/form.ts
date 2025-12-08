@@ -8,7 +8,6 @@ export interface QuestFormData {
     startingLat: number;
     startingLng: number;
     startRadius: number;
-    publicProgressVisibility: boolean;
     minParticipants: number;
     maxParticipants: number;
     maxDuration: number;

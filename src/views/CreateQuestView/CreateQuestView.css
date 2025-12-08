@@ -21,9 +21,179 @@
     padding: 1.25rem 1.75rem 0.75rem;
 }
 
+.create-quest-form {
+    width: 100%;
+    max-width: 1400px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+}
+
+.form-header {
+    margin-bottom: 1rem;
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.15rem;
+    flex-wrap: wrap;
+}
+
+.form-header__info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+}
+
+.form-header__actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.form-header h1 {
+    font-size: 1.85rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.25rem 0;
+    transition: color 0.3s ease;
+}
+
+.top-upload-error {
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+.form-subtitle {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin: 0;
+    transition: color 0.3s ease;
+}
+
+.header-action-btn {
+    width: auto;
+    min-width: 150px;
+    height: 46px;
+    padding: 0 1.4rem;
+    margin-bottom: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    font-weight: 700;
+    line-height: 1;
+    box-sizing: border-box;
+}
+
+.header-action-btn--delete {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    background: var(--error-bg) !important;
+    color: var(--error-text) !important;
+    border: 1px solid var(--error-border) !important;
+    font-weight: 700;
+    margin-bottom: 0;
+    transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, transform 0.1s ease;
+}
+
+.header-action-btn--delete:hover:not(:disabled) {
+    background: var(--error-hover-bg) !important;
+    border-color: var(--error-hover-border) !important;
+}
+
+.header-action-btn--delete:active:not(:disabled) {
+    transform: scale(0.99);
+}
+
+.header-delete-icon {
+    width: 18px;
+    height: 22px;
+}
+
+.form-content-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-form);
+    border-radius: 0.75rem;
+    padding: 2rem;
+    margin: 1rem 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+    overflow-x: hidden;
+}
+
+.form-content {
+    flex: 1;
+}
+
+.limited-flow,
+.edit-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.limited-section,
+.edit-section {
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.25rem;
+    background: var(--bg-form, #fff);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0;
+    margin-top: 0;
+    flex-wrap: nowrap;
+    width: 100%;
+}
+
+.form-actions .action-button {
+    padding: 0.95rem 3.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    flex: 0 1 auto;
+    min-width: 0;
+    transition: padding 0.2s ease, font-size 0.2s ease;
+}
+
+.form-actions .action-button--secondary {
+    flex-basis: 210px;
+}
+
+.form-actions .action-button--primary {
+    flex-basis: 280px;
+}
+
 @media (max-width: 1024px) {
     .create-quest-main {
         padding: 1.15rem 1.5rem 0.75rem;
+    }
+}
+
+@media (max-width: 900px) {
+    .form-actions .action-button {
+        padding: 0.9rem 2.25rem;
+    }
+
+    .form-actions .action-button--secondary {
+        flex-basis: 180px;
+    }
+
+    .form-actions .action-button--primary {
+        flex-basis: 220px;
     }
 }
 
@@ -31,11 +201,87 @@
     .create-quest-main {
         padding: 1rem 1.5rem 0.65rem;
     }
+
+    .form-header h1 {
+        font-size: 1.5rem;
+        text-align: center;
+    }
+
+    .form-header {
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .form-header__actions {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .header-action-btn {
+        flex: 1 1 32%;
+        min-width: 0;
+        text-align: center;
+    }
+
+    .header-action-btn--delete {
+        flex: 1 1 32%;
+        justify-content: center;
+    }
+
+    .form-content-wrapper {
+        padding: 1.5rem;
+    }
+
+    .form-actions {
+        gap: 0.75rem;
+    }
+
+    .form-subtitle {
+        text-align: center;
+    }
+}
+
+@media (max-width: 600px) {
+    .form-actions {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .form-header__actions {
+        justify-content: flex-start;
+    }
+
+    .header-action-btn {
+        flex: 1 1 calc(50% - 0.35rem);
+    }
+
+    .form-actions .action-button {
+        padding: 0.85rem 1.25rem;
+        font-size: 0.9rem;
+        flex: 1 1 calc(50% - 0.5rem);
+        text-align: center;
+    }
+
+    .form-actions .action-button--secondary,
+    .form-actions .action-button--primary {
+        flex-basis: auto;
+    }
 }
 
 @media (max-width: 480px) {
     .create-quest-main {
         padding: 0.85rem 1.25rem 0.6rem;
+    }
+}
+
+@media (max-width: 420px) {
+    .form-actions .action-button {
+        flex: 1 1 100%;
+    }
+
+    .header-action-btn {
+        flex: 1 1 100%;
     }
 }
 

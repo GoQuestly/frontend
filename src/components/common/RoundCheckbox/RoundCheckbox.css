@@ -41,3 +41,27 @@
     font-size: 0.85rem;
     font-weight: bold;
 }
+
+.checkbox-label.disabled {
+    cursor: not-allowed;
+    color: var(--text-tertiary);
+}
+
+.checkbox-label.disabled .round-checkbox {
+    border-color: var(--border-color);
+    background-color: var(--bg-tertiary, #f0f0f0);
+    cursor: not-allowed;
+}
+
+.checkbox-label.disabled .round-checkbox:hover {
+    border-color: var(--border-color);
+}
+
+.checkbox-label.disabled .round-checkbox:checked {
+    background-color: var(--border-color);
+    border-color: var(--border-color);
+}
+
+.checkbox-label.disabled .round-checkbox:checked::before {
+    color: var(--text-secondary);
+}
