@@ -10,9 +10,6 @@
     <header class="manage-session__header">
       <div class="manage-session__title-block">
         <h1 class="manage-session__title">{{ sessionTitle }}</h1>
-        <p class="manage-session__subtitle">
-          {{ $t('quests.sessions.managePage.subtitle') }}
-        </p>
       </div>
       <div class="manage-session__actions">
         <BaseButton
@@ -38,8 +35,8 @@
       <div class="map-card">
         <div class="card-header">
           <div>
-            <p class="card-title">{{ $t('quests.sessions.managePage.liveMap.title') }}</p>
-            <p class="card-subtitle">{{ $t('quests.sessions.managePage.liveMap.subtitle') }}</p>
+            <p class="card-title">{{ $t('quests.sessions.managePage.map.title') }}</p>
+            <p class="card-subtitle">{{ $t('quests.sessions.managePage.map.subtitle') }}</p>
           </div>
         </div>
         <div class="map-canvas">
@@ -72,6 +69,10 @@
           <div class="info-row">
             <span class="info-label">{{ $t('quests.sessions.managePage.sessionInfo.startTime') }}</span>
             <span class="info-value">{{ state.startTime || $t('quests.sessions.managePage.placeholders.notSet') }}</span>
+          </div>
+          <div v-if="state.sessionTimer" class="info-row">
+            <span class="info-label">{{ state.status === 'scheduled' ? $t('quests.sessions.managePage.sessionInfo.countdown') : $t('quests.sessions.managePage.sessionInfo.duration') }}</span>
+            <span class="info-value info-value--timer">{{ state.sessionTimer }}</span>
           </div>
           <div class="info-row">
             <span class="info-label">{{ $t('quests.sessions.managePage.sessionInfo.participants') }}</span>
@@ -107,43 +108,53 @@
               v-else
               v-for="participant in state.participantsOverview"
               :key="participant.id"
-              class="participant-row"
+              class="participant-card"
+              :class="{
+                'participant-card--rejected': participant.participationStatus === 'rejected' || participant.participationStatus === 'disqualified'
+              }"
           >
-            <div class="participant-header">
-              <p class="participant-name">{{ participant.name }}</p>
-            </div>
-            <p v-if="participant.location" class="participant-location">{{ participant.location }}</p>
-            <div class="progress-row">
-              <div class="progress-track">
-                <div
-                    class="progress-fill"
-                    :style="{
-                      width: `${participant.progress}%`,
-                      backgroundColor: participant.barColor
-                    }"
-                ></div>
+            <div class="participant-avatar-wrapper">
+              <div class="participant-avatar" :class="{ 'participant-avatar--image': participant.photoUrl }">
+                <img v-if="participant.photoUrl" :src="participant.photoUrl" :alt="participant.name" class="participant-avatar-img" />
+                <span v-else>{{ participant.name.charAt(0).toUpperCase() }}</span>
               </div>
-              <span class="progress-value">{{ participant.progress }}%</span>
+              <div v-if="participant.isActive" class="participant-online-indicator"></div>
+            </div>
+            <div class="participant-info">
+              <div class="participant-header">
+                <p class="participant-name">
+                  {{ participant.name }}
+                  <span
+                    v-if="participant.rejectionReason"
+                    class="rejection-badge"
+                    :title="$t(`quests.sessions.rejectionReason.${participant.rejectionReason}`)"
+                  >
+                    {{ $t(`quests.sessions.rejectionReason.${participant.rejectionReason}`) }}
+                  </span>
+                </p>
+                <span
+                  v-if="participant.participationStatus !== 'rejected' && participant.participationStatus !== 'disqualified'"
+                  class="participant-score"
+                >{{ participant.score }}</span>
+              </div>
+              <div class="progress-row">
+                <div class="progress-track">
+                  <div
+                      class="progress-fill"
+                      :style="{
+                        width: `${participant.progress}%`,
+                        backgroundColor: participant.barColor
+                      }"
+                  ></div>
+                </div>
+                <span class="progress-value">{{ participant.progress }}%</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <footer class="manage-session__footer">
-      <div class="footer-actions">
-        <BaseButton variant="secondary" class="footer-btn footer-btn--ghost" @click="handleBack">
-          &#x2190; {{ $t('quests.sessions.managePage.footer.back') }}
-        </BaseButton>
-      </div>
-      <div class="footer-meta">
-        <span class="sync-label">{{ $t('quests.sessions.managePage.footer.lastSync', { time: state.lastSync || '---' }) }}</span>
-        <div class="task-checking">
-          <span class="task-dot"></span>
-          {{ $t('quests.sessions.managePage.footer.taskChecking') }}
-        </div>
-      </div>
-    </footer>
     </div>
 
     <CreateSessionModal
@@ -190,7 +201,6 @@ const {
   sessionTitle,
   copyState,
   copyInviteLink,
-  handleBack,
   questCheckpoints,
   participantLocationsArray,
   handleEditSession,

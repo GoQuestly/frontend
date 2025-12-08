@@ -45,6 +45,7 @@ export interface SessionParticipant {
     joinedAt?: string | null;
     participationStatus?: string | null;
     rejectionReason?: string | null;
+    passedQuestPointCount?: number;
 }
 
 export interface QuestSessionDetail extends QuestSessionResponse {
@@ -77,9 +78,11 @@ export interface ParticipantLocation {
     participantId: number;
     userId: number;
     userName: string;
+    photoUrl?: string | null;
     latitude: number;
     longitude: number;
     timestamp: string;
+    isActive: boolean;
 }
 
 export interface JoinSessionRequest {
@@ -198,10 +201,17 @@ export interface TaskCompletedEvent {
 }
 
 export interface ParticipantScore {
+    participantId: number;
     userId: number;
     userName: string;
+    photoUrl?: string | null;
     totalScore: number;
     completedTasksCount: number;
+}
+
+export interface SessionScoresResponse {
+    participants: ParticipantScore[];
+    totalTasksInQuest: number;
 }
 
 export interface ScoresUpdatedEvent {
@@ -240,6 +250,12 @@ export interface PhotoModeratedEvent {
     moderatedAt: string;
 }
 
+export enum RejectionReason {
+    NO_LOCATION = 'NO_LOCATION',
+    TOO_FAR_FROM_START = 'TOO_FAR_FROM_START',
+    REQUIRED_TASK_NOT_COMPLETED = 'REQUIRED_TASK_NOT_COMPLETED'
+}
+
 export interface ParticipantRejectedEvent {
     participantId: number;
     userId: number;
@@ -247,4 +263,13 @@ export interface ParticipantRejectedEvent {
     sessionId: number;
     rejectionReason: string;
     rejectedAt: string;
+}
+
+export interface ParticipantDisqualifiedEvent {
+    participantId: number;
+    userId: number;
+    userName: string;
+    sessionId: number;
+    rejectionReason: string;
+    disqualifiedAt: string;
 }

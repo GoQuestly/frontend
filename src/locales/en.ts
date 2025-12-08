@@ -166,6 +166,11 @@ export default {
                 completed: 'Completed',
                 cancelled: 'Cancelled',
             },
+            rejectionReason: {
+                NO_LOCATION: 'No location',
+                TOO_FAR_FROM_START: 'Too far',
+                REQUIRED_TASK_NOT_COMPLETED: 'Task not done',
+            },
             editTitle: 'Edit Session Time',
             cannotEditActive: 'Only scheduled sessions can be edited. Active, completed, and cancelled sessions cannot be modified.',
             managePage: {
@@ -177,6 +182,8 @@ export default {
                     subtitle: 'Track participants, checkpoints, and route progress.',
                 },
                 map: {
+                    title: 'Map',
+                    subtitle: 'Participants and checkpoints',
                     checkpointsVisible: 'Checkpoints visible',
                     showCheckpoints: 'Show Checkpoints',
                     showPaths: 'Show Paths',
@@ -187,6 +194,8 @@ export default {
                     title: 'Session Info',
                     status: 'Status',
                     startTime: 'Start Time',
+                    countdown: 'Countdown',
+                    duration: 'Duration',
                     participants: 'Participants',
                     inviteLink: 'Invite Link',
                 },
@@ -198,6 +207,7 @@ export default {
                 participants: {
                     title: 'Participants Overview',
                     placeholderName: 'Participant',
+                    empty: 'No participants yet',
                 },
                 location: {
                     at: 'At: {place}',
@@ -237,6 +247,10 @@ export default {
                     participantPassedPoint: '{userName} reached {pointName}',
                     taskCompleted: '{userName} completed a task',
                     sessionCancelled: 'Session cancelled by {cancelledBy}',
+                },
+                timer: {
+                    startsIn: 'Starts in {time}',
+                    duration: 'Duration: {time}',
                 },
                 lastSyncJustNow: 'just now',
             },

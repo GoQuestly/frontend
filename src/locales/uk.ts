@@ -163,6 +163,11 @@ export default {
                 completed: 'Завершено',
                 cancelled: 'Скасовано',
             },
+            rejectionReason: {
+                NO_LOCATION: 'Немає локації',
+                TOO_FAR_FROM_START: 'Занадто далеко',
+                REQUIRED_TASK_NOT_COMPLETED: 'Завдання не виконано',
+            },
             editTitle: 'Редагувати Час Сесії',
             cannotEditActive: 'Можна редагувати тільки заплановані сесії. Активні, завершені та скасовані сесії не можна змінювати.',
             managePage: {
@@ -174,6 +179,8 @@ export default {
                     subtitle: 'Відстежуйте учасників, контрольні точки та прогрес маршруту.',
                 },
                 map: {
+                    title: 'Карта',
+                    subtitle: 'Учасники та контрольні точки',
                     checkpointsVisible: 'Точки відображені',
                     showCheckpoints: 'Показати Точки',
                     showPaths: 'Показати Маршрути',
@@ -184,6 +191,8 @@ export default {
                     title: 'Інформація про Сесію',
                     status: 'Статус',
                     startTime: 'Час Початку',
+                    countdown: 'Зворотній Відлік',
+                    duration: 'Тривалість',
                     participants: 'Учасники',
                     inviteLink: 'Посилання-Запрошення',
                 },
@@ -195,6 +204,7 @@ export default {
                 participants: {
                     title: 'Огляд Учасників',
                     placeholderName: 'Учасник',
+                    empty: 'Ще немає учасників',
                 },
                 location: {
                     at: 'Локація: {place}',
@@ -234,6 +244,10 @@ export default {
                     participantPassedPoint: '{userName} досяг точки {pointName}',
                     taskCompleted: '{userName} виконав завдання',
                     sessionCancelled: 'Сесію скасовано користувачем {cancelledBy}',
+                },
+                timer: {
+                    startsIn: 'Початок через {time}',
+                    duration: 'Тривалість: {time}',
                 },
                 lastSyncJustNow: 'Щойно',
             },

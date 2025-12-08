@@ -52,6 +52,7 @@ export const useSessionEvents = (
         const token = getAccessToken();
 
         if (!token) {
+            console.error('[useSessionEvents] No access token found');
             onError?.('No access token found');
             return;
         }
@@ -76,6 +77,7 @@ export const useSessionEvents = (
         });
 
         socket.on('connect_error', (error) => {
+            console.error('[useSessionEvents] Connection error:', error.message);
             isConnected.value = false;
             onError?.(`Connection error: ${error.message}`);
         });
@@ -86,6 +88,7 @@ export const useSessionEvents = (
         });
 
         socket.on('error', (error: ErrorResponse) => {
+            console.error('[useSessionEvents] Socket error:', error.error);
             onError?.(error.error);
         });
 
@@ -93,12 +96,14 @@ export const useSessionEvents = (
             if (response.success) {
                 isSubscribed.value = true;
             } else {
+                console.error('[useSessionEvents] Failed to subscribe:', response.message);
                 onError?.(response.message || 'Failed to subscribe to session');
                 isSubscribed.value = false;
             }
         });
 
         socket.on('subscribe-error', (error: ErrorResponse) => {
+            console.error('[useSessionEvents] Subscribe error:', error.error);
             isSubscribed.value = false;
             onError?.(error.error);
         });
@@ -107,11 +112,13 @@ export const useSessionEvents = (
             if (response.success) {
                 isSubscribed.value = false;
             } else {
+                console.error('[useSessionEvents] Failed to unsubscribe:', response.message);
                 onError?.(response.message || 'Failed to unsubscribe from session');
             }
         });
 
         socket.on('unsubscribe-error', (error: ErrorResponse) => {
+            console.error('[useSessionEvents] Unsubscribe error:', error.error);
             onError?.(error.error);
         });
 
@@ -129,16 +136,23 @@ export const useSessionEvents = (
     };
 
     const subscribeToSession = (sessionId: number) => {
-        if (!socket || !isConnected.value) {
+        currentSessionId.value = sessionId;
+
+        if (!socket) {
+            console.error('[useSessionEvents] Socket does not exist');
+            return;
+        }
+
+        if (!isConnected.value) {
             return;
         }
 
         const request: SubscribeToSessionRequest = { sessionId };
-        currentSessionId.value = sessionId;
         socket.emit('subscribe-to-session', request);
     };
 
     const unsubscribeFromSession = (sessionId: number) => {
+
         if (!socket || !isConnected.value) {
             return;
         }

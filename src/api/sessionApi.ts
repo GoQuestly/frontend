@@ -4,7 +4,8 @@ import type {
     ParticipantLocation,
     CreateQuestSessionRequest,
     QuestSessionResponse,
-    QuestSessionsResponse
+    QuestSessionsResponse,
+    SessionScoresResponse
 } from '@/types/session';
 
 export const sessionApi = {
@@ -57,6 +58,11 @@ export const sessionApi = {
 
     async getLatestLocations(sessionId: number): Promise<ParticipantLocation[]> {
         const response = await apiClient.get<ParticipantLocation[]>(`/organizer/sessions/${sessionId}/locations/latest`);
+        return response.data;
+    },
+
+    async getSessionScores(sessionId: number): Promise<SessionScoresResponse> {
+        const response = await apiClient.get<SessionScoresResponse>(`/organizer/sessions/${sessionId}/scores`);
         return response.data;
     },
 };

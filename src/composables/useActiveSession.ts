@@ -18,6 +18,7 @@ import type {
     PhotoSubmittedEvent,
     PhotoModeratedEvent,
     ParticipantRejectedEvent,
+    ParticipantDisqualifiedEvent,
     SessionCancelledEvent
 } from '@/types/session';
 
@@ -44,6 +45,7 @@ export interface UseActiveSessionOptions {
     onPhotoSubmitted?: (event: PhotoSubmittedEvent) => void;
     onPhotoModerated?: (event: PhotoModeratedEvent) => void;
     onParticipantRejected?: (event: ParticipantRejectedEvent) => void;
+    onParticipantDisqualified?: (event: ParticipantDisqualifiedEvent) => void;
     onSessionCancelled?: (event: SessionCancelledEvent) => void;
     onError?: (error: string) => void;
 }
@@ -78,6 +80,7 @@ export const useActiveSession = (
         onPhotoSubmitted,
         onPhotoModerated,
         onParticipantRejected,
+        onParticipantDisqualified,
         onSessionCancelled,
         onError
     } = options;
@@ -180,6 +183,10 @@ export const useActiveSession = (
 
         socket.on('participant-rejected', (event: ParticipantRejectedEvent) => {
             onParticipantRejected?.(event);
+        });
+
+        socket.on('participant-disqualified', (event: ParticipantDisqualifiedEvent) => {
+            onParticipantDisqualified?.(event);
         });
 
         socket.on('session-cancelled', (event: SessionCancelledEvent) => {
