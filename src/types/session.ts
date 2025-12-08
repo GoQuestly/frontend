@@ -273,3 +273,25 @@ export interface ParticipantDisqualifiedEvent {
     rejectionReason: string;
     disqualifiedAt: string;
 }
+
+export interface PendingPhotoForModeration {
+    participantTaskPhotoId: number;
+    participantTaskId: number;
+    userId: number;
+    userName: string;
+    questTaskId: number;
+    taskDescription: string;
+    pointName: string;
+    photoUrl: string;
+    uploadDate: string;
+}
+
+export interface ModeratePhotoRequest {
+    approved: boolean;
+    rejectionReason?: string;
+}
+
+export interface ModeratePhotoResponse {
+    success: boolean;
+    message?: string;
+}

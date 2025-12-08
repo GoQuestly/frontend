@@ -16,6 +16,8 @@ import type {
     ParticipantLocation,
     ParticipantPointPassedEvent,
     ParticipantRejectedEvent,
+    PhotoSubmittedEvent,
+    PhotoModeratedEvent,
     QuestSessionDetail,
     ScoresUpdatedEvent,
     SessionParticipant,
@@ -179,6 +181,7 @@ export const useManageSessionForm = () => {
 
     const questCheckpoints = ref<QuestCheckpoint[]>([]);
     const actionError = toRef(state, 'actionError');
+    const successMessage = ref('');
 
     const participantLocationsArray = computed(() => {
         return Array.from(state.participantLocations.values()).filter(location => {
@@ -316,6 +319,33 @@ export const useManageSessionForm = () => {
         isSubmitting: false,
     });
 
+    const photoModerationModal = reactive({
+        isOpen: false,
+    });
+
+    const pendingPhotosCount = ref(0);
+
+    const openPhotoModeration = (): void => {
+        photoModerationModal.isOpen = true;
+    };
+
+    const closePhotoModeration = (): void => {
+        photoModerationModal.isOpen = false;
+    };
+
+    const handlePhotoModerated = (): void => {
+        void loadPendingPhotosCount();
+    };
+
+    const loadPendingPhotosCount = async (): Promise<void> => {
+        if (!sessionId.value) return;
+        try {
+            const photos = await sessionApi.getPendingPhotos(sessionId.value);
+            pendingPhotosCount.value = photos.length;
+        } catch (error) {
+        }
+    };
+
 const getMinStartDate = (): string => {
     const date = new Date();
     date.setMinutes(date.getMinutes() + 1);
@@ -359,7 +389,6 @@ const translateWithFallback = (key: string, fallback: string): string => {
             return;
         }
 
-        // Dynamic validation: check if start date is at least 1 minute in the future
         const selectedDate = new Date(editModal.startDate);
         const minAllowedDate = new Date();
         minAllowedDate.setMinutes(minAllowedDate.getMinutes() + 1);
@@ -861,11 +890,26 @@ const translateWithFallback = (key: string, fallback: string): string => {
             onParticipantPointPassed: handleParticipantPointPassed,
             onTaskCompleted: handleTaskCompleted,
             onScoresUpdated: handleScoresUpdated,
+            onPhotoSubmitted: handlePhotoSubmitted,
+            onPhotoModerated: handlePhotoModeratedEvent,
             onSessionCancelled: handleSessionCancelledEvent,
             onParticipantRejected: handleParticipantRejected,
             onParticipantDisqualified: handleParticipantDisqualified,
             onError: handleError,
         });
+    };
+
+    const handlePhotoSubmitted = (event: PhotoSubmittedEvent): void => {
+        void loadPendingPhotosCount();
+        showTemporaryMessage(
+            successMessage,
+            $t('quests.sessions.managePage.events.photoSubmitted', { userName: event.userName }),
+            3000
+        );
+    };
+
+    const handlePhotoModeratedEvent = (_event: PhotoModeratedEvent): void => {
+        void loadPendingPhotosCount();
     };
 
     onMounted(async () => {
@@ -874,6 +918,7 @@ const translateWithFallback = (key: string, fallback: string): string => {
         loadSession().then(() => {
             startTimer();
             initSessionEventsSocket();
+            void loadPendingPhotosCount();
 
             if (state.status === 'in-progress') {
                 loadParticipantLocations();
@@ -902,6 +947,7 @@ const translateWithFallback = (key: string, fallback: string): string => {
         state,
         statusLabel,
         sessionTitle,
+        sessionId,
         copyState,
         copyInviteLink,
         loadSession,
@@ -915,6 +961,11 @@ const translateWithFallback = (key: string, fallback: string): string => {
         confirmDialog,
         closeConfirmDialog,
         confirmCancelSession,
+        photoModerationModal,
+        pendingPhotosCount,
+        openPhotoModeration,
+        closePhotoModeration,
+        handlePhotoModerated,
         translateWithFallback,
         actionError,
     };

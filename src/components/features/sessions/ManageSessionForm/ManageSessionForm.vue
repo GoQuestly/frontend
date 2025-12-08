@@ -20,6 +20,16 @@
           {{ $t('common.edit') }}
         </BaseButton>
         <BaseButton
+          v-if="state.status === 'in-progress'"
+          variant="primary"
+          class="action-btn action-btn--photos"
+          :class="{ 'has-pending': pendingPhotosCount > 0 }"
+          @click="openPhotoModeration"
+        >
+          {{ $t('quests.sessions.managePage.photoModeration.title') }}
+          <span v-if="pendingPhotosCount > 0" class="badge">{{ pendingPhotosCount }}</span>
+        </BaseButton>
+        <BaseButton
           variant="secondary"
           class="action-btn action-btn--cancel"
           :disabled="state.isActionLoading || state.status === 'cancelled'"
@@ -182,6 +192,14 @@
       @confirm="confirmCancelSession"
       @cancel="closeConfirmDialog"
     />
+
+    <PhotoModerationModal
+      v-if="sessionId"
+      :sessionId="sessionId"
+      :isOpen="photoModerationModal.isOpen"
+      @close="closePhotoModeration"
+      @moderated="handlePhotoModerated"
+    />
   </div>
 </template>
 
@@ -192,6 +210,7 @@ import SessionMapView from '@/components/common/SessionMapView/SessionMapView.vu
 import CreateSessionModal from '@/components/common/CreateSessionModal/CreateSessionModal.vue';
 import ConfirmDialog from '@/components/common/ConfirmDialog/ConfirmDialog.vue';
 import ErrorBox from '@/components/common/ErrorBox/ErrorBox.vue';
+import PhotoModerationModal from '@/components/features/sessions/PhotoModerationModal/PhotoModerationModal.vue';
 import { useManageSessionForm } from './ManageSessionForm.ts';
 import './ManageSessionForm.css';
 
@@ -199,6 +218,7 @@ const {
   state,
   statusLabel,
   sessionTitle,
+  sessionId,
   copyState,
   copyInviteLink,
   questCheckpoints,
@@ -211,6 +231,11 @@ const {
   confirmDialog,
   closeConfirmDialog,
   confirmCancelSession,
+  photoModerationModal,
+  pendingPhotosCount,
+  openPhotoModeration,
+  closePhotoModeration,
+  handlePhotoModerated,
   translateWithFallback,
   actionError,
 } = useManageSessionForm();
