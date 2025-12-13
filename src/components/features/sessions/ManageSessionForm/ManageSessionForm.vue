@@ -90,7 +90,7 @@
               <strong>{{ state.participants.current }}<template v-if="state.participants.max"> / {{ state.participants.max }}</template></strong>
             </span>
           </div>
-          <div class="info-row info-row--invite">
+          <div v-if="state.status === 'scheduled'" class="info-row info-row--invite">
             <span class="info-label">{{ $t('quests.sessions.managePage.sessionInfo.inviteLink') }}</span>
             <div class="invite-link-wrapper" @click="copyInviteLink">
               <span class="invite-link-text">{{ state.inviteLink || $t('quests.sessions.managePage.placeholders.notSet') }}</span>
