@@ -158,6 +158,12 @@ export interface SessionCancelledEvent {
     message: string;
 }
 
+export interface SessionEndedEvent {
+    sessionId: number;
+    endedAt: string;
+    message: string;
+}
+
 export interface UserJoinedEvent {
     userId: number;
     userName: string;

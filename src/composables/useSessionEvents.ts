@@ -9,6 +9,7 @@ import type {
     ParticipantJoinedEvent,
     ParticipantLeftEvent,
     SessionCancelledEvent,
+    SessionEndedEvent,
     ErrorResponse
 } from '@/types/session';
 
@@ -27,6 +28,7 @@ export interface UseSessionEventsOptions {
     onParticipantJoined?: (event: ParticipantJoinedEvent) => void;
     onParticipantLeft?: (event: ParticipantLeftEvent) => void;
     onSessionCancelled?: (event: SessionCancelledEvent) => void;
+    onSessionEnded?: (event: SessionEndedEvent) => void;
     onError?: (error: string) => void;
 }
 
@@ -46,7 +48,7 @@ export const useSessionEvents = (
     const isSubscribed = ref(false);
     const currentSessionId = ref<number | null>(null);
 
-    const { onParticipantJoined, onParticipantLeft, onSessionCancelled, onError } = options;
+    const { onParticipantJoined, onParticipantLeft, onSessionCancelled, onSessionEnded, onError } = options;
 
     const connect = () => {
         const token = getAccessToken();
@@ -132,6 +134,10 @@ export const useSessionEvents = (
 
         socket.on('session-cancelled', (event: SessionCancelledEvent) => {
             onSessionCancelled?.(event);
+        });
+
+        socket.on('session-ended', (event: SessionEndedEvent) => {
+            onSessionEnded?.(event);
         });
     };
 
