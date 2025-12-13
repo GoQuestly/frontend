@@ -676,6 +676,12 @@ const translateWithFallback = (key: string, fallback: string): string => {
         updateLastSyncTime();
     };
 
+    const handleSessionEndedEvent = (): void => {
+        state.status = 'completed';
+        stopTimer();
+        updateLastSyncTime();
+    };
+
     const handleParticipantRejected = (event: ParticipantRejectedEvent): void => {
         const participantIndex = state.participantsOverview.findIndex(
             p => p.participantId === event.participantId || p.userId === event.userId
@@ -862,6 +868,7 @@ const translateWithFallback = (key: string, fallback: string): string => {
             onParticipantJoined: handleParticipantJoined,
             onParticipantLeft: handleParticipantLeft,
             onSessionCancelled: handleSessionCancelledEvent,
+            onSessionEnded: handleSessionEndedEvent,
             onError: handleError,
         });
 
@@ -893,6 +900,7 @@ const translateWithFallback = (key: string, fallback: string): string => {
             onPhotoSubmitted: handlePhotoSubmitted,
             onPhotoModerated: handlePhotoModeratedEvent,
             onSessionCancelled: handleSessionCancelledEvent,
+            onSessionEnded: handleSessionEndedEvent,
             onParticipantRejected: handleParticipantRejected,
             onParticipantDisqualified: handleParticipantDisqualified,
             onError: handleError,

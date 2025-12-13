@@ -13,6 +13,7 @@
       </div>
       <div class="manage-session__actions">
         <BaseButton
+          v-if="state.status === 'scheduled'"
           variant="secondary"
           class="action-btn action-btn--edit"
           @click="handleEditSession"
@@ -30,9 +31,10 @@
           <span v-if="pendingPhotosCount > 0" class="badge">{{ pendingPhotosCount }}</span>
         </BaseButton>
         <BaseButton
+          v-if="state.status === 'scheduled' || state.status === 'in-progress'"
           variant="secondary"
           class="action-btn action-btn--cancel"
-          :disabled="state.isActionLoading || state.status === 'cancelled'"
+          :disabled="state.isActionLoading"
           @click="handleCancelSession"
         >
           {{ state.isActionLoading ? $t('common.loading') : $t('quests.sessions.managePage.actions.cancel') }}
