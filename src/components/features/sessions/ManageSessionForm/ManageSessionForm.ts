@@ -16,11 +16,12 @@ import type {
     ParticipantLocation,
     ParticipantPointPassedEvent,
     ParticipantRejectedEvent,
-    PhotoSubmittedEvent,
     PhotoModeratedEvent,
+    PhotoSubmittedEvent,
     QuestSessionDetail,
     ScoresUpdatedEvent,
     SessionParticipant,
+    SessionResultsResponse,
     SessionStatus,
     TaskCompletedEvent,
     UserJoinedEvent,
@@ -75,12 +76,15 @@ interface ManageSessionState {
     questDescription?: string;
     startPointName?: string;
     showCheckpoints: boolean;
+    showRoutes: boolean;
+    selectedParticipantId: number | null;
     liveMode: boolean;
     lastSync: string;
     sessionTimer: string;
     mapMarkers: MapMarker[];
     participantsOverview: ParticipantOverview[];
     participantLocations: Map<number, ParticipantLocation>;
+    sessionResults: SessionResultsResponse | null;
     isLoading: boolean;
     error: string;
     isActionLoading: boolean;
@@ -173,6 +177,9 @@ export const useManageSessionForm = () => {
         ],
         participantsOverview: [],
         participantLocations: new Map(),
+        sessionResults: null,
+        showRoutes: false,
+        selectedParticipantId: null as number | null,
         isLoading: false,
         error: '',
         isActionLoading: false,
@@ -190,6 +197,38 @@ export const useManageSessionForm = () => {
             );
             return participant && participant.participationStatus !== 'rejected' && participant.participationStatus !== 'disqualified';
         });
+    });
+
+    const participantRoutes = computed(() => {
+        if (!state.sessionResults || !state.sessionResults.rankings || !state.showRoutes) {
+            return [];
+        }
+
+        const COLORS = [
+            '#3b82f6',
+            '#8b5cf6',
+            '#f59e0b',
+            '#22c55e',
+            '#ef4444',
+            '#ec4899',
+            '#06b6d4',
+            '#f97316',
+        ];
+
+        let rankings = state.sessionResults.rankings.filter(ranking => ranking.route && ranking.route.length > 0);
+
+        if (state.selectedParticipantId !== null) {
+            rankings = rankings.filter(ranking => ranking.participantId === state.selectedParticipantId);
+        }
+
+        return rankings.map((ranking, index) => ({
+            participantId: ranking.participantId,
+            userName: ranking.userName,
+            photoUrl: ranking.photoUrl,
+            route: ranking.route || '',
+            color: COLORS[index % COLORS.length],
+            rank: ranking.rank,
+        }));
     });
 
     const statusLabel = computed(() => {
@@ -272,6 +311,16 @@ export const useManageSessionForm = () => {
         );
     };
 
+    const loadSessionResults = async (): Promise<void> => {
+        if (!sessionId.value) return;
+
+        try {
+            state.sessionResults = await sessionApi.getSessionResults(sessionId.value);
+        } catch (error) {
+            console.error('Failed to load session results:', error);
+        }
+    };
+
     const loadSession = async (): Promise<void> => {
         if (!sessionId.value) {
             state.error = $t('quests.sessions.managePage.errors.noSession');
@@ -299,6 +348,10 @@ export const useManageSessionForm = () => {
             }
 
             updateFromDetail(detail, quest?.maxParticipantCount, quest?.description, quest?.title, scoresMap);
+
+            if (state.status === 'completed' || state.status === 'cancelled') {
+                await loadSessionResults();
+            }
         } catch (error) {
             state.error = $t('quests.sessions.managePage.errors.loadFailed');
         } finally {
@@ -671,15 +724,17 @@ const translateWithFallback = (key: string, fallback: string): string => {
         updateLastSyncTime();
     };
 
-    const handleSessionCancelledEvent = (): void => {
+    const handleSessionCancelledEvent = async (): Promise<void> => {
         state.status = 'cancelled';
         updateLastSyncTime();
+        await loadSessionResults();
     };
 
-    const handleSessionEndedEvent = (): void => {
+    const handleSessionEndedEvent = async (): Promise<void> => {
         state.status = 'completed';
         stopTimer();
         updateLastSyncTime();
+        await loadSessionResults();
     };
 
     const handleParticipantRejected = (event: ParticipantRejectedEvent): void => {
@@ -920,6 +975,16 @@ const translateWithFallback = (key: string, fallback: string): string => {
         void loadPendingPhotosCount();
     };
 
+    const selectParticipant = (participantId: number | null): void => {
+        if (state.selectedParticipantId === participantId) {
+            state.selectedParticipantId = null;
+            state.showRoutes = false;
+        } else {
+            state.selectedParticipantId = participantId;
+            state.showRoutes = true;
+        }
+    };
+
     onMounted(async () => {
         await getServerTime();
 
@@ -961,6 +1026,8 @@ const translateWithFallback = (key: string, fallback: string): string => {
         loadSession,
         questCheckpoints,
         participantLocationsArray,
+        participantRoutes,
+        selectParticipant,
         handleEditSession,
         handleCancelSession,
         editModal,

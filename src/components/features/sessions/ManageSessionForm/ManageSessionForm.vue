@@ -55,7 +55,9 @@
           <SessionMapView
             :checkpoints="questCheckpoints"
             :participants="participantLocationsArray"
+            :participant-routes="participantRoutes"
             :show-checkpoints="state.showCheckpoints"
+            :show-routes="state.showRoutes"
             :show-legend="true"
           />
         </div>
@@ -109,7 +111,7 @@
           </div>
         </div>
 
-        <div class="info-card participants-card">
+        <div v-if="state.status !== 'completed' && state.status !== 'cancelled'" class="info-card participants-card">
           <div class="card-header">
             <p class="card-title">{{ $t('quests.sessions.managePage.participants.title') }}</p>
           </div>
@@ -160,6 +162,71 @@
                   ></div>
                 </div>
                 <span class="progress-value">{{ participant.progress }}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="(state.status === 'completed' || state.status === 'cancelled') && state.sessionResults" class="info-card results-card">
+          <div class="card-header">
+            <p class="card-title">{{ $t('quests.sessions.managePage.results.title') }}</p>
+          </div>
+
+          <div class="results-section">
+            <p class="results-section-title">{{ $t('quests.sessions.managePage.results.statistics.title') }}</p>
+            <div class="stats-grid">
+              <div class="stat-item">
+                <span class="stat-label">{{ $t('quests.sessions.managePage.results.statistics.duration') }}</span>
+                <span class="stat-value">{{ formatDurationFromSeconds(state.sessionResults.statistics.sessionDurationSeconds) }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">{{ $t('quests.sessions.managePage.results.statistics.totalParticipants') }}</span>
+                <span class="stat-value">{{ state.sessionResults.statistics.totalParticipantsCount }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">{{ $t('quests.sessions.managePage.results.statistics.finishedParticipants') }}</span>
+                <span class="stat-value">{{ state.sessionResults.statistics.finishedParticipantsCount }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">{{ $t('quests.sessions.managePage.results.statistics.didNotFinish') }}</span>
+                <span class="stat-value">{{ state.sessionResults.statistics.rejectedParticipantsCount + state.sessionResults.statistics.disqualifiedParticipantsCount }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="results-section">
+            <p class="results-section-title">{{ $t('quests.sessions.managePage.results.rankings.title') }}</p>
+            <div class="rankings-list">
+              <div
+                v-for="ranking in state.sessionResults.rankings"
+                :key="ranking.participantId"
+                class="ranking-item"
+                :class="{
+                  'ranking-item--selected': state.selectedParticipantId === ranking.participantId,
+                  'ranking-item--has-route': ranking.route && ranking.route.length > 0
+                }"
+                @click="ranking.route && ranking.route.length > 0 ? selectParticipant(ranking.participantId) : null"
+              >
+                <div class="ranking-header">
+                  <div class="ranking-rank">{{ ranking.rank }}</div>
+                  <div class="ranking-avatar-wrapper">
+                    <div class="ranking-avatar" :class="{ 'ranking-avatar--image': ranking.photoUrl }">
+                      <img v-if="ranking.photoUrl" :src="ranking.photoUrl" :alt="ranking.userName" class="ranking-avatar-img" />
+                      <span v-else>{{ ranking.userName.charAt(0).toUpperCase() }}</span>
+                    </div>
+                  </div>
+                  <div class="ranking-info">
+                    <p class="ranking-name">{{ ranking.userName }}</p>
+                    <div class="ranking-details">
+                      <span class="ranking-detail">{{ ranking.totalScore }} {{ $t('quests.sessions.managePage.results.rankings.score') }}</span>
+                      <span class="ranking-detail">{{ ranking.passedCheckpointsCount }} {{ $t('quests.sessions.managePage.results.rankings.checkpoints') }}</span>
+                    </div>
+                  </div>
+                  <div class="ranking-time">
+                    <span v-if="ranking.completionTimeSeconds">{{ formatDurationFromSeconds(ranking.completionTimeSeconds) }}</span>
+                    <span v-else class="ranking-dnf">{{ $t('quests.sessions.managePage.results.rankings.notFinished') }}</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -225,6 +292,8 @@ const {
   copyInviteLink,
   questCheckpoints,
   participantLocationsArray,
+  participantRoutes,
+  selectParticipant,
   handleEditSession,
   handleCancelSession,
   editModal,
@@ -241,4 +310,15 @@ const {
   translateWithFallback,
   actionError,
 } = useManageSessionForm();
+
+const formatDurationFromSeconds = (seconds: number): string => {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+
+  if (hours > 0) {
+    return `${hours}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  }
+  return `${minutes}:${String(secs).padStart(2, '0')}`;
+};
 </script>

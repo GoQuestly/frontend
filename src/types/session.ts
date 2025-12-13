@@ -301,3 +301,29 @@ export interface ModeratePhotoResponse {
     success: boolean;
     message?: string;
 }
+
+export interface SessionStatistics {
+    sessionDurationSeconds: number;
+    totalParticipantsCount: number;
+    finishedParticipantsCount: number;
+    rejectedParticipantsCount: number;
+    disqualifiedParticipantsCount: number;
+}
+
+export interface ParticipantRanking {
+    rank: number;
+    participantId: number;
+    userId: number;
+    userName: string;
+    photoUrl?: string | null;
+    totalScore: number;
+    passedCheckpointsCount: number;
+    finishDate?: string | null;
+    completionTimeSeconds?: number | null;
+    route?: string | null;
+}
+
+export interface SessionResultsResponse {
+    statistics: SessionStatistics;
+    rankings: ParticipantRanking[];
+}

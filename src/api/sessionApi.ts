@@ -8,7 +8,8 @@ import type {
     SessionScoresResponse,
     PendingPhotoForModeration,
     ModeratePhotoRequest,
-    ModeratePhotoResponse
+    ModeratePhotoResponse,
+    SessionResultsResponse
 } from '@/types/session';
 
 export const sessionApi = {
@@ -84,6 +85,13 @@ export const sessionApi = {
         const response = await apiClient.post<ModeratePhotoResponse>(
             `/organizer/sessions/${sessionId}/photos/${photoId}/moderate`,
             data
+        );
+        return response.data;
+    },
+
+    async getSessionResults(sessionId: number): Promise<SessionResultsResponse> {
+        const response = await apiClient.get<SessionResultsResponse>(
+            `/organizer/sessions/${sessionId}/results`
         );
         return response.data;
     },

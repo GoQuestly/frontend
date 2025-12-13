@@ -19,6 +19,7 @@ import { ref, onMounted, watch, onBeforeUnmount, withDefaults } from 'vue';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { getDefaultCoordinates } from '@/utils/geolocation';
+import { decodePolyline } from '@/utils/polyline';
 import type { ParticipantLocation } from '@/types/session';
 
 interface Checkpoint {
@@ -29,11 +30,22 @@ interface Checkpoint {
   order: number;
 }
 
+interface ParticipantRoute {
+  participantId: number;
+  userName: string;
+  photoUrl?: string | null;
+  route: string;
+  color?: string;
+  rank?: number;
+}
+
 interface Props {
   checkpoints?: Checkpoint[];
   participants?: ParticipantLocation[];
+  participantRoutes?: ParticipantRoute[];
   showCheckpoints?: boolean;
   showPaths?: boolean;
+  showRoutes?: boolean;
   showLegend?: boolean;
   center?: { lat: number; lng: number };
   zoom?: number;
@@ -42,8 +54,10 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   checkpoints: () => [],
   participants: () => [],
+  participantRoutes: () => [],
   showCheckpoints: true,
   showPaths: false,
+  showRoutes: false,
   showLegend: true,
   center: () => getDefaultCoordinates(),
   zoom: 12,
@@ -54,6 +68,7 @@ let map: L.Map | null = null;
 let checkpointMarkers: Map<string, L.Marker> = new Map();
 let participantMarkers: Map<number, L.Marker> = new Map();
 let pathPolyline: L.Polyline | null = null;
+let routePolylines: Map<number, L.Polyline> = new Map();
 let isInitialBoundsSet = false;
 let markerAnimations: Map<number, number> = new Map();
 
@@ -444,9 +459,50 @@ const adjustMapBounds = () => {
   }
 };
 
+const updateParticipantRoutes = () => {
+  if (!map) return;
+
+  routePolylines.forEach(polyline => map?.removeLayer(polyline));
+  routePolylines.clear();
+
+  if (!props.showRoutes || !props.participantRoutes || props.participantRoutes.length === 0) {
+    return;
+  }
+
+  props.participantRoutes.forEach((participantRoute, index) => {
+    if (!participantRoute.route) return;
+
+    const coordinates = decodePolyline(participantRoute.route);
+    if (coordinates.length === 0) return;
+
+    const latLngs = coordinates.map(coord => [coord.lat, coord.lng] as L.LatLngExpression);
+
+    const color = participantRoute.color || getColorForParticipant(index);
+    const weight = participantRoute.rank === 1 ? 4 : 3;
+    const opacity = participantRoute.rank === 1 ? 0.9 : 0.7;
+
+    const polyline = L.polyline(latLngs, {
+      color: color,
+      weight: weight,
+      opacity: opacity,
+    }).addTo(map!);
+
+    const popupContent = `
+      <div style="font-family: inherit;">
+        <strong>${participantRoute.userName}</strong>
+        ${participantRoute.rank ? `<br/><span style="font-size: 0.9em;">Rank: ${participantRoute.rank}</span>` : ''}
+      </div>
+    `;
+    polyline.bindPopup(popupContent);
+
+    routePolylines.set(participantRoute.participantId, polyline);
+  });
+};
+
 const updateMap = () => {
   updateCheckpoints();
   updateParticipants();
+  updateParticipantRoutes();
 };
 
 watch(() => props.checkpoints, () => {
@@ -457,6 +513,10 @@ watch(() => props.participants, () => {
   updateParticipants();
 }, { deep: true });
 
+watch(() => props.participantRoutes, () => {
+  updateParticipantRoutes();
+}, { deep: true });
+
 watch(() => props.showCheckpoints, () => {
   updateCheckpoints();
 });
@@ -465,11 +525,18 @@ watch(() => props.showPaths, () => {
   updatePath();
 });
 
+watch(() => props.showRoutes, () => {
+  updateParticipantRoutes();
+});
+
 onBeforeUnmount(() => {
   markerAnimations.forEach((animationId) => {
     cancelAnimationFrame(animationId);
   });
   markerAnimations.clear();
+
+  routePolylines.forEach(polyline => map?.removeLayer(polyline));
+  routePolylines.clear();
 
   if (map) {
     map.remove();
