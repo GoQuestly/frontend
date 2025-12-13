@@ -433,8 +433,9 @@ export default {
                     codeWordRequired: 'Кодове слово обов\'язкове',
                     checkpointNotFound: 'Контрольну точку не знайдено',
                     taskSaved: 'Завдання успішно збережено',
-                    taskSaveFailed: 'Не вдалося зберегти завдання',
+                    taskSaveFailed: 'Щось пішло не так. Спробуйте ще раз пізніше.',
                     taskLoadFailed: 'Не вдалося завантажити завдання',
+                    taskDeleteFailed: 'Щось пішло не так. Спробуйте ще раз пізніше.',
                 },
             },
             step4: {

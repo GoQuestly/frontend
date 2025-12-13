@@ -82,7 +82,7 @@
           </div>
           <div class="info-row">
             <span class="info-label">{{ $t('quests.sessions.managePage.sessionInfo.startTime') }}</span>
-            <span class="info-value">{{ state.startTime || $t('quests.sessions.managePage.placeholders.notSet') }}</span>
+            <span class="info-value">{{ startTime || $t('quests.sessions.managePage.placeholders.notSet') }}</span>
           </div>
           <div v-if="state.sessionTimer" class="info-row">
             <span class="info-label">{{ state.status === 'scheduled' ? $t('quests.sessions.managePage.sessionInfo.countdown') : $t('quests.sessions.managePage.sessionInfo.duration') }}</span>
@@ -264,6 +264,7 @@
 
     <PhotoModerationModal
       v-if="sessionId"
+      ref="photoModerationModalRef"
       :sessionId="sessionId"
       :isOpen="photoModerationModal.isOpen"
       @close="closePhotoModeration"
@@ -288,6 +289,7 @@ const {
   statusLabel,
   sessionTitle,
   sessionId,
+  startTime,
   copyState,
   copyInviteLink,
   questCheckpoints,
@@ -303,6 +305,7 @@ const {
   closeConfirmDialog,
   confirmCancelSession,
   photoModerationModal,
+  photoModerationModalRef,
   pendingPhotosCount,
   openPhotoModeration,
   closePhotoModeration,

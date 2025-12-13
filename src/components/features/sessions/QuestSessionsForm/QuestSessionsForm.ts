@@ -1,10 +1,11 @@
-import { onMounted, onUnmounted, reactive, ref } from 'vue';
+import { onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { questsApi } from '@/api/questsApi';
 import { sessionApi } from '@/api/sessionApi';
 import { showTemporaryMessage } from '@/utils/messages';
 import { MESSAGE_TIMEOUT_MS } from '@/utils/constants';
+import { formatDateTime } from '@/utils/format';
 import type { SessionCardProps } from '@/components/common/SessionCard/SessionCard';
 import type {
     CreateQuestSessionRequest,
@@ -18,7 +19,7 @@ export const useQuestSessionsForm = () => {
     const route = useRoute();
     const router = useRouter();
     const questId = Number(route.params.questId);
-    const { t: $t } = useI18n();
+    const { t: $t, locale } = useI18n();
 
     const state = reactive<QuestSessionsState>({
         quest: null,
@@ -39,6 +40,7 @@ export const useQuestSessionsForm = () => {
     const editError = ref('');
     const sessionStartTimes = ref<number[]>([]);
     const checkpointsCount = ref(0);
+    const rawSessions = ref<QuestSessionResponse[]>([]);
 
     const getMinStartDate = (): Date => {
         const date = new Date();
@@ -53,18 +55,6 @@ export const useQuestSessionsForm = () => {
     };
 
     const minStartDate = ref(formatDateTimeLocal(getMinStartDate()));
-
-    const formatStart = (dateString: string | null): string => {
-        if (!dateString) return '';
-        const date = new Date(dateString);
-        return date.toLocaleString(undefined, {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: 'numeric',
-            minute: '2-digit',
-        });
-    };
 
     const mapStatus = (session: QuestSessionResponse): SessionStatus => {
         if (session.endReason === 'cancelled') return 'cancelled';
@@ -89,7 +79,7 @@ export const useQuestSessionsForm = () => {
             name: data.questTitleShort || data.questTitle || `${$t('quests.sessions.session')} ${data.questSessionId}`,
             status,
             statusLabel,
-            start: formatStart(data.startDate),
+            start: formatDateTime(data.startDate, locale.value),
             participants: maxParticipants
                 ? `${data.participantCount} / ${maxParticipants}`
                 : `${data.participantCount}`,
@@ -118,14 +108,13 @@ export const useQuestSessionsForm = () => {
             checkpointsCount.value = checkpoints.length;
 
             state.totalPages = Math.max(1, Math.ceil((sessionsResponse.total || 0) / state.pageSize));
-            state.sessions = (sessionsResponse.items || []).map((session: QuestSessionResponse) =>
-                mapSession(session, quest.maxParticipantCount)
-            );
+            rawSessions.value = sessionsResponse.items || [];
             sessionStartTimes.value = (sessionsResponse.items || [])
                 .map((session: QuestSessionResponse) => new Date(session.startDate || '').getTime())
                 .filter((time: number) => !Number.isNaN(time));
         } catch (error: any) {
             state.error = $t('quests.sessions.loadFailed');
+            rawSessions.value = [];
             state.sessions = [];
             sessionStartTimes.value = [];
             checkpointsCount.value = 0;
@@ -133,6 +122,10 @@ export const useQuestSessionsForm = () => {
             state.isLoading = false;
         }
     };
+
+    watch([locale, rawSessions, () => state.quest?.maxParticipants], () => {
+        state.sessions = rawSessions.value.map((session) => mapSession(session, state.quest?.maxParticipants));
+    }, { deep: true });
 
     const openCreateModal = (): void => {
         if (checkpointsCount.value === 0) {
@@ -180,7 +173,6 @@ export const useQuestSessionsForm = () => {
             return;
         }
 
-        // Dynamic validation: check if start date is at least 1 minute in the future
         const selectedDate = new Date(startDateIso);
         const minAllowedDate = getMinStartDate();
 
@@ -189,17 +181,13 @@ export const useQuestSessionsForm = () => {
             return;
         }
 
-        // Validate minimum gap between sessions based on estimated duration
         if (state.quest?.maxDurationMinutes) {
             const newSessionTime = selectedDate.getTime();
             const estimatedDurationMs = state.quest.maxDurationMinutes * 60 * 1000;
 
-            // Fetch all sessions to check for conflicts
             const allSessions = await fetchAllSessionsForQuest(questId);
 
-            // Only consider scheduled and active sessions (exclude completed and cancelled)
             const activeSessions = allSessions.filter((session) => {
-                // Session is completed if it has an endDate or is cancelled
                 return !session.endDate && session.endReason !== 'cancelled';
             });
 

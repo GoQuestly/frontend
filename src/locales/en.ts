@@ -436,8 +436,9 @@ export default {
                     codeWordRequired: 'Code word is required',
                     checkpointNotFound: 'Checkpoint not found',
                     taskSaved: 'Task saved successfully',
-                    taskSaveFailed: 'Failed to save task',
+                    taskSaveFailed: 'Something went wrong. Please try again later.',
                     taskLoadFailed: 'Failed to load task',
+                    taskDeleteFailed: 'Something went wrong. Please try again later.',
                 },
             },
             step4: {

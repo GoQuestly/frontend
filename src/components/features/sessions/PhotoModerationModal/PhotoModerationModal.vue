@@ -230,6 +230,10 @@ watch(() => props.isOpen, (newVal) => {
     rejectionReason.value = '';
   }
 });
+
+defineExpose({
+  refresh: loadPendingPhotos,
+});
 </script>
 
 <style scoped>

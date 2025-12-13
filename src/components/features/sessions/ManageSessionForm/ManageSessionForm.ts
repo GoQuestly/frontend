@@ -8,6 +8,7 @@ import {useActiveSession} from '@/composables/useActiveSession';
 import {useSessionEvents} from '@/composables/useSessionEvents';
 import {showTemporaryMessage} from '@/utils/messages';
 import {MESSAGE_TIMEOUT_MS} from '@/utils/constants';
+import {formatDateTime, formatTime} from '@/utils/format';
 import type {
     LocationUpdatedEvent,
     ParticipantDisqualifiedEvent,
@@ -64,7 +65,6 @@ interface QuestCheckpoint {
 
 interface ManageSessionState {
     status: SessionStatus;
-    startTime: string;
     rawStartDate: string | null;
     rawEndDate: string | null;
     participants: {
@@ -104,18 +104,6 @@ const mapStatus = (data: QuestSessionDetail): SessionStatus => {
     return 'scheduled';
 };
 
-const formatStart = (value?: string | null): string => {
-    if (!value) return '';
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return '';
-    return date.toLocaleString(undefined, {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-    });
-};
 
 const mapParticipants = (
     participants: SessionParticipant[] = [],
@@ -145,7 +133,7 @@ const mapParticipants = (
 
 export const useManageSessionForm = () => {
     const route = useRoute();
-    const { t: $t } = useI18n();
+    const { t: $t, locale } = useI18n();
     const sessionIdParam = route.params.sessionId as string | undefined;
     const sessionId = computed(() => {
         const raw = Number(sessionIdParam);
@@ -154,7 +142,6 @@ export const useManageSessionForm = () => {
 
     const state = reactive<ManageSessionState>({
         status: 'scheduled',
-        startTime: '',
         rawStartDate: null,
         rawEndDate: null,
         participants: {
@@ -189,6 +176,8 @@ export const useManageSessionForm = () => {
     const questCheckpoints = ref<QuestCheckpoint[]>([]);
     const actionError = toRef(state, 'actionError');
     const successMessage = ref('');
+
+    const startTime = computed(() => formatDateTime(state.rawStartDate, locale.value) || '');
 
     const participantLocationsArray = computed(() => {
         return Array.from(state.participantLocations.values()).filter(location => {
@@ -290,7 +279,6 @@ export const useManageSessionForm = () => {
         scoresMap?: Map<number, { totalScore: number; completedTasksCount: number }>
     ) => {
         state.status = mapStatus(detail);
-        state.startTime = formatStart(detail.startDate) || '';
         state.rawStartDate = detail.startDate;
         state.rawEndDate = detail.endDate;
         state.participants.current = detail.participantCount ?? 0;
@@ -376,6 +364,7 @@ export const useManageSessionForm = () => {
         isOpen: false,
     });
 
+    const photoModerationModalRef = ref<{ refresh: () => Promise<void> } | null>(null);
     const pendingPhotosCount = ref(0);
 
     const openPhotoModeration = (): void => {
@@ -533,11 +522,7 @@ const translateWithFallback = (key: string, fallback: string): string => {
             updateParticipantsWithLocations();
 
             const now = new Date();
-            state.lastSync = now.toLocaleTimeString(undefined, {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            });
+            state.lastSync = formatTime(now, locale.value);
         } catch (error) {
             console.error(error)
         }
@@ -765,11 +750,7 @@ const translateWithFallback = (key: string, fallback: string): string => {
 
     const updateLastSyncTime = (): void => {
         const now = new Date();
-        state.lastSync = now.toLocaleTimeString(undefined, {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit'
-        });
+        state.lastSync = formatTime(now, locale.value);
     };
 
     const handleError = (error: string): void => {
@@ -964,6 +945,11 @@ const translateWithFallback = (key: string, fallback: string): string => {
 
     const handlePhotoSubmitted = (event: PhotoSubmittedEvent): void => {
         void loadPendingPhotosCount();
+
+        if (photoModerationModal.isOpen && photoModerationModalRef.value) {
+            void photoModerationModalRef.value.refresh();
+        }
+
         showTemporaryMessage(
             successMessage,
             $t('quests.sessions.managePage.events.photoSubmitted', { userName: event.userName }),
@@ -1021,6 +1007,7 @@ const translateWithFallback = (key: string, fallback: string): string => {
         statusLabel,
         sessionTitle,
         sessionId,
+        startTime,
         copyState,
         copyInviteLink,
         loadSession,
@@ -1037,6 +1024,7 @@ const translateWithFallback = (key: string, fallback: string): string => {
         closeConfirmDialog,
         confirmCancelSession,
         photoModerationModal,
+        photoModerationModalRef,
         pendingPhotosCount,
         openPhotoModeration,
         closePhotoModeration,

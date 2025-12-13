@@ -45,6 +45,38 @@ export const useCheckpointsSetup = (props: Props, emit: Emit) => {
         });
     };
 
+    const createInitialCheckpoint = async (): Promise<void> => {
+        if (!props.questId) {
+            return;
+        }
+
+        try {
+            const startLat = props.modelValue.startingLat;
+            const startLng = props.modelValue.startingLng;
+
+            const data = await questsApi.createCheckpoint(props.questId, {
+                name: 'Checkpoint 1',
+                latitude: startLat,
+                longitude: startLng,
+                orderNum: 1,
+            });
+
+            const newCheckpoint: Checkpoint = {
+                id: String(data.questPointId),
+                name: data.name,
+                latitude: data.latitude,
+                longitude: data.longitude,
+                questPointId: data.questPointId,
+            };
+
+            localData.checkpoints = [newCheckpoint];
+            selectedCheckpointId.value = newCheckpoint.id;
+            updateParent();
+        } catch (err: any) {
+
+        }
+    };
+
     const loadCheckpoints = async (): Promise<void> => {
         if (!props.questId) {
             localData.checkpoints = [];
@@ -66,11 +98,16 @@ export const useCheckpointsSetup = (props: Props, emit: Emit) => {
             }));
 
             updateParent();
+
+            if (localData.checkpoints.length === 0) {
+                await createInitialCheckpoint();
+            }
         } catch (err: any) {
             if (err.response?.status === 401) {
                 errorKey.value = 'quests.createQuest.errors.sessionExpired';
             } else if (err.response?.status === 500) {
                 localData.checkpoints = [];
+                await createInitialCheckpoint();
             } else {
                 errorKey.value = 'quests.createQuest.step2.errors.checkpointCreateFailed';
             }
@@ -228,11 +265,6 @@ export const useCheckpointsSetup = (props: Props, emit: Emit) => {
 
     const deleteCheckpoint = async (id: string): Promise<void> => {
         errorKey.value = '';
-
-        if (localData.checkpoints.length <= 1) {
-            errorKey.value = 'quests.createQuest.step2.errors.cannotDeleteLastCheckpoint';
-            return;
-        }
 
         const checkpoint = localData.checkpoints.find(cp => cp.id === id);
 

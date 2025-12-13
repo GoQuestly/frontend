@@ -53,3 +53,24 @@ export const formatCheckpoints = (
     return `${count} ${forms[formIndex]}`;
 };
 
+export const formatDateTime = (value: string | null, locale: string): string => {
+    if (!value) return '';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '';
+    return date.toLocaleString(locale, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+    });
+};
+
+export const formatTime = (date: Date, locale: string): string => {
+    return date.toLocaleTimeString(locale, {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    });
+};
+
