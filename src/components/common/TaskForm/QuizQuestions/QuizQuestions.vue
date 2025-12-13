@@ -31,6 +31,23 @@
         />
       </div>
 
+      <div class="multiple-correct-toggle">
+        <label class="toggle-label">
+          <RoundCheckbox
+              :model-value="question.allowMultipleCorrect || false"
+              :disabled="props.disabled"
+              @update:model-value="(value) => toggleMultipleCorrect(question.id, value)"
+          />
+          <span>{{ $t('quests.createQuest.step3.allowMultipleCorrect') }}</span>
+        </label>
+        <span class="mode-hint">
+          {{ question.allowMultipleCorrect
+            ? $t('quests.createQuest.step3.multipleCorrectHint')
+            : $t('quests.createQuest.step3.singleCorrectHint')
+          }}
+        </span>
+      </div>
+
       <div class="answer-options">
         <div
             v-for="(option, oIndex) in question.options"
@@ -147,9 +164,14 @@ function normalizeQuestion(question: Question): Question {
     normalizedOptions[0].isCorrect = true;
   }
 
+  // Auto-detect if question has multiple correct answers
+  const correctCount = normalizedOptions.filter(o => o.isCorrect).length;
+  const hasMultipleCorrect = correctCount > 1;
+
   return {
     ...question,
     options: normalizedOptions,
+    allowMultipleCorrect: question.allowMultipleCorrect ?? hasMultipleCorrect,
   };
 }
 
@@ -163,6 +185,7 @@ const addQuestion = (): void => {
     id: Date.now().toString(),
     text: '',
     points: '50',
+    allowMultipleCorrect: false,
     options: [
       { id: '1', text: '', isCorrect: true },
       { id: '2', text: '', isCorrect: false },
@@ -191,27 +214,56 @@ const deleteQuestion = async (questionId: string): Promise<void> => {
   }
 };
 
+const toggleMultipleCorrect = (questionId: string, value: boolean): void => {
+  const question = localQuestions.find(q => q.id === questionId);
+  if (!question) return;
+
+  question.allowMultipleCorrect = value;
+
+  // If switching to single-choice mode and multiple answers are selected,
+  // keep only the first correct answer
+  if (!value) {
+    const correctOptions = question.options.filter(opt => opt.isCorrect);
+    if (correctOptions.length > 1) {
+      question.options.forEach(opt => {
+        opt.isCorrect = opt.id === correctOptions[0].id;
+      });
+    }
+  }
+
+  emitUpdate();
+};
+
 const toggleCorrectAnswer = (questionId: string, optionId: string, value: boolean): void => {
   const question = localQuestions.find(q => q.id === questionId);
   if (!question) return;
 
-  if (value) {
-    question.options.forEach(option => {
-      option.isCorrect = option.id === optionId;
-    });
-  } else {
-    const hasOtherCorrect = question.options.some(opt => opt.isCorrect && opt.id !== optionId);
-    if (!hasOtherCorrect) {
-      question.options.forEach(opt => opt.isCorrect = false);
-      if (question.options.length > 0) {
-        question.options[0].isCorrect = true;
-      }
+  const option = question.options.find(opt => opt.id === optionId);
+  if (!option) return;
+
+  if (question.allowMultipleCorrect) {
+    // Multiple correct answers mode
+    if (value) {
+      option.isCorrect = true;
     } else {
-      question.options.forEach(option => {
-        if (option.id === optionId) {
-          option.isCorrect = false;
-        }
+      // Don't allow unchecking if it's the last correct answer
+      const correctCount = question.options.filter(opt => opt.isCorrect).length;
+      if (correctCount > 1) {
+        option.isCorrect = false;
+      } else {
+        // Keep at least one correct answer
+        return;
+      }
+    }
+  } else {
+    // Single correct answer mode
+    if (value) {
+      question.options.forEach(opt => {
+        opt.isCorrect = opt.id === optionId;
       });
+    } else {
+      // Don't allow unchecking in single-choice mode
+      return;
     }
   }
 
