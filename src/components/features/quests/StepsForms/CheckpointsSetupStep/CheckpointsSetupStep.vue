@@ -16,7 +16,7 @@
               :is-selected="selectedCheckpointId === checkpoint.id"
               class="checkpoint-item"
               :data-id="checkpoint.id"
-              :can-delete="true"
+              :can-delete="index !== 0 || localData.checkpoints.length > 1"
               :can-reorder="true"
               :allow-name-edit="true"
               :success-message="lastSavedCheckpointId === checkpoint.id ? successMessage : ''"

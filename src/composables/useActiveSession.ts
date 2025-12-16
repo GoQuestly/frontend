@@ -19,7 +19,8 @@ import type {
     PhotoModeratedEvent,
     ParticipantRejectedEvent,
     ParticipantDisqualifiedEvent,
-    SessionCancelledEvent
+    SessionCancelledEvent,
+    SessionEndedEvent
 } from '@/types/session';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -47,6 +48,7 @@ export interface UseActiveSessionOptions {
     onParticipantRejected?: (event: ParticipantRejectedEvent) => void;
     onParticipantDisqualified?: (event: ParticipantDisqualifiedEvent) => void;
     onSessionCancelled?: (event: SessionCancelledEvent) => void;
+    onSessionEnded?: (event: SessionEndedEvent) => void;
     onError?: (error: string) => void;
 }
 
@@ -82,6 +84,7 @@ export const useActiveSession = (
         onParticipantRejected,
         onParticipantDisqualified,
         onSessionCancelled,
+        onSessionEnded,
         onError
     } = options;
 
@@ -191,6 +194,10 @@ export const useActiveSession = (
 
         socket.on('session-cancelled', (event: SessionCancelledEvent) => {
             onSessionCancelled?.(event);
+        });
+
+        socket.on('session-ended', (event: SessionEndedEvent) => {
+            onSessionEnded?.(event);
         });
     };
 
