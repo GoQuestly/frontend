@@ -69,8 +69,6 @@ export const useCheckpointsSetup = (props: Props, emit: Emit) => {
         } catch (err: any) {
             if (err.response?.status === 401) {
                 errorKey.value = 'quests.createQuest.errors.sessionExpired';
-            } else if (err.response?.status === 500) {
-                localData.checkpoints = [];
             } else {
                 errorKey.value = 'quests.createQuest.step2.errors.checkpointCreateFailed';
             }
@@ -312,8 +310,6 @@ export const useCheckpointsSetup = (props: Props, emit: Emit) => {
         } catch (err: any) {
             if (err.response?.status === 401) {
                 errorKey.value = 'quests.createQuest.errors.sessionExpired';
-            } else if (err.response?.status === 500) {
-                errorKey.value = 'quests.createQuest.step2.errors.checkpointCreateFailed';
             } else {
                 errorKey.value = 'quests.createQuest.step2.errors.checkpointCreateFailed';
             }

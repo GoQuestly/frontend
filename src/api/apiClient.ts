@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getAccessToken, clearAuth } from '@/utils/storage';
+import { getAccessToken, clearAuth, getAdminToken, clearAdminAuth } from '@/utils/storage';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -12,9 +12,18 @@ export const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
     (config) => {
-        const accessToken = getAccessToken();
-        if (accessToken) {
-            config.headers.Authorization = `Bearer ${accessToken}`;
+        const isAdminEndpoint = config.url?.includes('/admin');
+
+        if (isAdminEndpoint) {
+            const adminToken = getAdminToken();
+            if (adminToken) {
+                config.headers.Authorization = `Bearer ${adminToken}`;
+            }
+        } else {
+            const accessToken = getAccessToken();
+            if (accessToken) {
+                config.headers.Authorization = `Bearer ${accessToken}`;
+            }
         }
         return config;
     },
@@ -30,9 +39,17 @@ apiClient.interceptors.response.use(
             error.config?.url?.includes('/auth/google') ||
             error.config?.url?.includes('/auth/verify-email');
 
-        if (error.response?.status === 401 && !isAuthEndpoint) {
-            clearAuth();
-            window.location.href = '/login';
+        const isAdminLoginEndpoint = error.config?.url?.includes('/admin/login');
+        const isAdminEndpoint = error.config?.url?.includes('/admin');
+
+        if (error.response?.status === 401 && !isAuthEndpoint && !isAdminLoginEndpoint) {
+            if (isAdminEndpoint) {
+                clearAdminAuth();
+                window.location.href = '/admin/login';
+            } else {
+                clearAuth();
+                window.location.href = '/login';
+            }
         }
 
         return Promise.reject(error);

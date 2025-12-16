@@ -285,6 +285,7 @@ export default {
             errors: {
                 saveFailed: 'Не вдалося зберегти квест. Спробуйте ще раз.',
                 uploadFailed: 'Не вдалося завантажити обкладинку. Спробуйте ще раз.',
+                updateFailed: 'Не вдалося оновити квест. Спробуйте ще раз.',
                 notAuthorized: 'Ви не авторизовані. Будь ласка, увійдіть в систему.',
                 sessionExpired: 'Ваша сесія закінчилася. Будь ласка, увійдіть знову.',
                 questNotCreated: 'Збережіть зміни.',
@@ -470,6 +471,74 @@ export default {
     },
     footer: {
         copyright: 'GoQuestly ©2025',
+    },
+    admin: {
+        login: {
+            title: 'Панель Адміністратора',
+            subtitle: 'Увійдіть для доступу до панелі адміністратора',
+        },
+        dashboard: {
+            title: 'Панель Адміністратора',
+            tabs: {
+                users: 'Управління Користувачами',
+                statistics: 'Статистика Платформи',
+            },
+        },
+        users: {
+            title: 'Управління Користувачами',
+            searchPlaceholder: 'Пошук за іменем або поштою...',
+            filters: {
+                all: 'Всі Користувачі',
+                active: 'Тільки Активні',
+                banned: 'Тільки Забанені',
+                verified: 'Тільки Верифіковані',
+                unverified: 'Тільки Неверифіковані',
+            },
+            columns: {
+                id: 'ID',
+                photo: 'Фото',
+                name: 'Ім\'я',
+                email: 'Пошта',
+                verified: 'Верифікація',
+                quests: 'Квести',
+                sessions: 'Сесії',
+                createdAt: 'Зареєстрований',
+                status: 'Статус',
+                actions: 'Дії',
+            },
+            verified: 'Верифікований',
+            unverified: 'Неверифікований',
+            active: 'Активний',
+            banned: 'Забанений',
+            page: 'Сторінка',
+            actions: {
+                ban: 'Забанити',
+                unban: 'Розбанити',
+            },
+            noUsers: 'Користувачів не знайдено',
+        },
+        statistics: {
+            title: 'Статистика Платформи',
+            period: 'Період',
+            periods: {
+                day: 'Останній День',
+                week: 'Останній Тиждень',
+                month: 'Останній Місяць',
+                allTime: 'Весь Час',
+            },
+            totalUsers: 'Всього Користувачів',
+            newUsers: 'Нових Користувачів',
+            totalQuests: 'Всього Квестів',
+            totalSessions: 'Всього Сесій',
+            completedSessions: 'Завершених Сесій',
+            completionRate: 'Рівень Завершення',
+            activeUsers: 'Активних Користувачів',
+            activeSessions: 'Активних Сесій',
+            userGrowth: 'Зростання Користувачів',
+        },
+        footer: {
+            copyright: '© GoQuestly. Всі права захищені.',
+        },
     },
     errors: {
         sessionExpired: 'Ваша сесія закінчилася. Будь ласка, увійдіть знову.',

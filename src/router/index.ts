@@ -5,7 +5,8 @@ import {
     setAccessToken,
     removePendingUserId,
     setUser,
-    clearAuth
+    clearAuth,
+    getAdminToken
 } from '@/utils/storage';
 import { isValidToken } from '@/utils/validation';
 import { authApi } from '@/api/authApi.ts';
@@ -116,6 +117,17 @@ const router = createRouter({
             component: () => import('../views/InviteView/InviteView.vue'),
         },
         {
+            path: '/admin/login',
+            name: 'admin-login',
+            component: () => import('../views/AdminLoginView/AdminLoginView.vue'),
+        },
+        {
+            path: '/admin/dashboard',
+            name: 'admin-dashboard',
+            component: () => import('../views/AdminDashboardView/AdminDashboardView.vue'),
+            meta: { requiresAdmin: true },
+        },
+        {
             path: '/:pathMatch(.*)*',
             name: 'NotFound',
             component: () => import('../views/NotFoundView/NotFoundView.vue'),
@@ -127,6 +139,18 @@ router.beforeEach(async (to, _from, next) => {
     const token = getAccessToken();
     const tokenValid = isValidToken(token);
     const user = getUser();
+    const adminToken = getAdminToken();
+    const adminTokenValid = isValidToken(adminToken);
+
+    if (to.meta.requiresAdmin) {
+        if (!adminTokenValid) {
+            return next({ name: 'admin-login', replace: true });
+        }
+    }
+
+    if (to.name === 'admin-login' && adminTokenValid) {
+        return next({ name: 'admin-dashboard', replace: true });
+    }
 
     if (to.meta.isAuthCallback) {
         const callbackToken = to.query.token as string;

@@ -80,7 +80,6 @@ const getInitialsFromName = (name: string): string => {
   return name.substring(0, 2).toUpperCase();
 };
 
-// Функція для плавного переміщення маркера
 const animateMarkerMove = (
   marker: L.Marker,
   participantId: number,

@@ -180,7 +180,6 @@ export const useQuestSessionsForm = () => {
             return;
         }
 
-        // Dynamic validation: check if start date is at least 1 minute in the future
         const selectedDate = new Date(startDateIso);
         const minAllowedDate = getMinStartDate();
 
@@ -189,17 +188,13 @@ export const useQuestSessionsForm = () => {
             return;
         }
 
-        // Validate minimum gap between sessions based on estimated duration
         if (state.quest?.maxDurationMinutes) {
             const newSessionTime = selectedDate.getTime();
             const estimatedDurationMs = state.quest.maxDurationMinutes * 60 * 1000;
 
-            // Fetch all sessions to check for conflicts
             const allSessions = await fetchAllSessionsForQuest(questId);
 
-            // Only consider scheduled and active sessions (exclude completed and cancelled)
             const activeSessions = allSessions.filter((session) => {
-                // Session is completed if it has an endDate or is cancelled
                 return !session.endDate && session.endReason !== 'cancelled';
             });
 
