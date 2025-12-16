@@ -295,7 +295,7 @@ export const useTaskAssignment = (props: Props, emit: Emit) => {
                 await questsApi.deleteTask(task.questTaskId);
                 showSuccess('Task deleted successfully');
             } catch (error: any) {
-                showError(error?.response?.data?.message || 'Failed to delete task');
+                showError(t('quests.createQuest.step3.errors.taskDeleteFailed'));
                 return;
             }
         }
@@ -336,7 +336,7 @@ export const useTaskAssignment = (props: Props, emit: Emit) => {
 
             showSuccess('All tasks saved successfully');
         } catch (error: any) {
-            showError(error?.response?.data?.message || error?.message || 'Failed to save tasks');
+            showError(t('quests.createQuest.step3.errors.taskSaveFailed'));
             throw error;
         } finally {
             isSaving.value = false;

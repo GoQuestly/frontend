@@ -11,6 +11,7 @@ export interface Question {
     text: string;
     options: AnswerOption[];
     points: string;
+    allowMultipleCorrect?: boolean;
 }
 
 export interface Task {

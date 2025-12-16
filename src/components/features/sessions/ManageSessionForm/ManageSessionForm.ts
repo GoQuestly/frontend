@@ -8,6 +8,7 @@ import {useActiveSession} from '@/composables/useActiveSession';
 import {useSessionEvents} from '@/composables/useSessionEvents';
 import {showTemporaryMessage} from '@/utils/messages';
 import {MESSAGE_TIMEOUT_MS} from '@/utils/constants';
+import {formatDateTime, formatTime} from '@/utils/format';
 import type {
     LocationUpdatedEvent,
     ParticipantDisqualifiedEvent,
@@ -16,11 +17,12 @@ import type {
     ParticipantLocation,
     ParticipantPointPassedEvent,
     ParticipantRejectedEvent,
-    PhotoSubmittedEvent,
     PhotoModeratedEvent,
+    PhotoSubmittedEvent,
     QuestSessionDetail,
     ScoresUpdatedEvent,
     SessionParticipant,
+    SessionResultsResponse,
     SessionStatus,
     TaskCompletedEvent,
     UserJoinedEvent,
@@ -63,7 +65,6 @@ interface QuestCheckpoint {
 
 interface ManageSessionState {
     status: SessionStatus;
-    startTime: string;
     rawStartDate: string | null;
     rawEndDate: string | null;
     participants: {
@@ -75,12 +76,15 @@ interface ManageSessionState {
     questDescription?: string;
     startPointName?: string;
     showCheckpoints: boolean;
+    showRoutes: boolean;
+    selectedParticipantId: number | null;
     liveMode: boolean;
     lastSync: string;
     sessionTimer: string;
     mapMarkers: MapMarker[];
     participantsOverview: ParticipantOverview[];
     participantLocations: Map<number, ParticipantLocation>;
+    sessionResults: SessionResultsResponse | null;
     isLoading: boolean;
     error: string;
     isActionLoading: boolean;
@@ -100,18 +104,6 @@ const mapStatus = (data: QuestSessionDetail): SessionStatus => {
     return 'scheduled';
 };
 
-const formatStart = (value?: string | null): string => {
-    if (!value) return '';
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return '';
-    return date.toLocaleString(undefined, {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-    });
-};
 
 const mapParticipants = (
     participants: SessionParticipant[] = [],
@@ -141,7 +133,7 @@ const mapParticipants = (
 
 export const useManageSessionForm = () => {
     const route = useRoute();
-    const { t: $t } = useI18n();
+    const { t: $t, locale } = useI18n();
     const sessionIdParam = route.params.sessionId as string | undefined;
     const sessionId = computed(() => {
         const raw = Number(sessionIdParam);
@@ -150,7 +142,6 @@ export const useManageSessionForm = () => {
 
     const state = reactive<ManageSessionState>({
         status: 'scheduled',
-        startTime: '',
         rawStartDate: null,
         rawEndDate: null,
         participants: {
@@ -173,6 +164,9 @@ export const useManageSessionForm = () => {
         ],
         participantsOverview: [],
         participantLocations: new Map(),
+        sessionResults: null,
+        showRoutes: false,
+        selectedParticipantId: null as number | null,
         isLoading: false,
         error: '',
         isActionLoading: false,
@@ -183,6 +177,8 @@ export const useManageSessionForm = () => {
     const actionError = toRef(state, 'actionError');
     const successMessage = ref('');
 
+    const startTime = computed(() => formatDateTime(state.rawStartDate, locale.value) || '');
+
     const participantLocationsArray = computed(() => {
         return Array.from(state.participantLocations.values()).filter(location => {
             const participant = state.participantsOverview.find(
@@ -190,6 +186,38 @@ export const useManageSessionForm = () => {
             );
             return participant && participant.participationStatus !== 'rejected' && participant.participationStatus !== 'disqualified';
         });
+    });
+
+    const participantRoutes = computed(() => {
+        if (!state.sessionResults || !state.sessionResults.rankings || !state.showRoutes) {
+            return [];
+        }
+
+        const COLORS = [
+            '#3b82f6',
+            '#8b5cf6',
+            '#f59e0b',
+            '#22c55e',
+            '#ef4444',
+            '#ec4899',
+            '#06b6d4',
+            '#f97316',
+        ];
+
+        let rankings = state.sessionResults.rankings.filter(ranking => ranking.route && ranking.route.length > 0);
+
+        if (state.selectedParticipantId !== null) {
+            rankings = rankings.filter(ranking => ranking.participantId === state.selectedParticipantId);
+        }
+
+        return rankings.map((ranking, index) => ({
+            participantId: ranking.participantId,
+            userName: ranking.userName,
+            photoUrl: ranking.photoUrl,
+            route: ranking.route || '',
+            color: COLORS[index % COLORS.length],
+            rank: ranking.rank,
+        }));
     });
 
     const statusLabel = computed(() => {
@@ -251,7 +279,6 @@ export const useManageSessionForm = () => {
         scoresMap?: Map<number, { totalScore: number; completedTasksCount: number }>
     ) => {
         state.status = mapStatus(detail);
-        state.startTime = formatStart(detail.startDate) || '';
         state.rawStartDate = detail.startDate;
         state.rawEndDate = detail.endDate;
         state.participants.current = detail.participantCount ?? 0;
@@ -270,6 +297,16 @@ export const useManageSessionForm = () => {
             $t('quests.sessions.managePage.participants.placeholderName'),
             scoresMap
         );
+    };
+
+    const loadSessionResults = async (): Promise<void> => {
+        if (!sessionId.value) return;
+
+        try {
+            state.sessionResults = await sessionApi.getSessionResults(sessionId.value);
+        } catch (error) {
+            console.error('Failed to load session results:', error);
+        }
     };
 
     const loadSession = async (): Promise<void> => {
@@ -299,6 +336,10 @@ export const useManageSessionForm = () => {
             }
 
             updateFromDetail(detail, quest?.maxParticipantCount, quest?.description, quest?.title, scoresMap);
+
+            if (state.status === 'completed' || state.status === 'cancelled') {
+                await loadSessionResults();
+            }
         } catch (error) {
             state.error = $t('quests.sessions.managePage.errors.loadFailed');
         } finally {
@@ -323,6 +364,7 @@ export const useManageSessionForm = () => {
         isOpen: false,
     });
 
+    const photoModerationModalRef = ref<{ refresh: () => Promise<void> } | null>(null);
     const pendingPhotosCount = ref(0);
 
     const openPhotoModeration = (): void => {
@@ -480,11 +522,7 @@ const translateWithFallback = (key: string, fallback: string): string => {
             updateParticipantsWithLocations();
 
             const now = new Date();
-            state.lastSync = now.toLocaleTimeString(undefined, {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            });
+            state.lastSync = formatTime(now, locale.value);
         } catch (error) {
             console.error(error)
         }
@@ -671,9 +709,17 @@ const translateWithFallback = (key: string, fallback: string): string => {
         updateLastSyncTime();
     };
 
-    const handleSessionCancelledEvent = (): void => {
+    const handleSessionCancelledEvent = async (): Promise<void> => {
         state.status = 'cancelled';
         updateLastSyncTime();
+        await loadSessionResults();
+    };
+
+    const handleSessionEndedEvent = async (): Promise<void> => {
+        state.status = 'completed';
+        stopTimer();
+        updateLastSyncTime();
+        await loadSessionResults();
     };
 
     const handleParticipantRejected = (event: ParticipantRejectedEvent): void => {
@@ -704,11 +750,7 @@ const translateWithFallback = (key: string, fallback: string): string => {
 
     const updateLastSyncTime = (): void => {
         const now = new Date();
-        state.lastSync = now.toLocaleTimeString(undefined, {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit'
-        });
+        state.lastSync = formatTime(now, locale.value);
     };
 
     const handleError = (error: string): void => {
@@ -862,6 +904,7 @@ const translateWithFallback = (key: string, fallback: string): string => {
             onParticipantJoined: handleParticipantJoined,
             onParticipantLeft: handleParticipantLeft,
             onSessionCancelled: handleSessionCancelledEvent,
+            onSessionEnded: handleSessionEndedEvent,
             onError: handleError,
         });
 
@@ -893,6 +936,7 @@ const translateWithFallback = (key: string, fallback: string): string => {
             onPhotoSubmitted: handlePhotoSubmitted,
             onPhotoModerated: handlePhotoModeratedEvent,
             onSessionCancelled: handleSessionCancelledEvent,
+            onSessionEnded: handleSessionEndedEvent,
             onParticipantRejected: handleParticipantRejected,
             onParticipantDisqualified: handleParticipantDisqualified,
             onError: handleError,
@@ -901,6 +945,11 @@ const translateWithFallback = (key: string, fallback: string): string => {
 
     const handlePhotoSubmitted = (event: PhotoSubmittedEvent): void => {
         void loadPendingPhotosCount();
+
+        if (photoModerationModal.isOpen && photoModerationModalRef.value) {
+            void photoModerationModalRef.value.refresh();
+        }
+
         showTemporaryMessage(
             successMessage,
             $t('quests.sessions.managePage.events.photoSubmitted', { userName: event.userName }),
@@ -910,6 +959,16 @@ const translateWithFallback = (key: string, fallback: string): string => {
 
     const handlePhotoModeratedEvent = (_event: PhotoModeratedEvent): void => {
         void loadPendingPhotosCount();
+    };
+
+    const selectParticipant = (participantId: number | null): void => {
+        if (state.selectedParticipantId === participantId) {
+            state.selectedParticipantId = null;
+            state.showRoutes = false;
+        } else {
+            state.selectedParticipantId = participantId;
+            state.showRoutes = true;
+        }
     };
 
     onMounted(async () => {
@@ -948,11 +1007,14 @@ const translateWithFallback = (key: string, fallback: string): string => {
         statusLabel,
         sessionTitle,
         sessionId,
+        startTime,
         copyState,
         copyInviteLink,
         loadSession,
         questCheckpoints,
         participantLocationsArray,
+        participantRoutes,
+        selectParticipant,
         handleEditSession,
         handleCancelSession,
         editModal,
@@ -962,6 +1024,7 @@ const translateWithFallback = (key: string, fallback: string): string => {
         closeConfirmDialog,
         confirmCancelSession,
         photoModerationModal,
+        photoModerationModalRef,
         pendingPhotosCount,
         openPhotoModeration,
         closePhotoModeration,
