@@ -3,6 +3,7 @@ import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { adminApi } from '@/api/adminApi';
 import { setAdminToken, setAdminEmail } from '@/utils/storage';
+import { isValidEmail, validatePasswordLength } from '@/utils/validation';
 
 export const useAdminLogin = () => {
   const router = useRouter();
@@ -15,6 +16,18 @@ export const useAdminLogin = () => {
 
   const handleSubmit = async () => {
     errorMessage.value = '';
+
+    if (!isValidEmail(email.value)) {
+      errorMessage.value = t('errors.invalidEmail');
+      return;
+    }
+
+    const passwordError = validatePasswordLength(password.value);
+    if (passwordError) {
+      errorMessage.value = t(`common.${passwordError}`);
+      return;
+    }
+
     isLoading.value = true;
 
     try {

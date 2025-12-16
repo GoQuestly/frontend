@@ -27,9 +27,16 @@ import { useAuth } from '@/composables/useAuth';
 import { handleLogoutLogic } from './LogoutButton';
 import './LogoutButton.css';
 
-const { logout } = useAuth();
+interface Props {
+  customLogout?: () => Promise<void>;
+}
+
+const props = defineProps<Props>();
+
+const { logout: defaultLogout } = useAuth();
 
 const handleLogout = async (): Promise<void> => {
-  await handleLogoutLogic(logout);
+  const logoutFn = props.customLogout || defaultLogout;
+  await handleLogoutLogic(logoutFn);
 };
 </script>
