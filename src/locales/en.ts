@@ -311,6 +311,7 @@ export default {
             errors: {
                 saveFailed: 'Failed to save quest. Please try again.',
                 uploadFailed: 'Failed to upload cover. Please try again.',
+                updateFailed: 'Failed to update quest. Please try again.',
                 notAuthorized: 'You are not authorized. Please sign in.',
                 sessionExpired: 'Your session expired. Please sign in again.',
                 questNotCreated: 'Save your changes first.',
@@ -500,6 +501,74 @@ export default {
     },
     footer: {
         copyright: 'GoQuestly ©2025',
+    },
+    admin: {
+        login: {
+            title: 'Admin Panel',
+            subtitle: 'Sign in to access admin dashboard',
+        },
+        dashboard: {
+            title: 'Admin Dashboard',
+            tabs: {
+                users: 'Users Management',
+                statistics: 'Platform Statistics',
+            },
+        },
+        users: {
+            title: 'Users Management',
+            searchPlaceholder: 'Search by name or email...',
+            filters: {
+                all: 'All Users',
+                active: 'Active Only',
+                banned: 'Banned Only',
+                verified: 'Verified Only',
+                unverified: 'Unverified Only',
+            },
+            columns: {
+                id: 'ID',
+                photo: 'Photo',
+                name: 'Name',
+                email: 'Email',
+                verified: 'Verification',
+                quests: 'Quests',
+                sessions: 'Sessions',
+                createdAt: 'Registered',
+                status: 'Status',
+                actions: 'Actions',
+            },
+            verified: 'Verified',
+            unverified: 'Unverified',
+            active: 'Active',
+            banned: 'Banned',
+            page: 'Page',
+            actions: {
+                ban: 'Ban',
+                unban: 'Unban',
+            },
+            noUsers: 'No users found',
+        },
+        statistics: {
+            title: 'Platform Statistics',
+            period: 'Period',
+            periods: {
+                day: 'Last Day',
+                week: 'Last Week',
+                month: 'Last Month',
+                allTime: 'All Time',
+            },
+            totalUsers: 'Total Users',
+            newUsers: 'New Users',
+            totalQuests: 'Total Quests',
+            totalSessions: 'Total Sessions',
+            completedSessions: 'Completed Sessions',
+            completionRate: 'Completion Rate',
+            activeUsers: 'Active Users',
+            activeSessions: 'Active Sessions',
+            userGrowth: 'User Growth',
+        },
+        footer: {
+            copyright: '© GoQuestly. All rights reserved.',
+        },
     },
     errors: {
         sessionExpired: 'Your session expired. Please sign in again.',

@@ -49,3 +49,16 @@ export const clearAuth = (): void => {
     removeUser();
     removePendingUserId();
 };
+
+export const getAdminToken = (): string | null => getItem('adminToken');
+export const setAdminToken = (token: string): void => setItem('adminToken', token);
+export const removeAdminToken = (): void => removeItem('adminToken');
+
+export const getAdminEmail = (): string | null => getItem('adminEmail');
+export const setAdminEmail = (email: string): void => setItem('adminEmail', email);
+export const removeAdminEmail = (): void => removeItem('adminEmail');
+
+export const clearAdminAuth = (): void => {
+    removeAdminToken();
+    removeAdminEmail();
+};

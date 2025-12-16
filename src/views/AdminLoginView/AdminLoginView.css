@@ -1,0 +1,91 @@
+.admin-login-view {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-primary);
+  padding: 1rem;
+  position: relative;
+  transition: background-color 0.3s ease;
+}
+
+.admin-login-container {
+  width: 100%;
+  max-width: 450px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.admin-login-card {
+  background-color: var(--bg-form);
+  border-radius: 12px;
+  padding: 2.5rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  transition: background-color 0.3s ease;
+  width: 100%;
+  min-height: 400px;
+}
+
+.toggles-container {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  gap: 0.5rem;
+  z-index: 1000;
+}
+
+.admin-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.admin-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+  transition: color 0.3s ease;
+}
+
+.admin-subtitle {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin: 0;
+  transition: color 0.3s ease;
+}
+
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.field-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  transition: color 0.3s ease;
+}
+
+.submit-button {
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 480px) {
+  .admin-login-card {
+    padding: 2rem 1.5rem;
+  }
+
+  .admin-title {
+    font-size: 1.75rem;
+  }
+}

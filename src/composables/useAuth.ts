@@ -42,6 +42,7 @@ export const useAuth = () => {
 
     const logout = async (): Promise<void> => {
         clearAuth();
+        localStorage.removeItem('createQuestDraft');
         token.value = null;
         currentUser.value = null;
         await router.replace('/login');

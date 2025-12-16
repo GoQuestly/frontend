@@ -207,7 +207,6 @@ export const useQuestInformationStep = (props: Props, emit: Emit) => {
 
     const validate = (): boolean => {
         errorKeys.coverImage = '';
-        errorKeys.coverImage = '';
 
         if (formRef.value && !formRef.value.checkValidity()) {
             formRef.value.reportValidity();
