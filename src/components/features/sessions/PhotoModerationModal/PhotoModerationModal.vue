@@ -66,9 +66,12 @@
                   <textarea
                     v-model="rejectionReason"
                     class="reject-textarea"
+                    :class="{ 'reject-textarea-error': rejectionReasonError }"
                     :placeholder="$t('quests.sessions.managePage.photoModeration.rejectionPlaceholder')"
                     rows="3"
+                    @input="rejectionReasonError = ''"
                   ></textarea>
+                  <span v-if="rejectionReasonError" class="reject-error">{{ rejectionReasonError }}</span>
                 </div>
 
                 <div class="photo-actions">
@@ -130,6 +133,7 @@ const errorMessage = ref('');
 const moderating = ref<number | null>(null);
 const showRejectInput = ref<number | null>(null);
 const rejectionReason = ref('');
+const rejectionReasonError = ref('');
 
 const getPhotoUrl = (photoUrl: string): string => {
   const baseUrl = import.meta.env.VITE_API_URL || 'https://api.go-questly.pp.ua/';
@@ -187,12 +191,13 @@ const handleApprove = async (photoId: number) => {
 const handleReject = async (photoId: number) => {
   if (showRejectInput.value === photoId) {
     if (!rejectionReason.value.trim()) {
-      errorMessage.value = t('quests.sessions.managePage.photoModeration.rejectionReason');
+      rejectionReasonError.value = t('quests.sessions.managePage.photoModeration.rejectionReason');
       return;
     }
 
     moderating.value = photoId;
     errorMessage.value = '';
+    rejectionReasonError.value = '';
 
     try {
       await sessionApi.moderatePhoto(props.sessionId, photoId, {
@@ -211,6 +216,7 @@ const handleReject = async (photoId: number) => {
   } else {
     showRejectInput.value = photoId;
     rejectionReason.value = '';
+    rejectionReasonError.value = '';
   }
 };
 
@@ -228,6 +234,7 @@ watch(() => props.isOpen, (newVal) => {
     loadPendingPhotos();
     showRejectInput.value = null;
     rejectionReason.value = '';
+    rejectionReasonError.value = '';
   }
 });
 
@@ -451,6 +458,20 @@ defineExpose({
 .reject-textarea:focus {
   outline: none;
   border-color: var(--color-primary);
+}
+
+.reject-textarea-error {
+  border-color: var(--color-danger);
+}
+
+.reject-textarea-error:focus {
+  border-color: var(--color-danger);
+}
+
+.reject-error {
+  color: var(--color-danger);
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
 }
 
 .photo-actions {
