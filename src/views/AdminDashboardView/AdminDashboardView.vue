@@ -6,9 +6,7 @@
         <div class="header-actions">
           <ThemeToggle />
           <LocaleToggle />
-          <BaseButton variant="secondary" @click="handleLogout">
-            {{ $t('common.logout') }}
-          </BaseButton>
+          <LogoutButton :custom-logout="handleAdminLogout" />
         </div>
       </div>
     </header>
@@ -42,9 +40,9 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import BaseButton from '@/components/base/BaseButton/BaseButton.vue';
 import ThemeToggle from '@/components/common/ThemeToggle/ThemeToggle.vue';
 import LocaleToggle from '@/components/common/LocaleToggle/LocaleToggle.vue';
+import LogoutButton from '@/components/common/LogoutButton/LogoutButton.vue';
 import Footer from '@/components/common/Footer/Footer.vue';
 import UsersManagementTab from '@/components/features/admin/UsersManagementTab/UsersManagementTab.vue';
 import StatisticsTab from '@/components/features/admin/StatisticsTab/StatisticsTab.vue';
@@ -53,9 +51,9 @@ import { clearAdminAuth } from '@/utils/storage';
 const router = useRouter();
 const activeTab = ref<'users' | 'statistics'>('users');
 
-const handleLogout = () => {
+const handleAdminLogout = async (): Promise<void> => {
   clearAdminAuth();
-  router.push({ name: 'admin-login' });
+  await router.push({ name: 'admin-login' });
 };
 </script>
 

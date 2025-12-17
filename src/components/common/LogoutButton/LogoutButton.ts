@@ -1,7 +1,5 @@
-import type { useAuth } from '@/composables/useAuth';
-
 export const handleLogoutLogic = async (
-    logout: ReturnType<typeof useAuth>['logout']
+    logout: () => Promise<void>
 ): Promise<void> => {
     await logout();
 };
